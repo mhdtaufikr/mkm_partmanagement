@@ -9,10 +9,6 @@
                     <div style="margin-left: -2px" class="nav-link-icon"><i class="fas fa-home"></i></div>
                     Home
                 </a>
-                <a class="nav-link" href="{{url('/form')}}">
-                    <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
-                    Loan Form
-                </a>
                  <!-- Sidenav Menu Heading (Master)-->
                  <div class="sidenav-menu-heading">Master</div>
                  <!-- Sidenav Accordion (Master)-->
