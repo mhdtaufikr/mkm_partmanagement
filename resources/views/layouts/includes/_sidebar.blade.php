@@ -19,6 +19,9 @@
                  </a>
                  <div class="collapse" id="collapsemaster" data-bs-parent="#accordionSidenav">
                     <nav class="sidenav-menu-nested nav">
+                        <a class="nav-link" href="{{url('/mst/machine/part')}}">Machine</a>
+                     </nav>
+                    <nav class="sidenav-menu-nested nav">
                         <a class="nav-link" href="{{url('/mst/sap/part')}}">SAP Part</a>
                      </nav>
                      <nav class="sidenav-menu-nested nav">

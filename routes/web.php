@@ -7,6 +7,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RulesController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MstPartSAPController;
+use App\Http\Controllers\MstMachinePartController;
+use App\Http\Controllers\MstPartRepairController;
 
 
 /*
@@ -48,9 +50,11 @@ Route::middleware(['auth'])->group(function () {
      Route::get('/user/revoke/{user}', [UserController::class, 'revoke'])->middleware(['checkRole:IT']);
      Route::get('/user/access/{user}', [UserController::class, 'access'])->middleware(['checkRole:IT']);
 
-
      //mstSAP Part
      Route::get('/mst/sap/part', [MstPartSAPController::class, 'sapPart'])->middleware(['checkRole:IT']);
-     Route::get('/mst/repair/part', [MstPartSAPController::class, 'repairPart'])->middleware(['checkRole:IT']);
+     Route::get('/mst/repair/part', [MstPartRepairController::class, 'repairPart'])->middleware(['checkRole:IT']);
 
+     //mstMachine Part
+     Route::get('/mst/machine/part', [MstMachinePartController::class, 'index'])->middleware(['checkRole:IT']);
+     Route::get('/mst/machine/detail/{id}', [MstMachinePartController::class, 'detail'])->middleware(['checkRole:IT']);
 });

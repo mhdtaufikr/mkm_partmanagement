@@ -19,7 +19,7 @@
         </div>
     </header>
 <!-- Main page content-->
-<div class="container-fluid px-4 mt-n10">       
+<div class="container-fluid px-4 mt-n10">
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -40,17 +40,17 @@
           <div class="col-12">
             <div class="card">
               <div class="card-header">
-                <h3 class="card-title">List of Asset</h3>
+                <h3 class="card-title">List of Repair Part</h3>
               </div>
-              
+
               <!-- /.card-header -->
               <div class="card-body">
                 <div class="row">
                     <div class="mb-3 col-sm-12">
                         <button type="button" class="btn btn-dark btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#modal-add">
-                            <i class="fas fa-plus-square"></i> 
+                            <i class="fas fa-plus-square"></i>
                           </button>
-                          
+
                           <!-- Modal -->
                           <div class="modal fade" id="modal-add" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">
                             <div class="modal-dialog">
@@ -85,7 +85,7 @@
                                             <div class="form-group mb-3">
                                                 <label for="qty">Asset Quantity</label>
                                                 <input class="form-control" name="qty" type="number" value="0" required>
-                                            </div>                                            
+                                            </div>
                                         </div>
                                         {{-- <div class="col-md-8">
                                             <div class="form-group">
@@ -108,23 +108,23 @@
                               </div>
                             </div>
                           </div>
-                          
+
 
                       <!--alert success -->
                       @if (session('status'))
                       <div class="alert alert-success alert-dismissible fade show" role="alert">
                         <strong>{{ session('status') }}</strong>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                      </div> 
+                      </div>
                     @endif
 
                     @if (session('failed'))
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                       <strong>{{ session('failed') }}</strong>
                       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div> 
+                    </div>
                   @endif
-                    
+
                       <!--alert success -->
                       <!--validasi form-->
                         @if (count($errors)>0)
@@ -140,7 +140,7 @@
                         @endif
                       <!--end validasi form-->
                 </div>
-                <div class="table-responsive"> 
+                <div class="table-responsive">
                 <table id="tableUser" class="table table-bordered table-striped">
                     <thead>
                         <tr>
@@ -226,7 +226,7 @@
                                         <div class="form-group mb-3">
                                             <label for="qty">Asset Quantity</label>
                                             <input value="{{$data->qty}}" class="form-control" name="qty" type="number" value="0" required>
-                                        </div>                                            
+                                        </div>
                                     </div>
                                     {{-- <div class="col-md-8">
                                         <div class="form-group">
@@ -290,7 +290,7 @@
                           <form action="{{ url('') }}" enctype="multipart/form-data" method="GET">
                           @csrf
                           <div class="modal-body">
-                            
+
                           </div>
                           <div class="modal-footer justify-content-between">
                             <button type="button" class="btn btn-dark btn-default" data-dismiss="modal">Close</button>
@@ -324,14 +324,14 @@
   <!-- /.content-wrapper -->
 </div>
 
-     
+
 </main>
 <!-- For Datatables -->
 <script>
     $(document).ready(function() {
       var table = $("#tableUser").DataTable({
-        "responsive": true, 
-        "lengthChange": false, 
+        "responsive": true,
+        "lengthChange": false,
         "autoWidth": false,
         // "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
       });

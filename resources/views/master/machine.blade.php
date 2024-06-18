@@ -40,7 +40,7 @@
           <div class="col-12">
             <div class="card">
               <div class="card-header">
-                <h3 class="card-title">List of Stock Part</h3>
+                <h3 class="card-title">List of Machine</h3>
               </div>
 
               <!-- /.card-header -->
@@ -140,44 +140,27 @@
                         @endif
                       <!--end validasi form-->
                 </div>
-                <div class="table-responsive">
+                <div class="table">
                 <table id="tableUser" class="table table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th>No</th>
-                            <th>Material</th>
-                            {{-- <th>Material Description</th> --}}
-                            <th>Plnt</th>
-                            <th>SLoc</th>
-                            <th>Beginning Qty</th>
-                            <th>Beginning Value</th>
-                            <th>Received Qty</th>
-                            <th>Received Value</th>
-                            <th>Consumed Qty</th>
-                            <th>Consumed Value</th>
-                            <th>Total Stock</th>
-                            <th>Total Value</th>
+                            <th>Machine Name</th>
+                            <th>Process</th>
+                            <th>Model</th>
+                            <th>Serial Number</th>
+                            <th>Date</th>
                             <th>Action</th>
-
-
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($item as $key => $data)
-                            <tr>
-                                <td>{{ $key + 1 }}</td>
-                                    <td>{{ $data->material }}</td>
-                                    {{-- <td>{{ $data->material_description }}</td> --}}
-                                    <td>{{ $data->plnt }}</td>
-                                    <td>{{ $data->sloc }}</td>
-                                    <td>{{ number_format($data->begining_qty, 0, '.', '') }} {{ $data->bun }}</td>
-                                    <td>{{ $data->currency }} {{ number_format($data->begining_value, 2) }}</td>
-                                    <td>{{ $data->received_qty }} {{ $data->bun }}</td>
-                                    <td>{{ $data->currency }} {{ number_format($data->received_value, 2) }}</td>
-                                    <td>{{ $data->consumed_qty }} {{ $data->bun }}</td>
-                                    <td>{{ $data->currency }} {{ number_format($data->consumed_value, 2) }}</td>
-                                    <td>{{ $data->total_stock }} {{ $data->bun }}</td>
-                                    <td>{{ $data->currency }} {{ number_format($data->total_value, 2) }}</td>
+                        @foreach($items as $data)
+                        <tr>
+                            <td>{{ $data->machine_name }}</td>
+                            <td>{{ $data->process }}</td>
+                            <td>{{ $data->model }}</td>
+                            <td>{{ $data->serial_number }}</td>
+                            <td>{{ $data->date }}</td>
+
                                <td>
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -186,13 +169,20 @@
                                     <ul class="dropdown-menu">
                                         <li>
                                             <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-update{{ $data->id }}">
-                                                <i class="fas fa-edit"></i> Edit Part
+                                                <i class="fas fa-edit"></i> Edit
                                             </button>
                                         </li>
                                         <li>
                                             <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-delete{{ $data->id }}">
-                                                <i class="fas fa-trash-alt"></i> Delete Part
+                                                <i class="fas fa-trash-alt"></i> Delete
                                             </button>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ url('/mst/machine/detail/'.encrypt($data->id)) }}">
+                                                <i class="fas fa-info"></i> Detail
+                                            </a>
+
+
                                         </li>
                                     </ul>
                                 </div>
