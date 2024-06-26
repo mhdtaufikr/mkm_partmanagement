@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class MachineSparePartsInventory extends Model
 {
     use HasFactory;
+
     protected $guarded = ['id'];
 
     public function part()
@@ -18,5 +19,10 @@ class MachineSparePartsInventory extends Model
     public function machine()
     {
         return $this->belongsTo(Machine::class, 'machine_id');
+    }
+
+    public function repairs()
+    {
+        return $this->hasMany(RepairPart::class, 'part_id', 'part_id');
     }
 }

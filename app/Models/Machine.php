@@ -14,4 +14,16 @@ class Machine extends Model
     {
         return $this->hasMany(MachineSparePartsInventory::class, 'machine_id');
     }
+
+    public function inventoryStatus()
+    {
+        return $this->hasManyThrough(
+            InventoryStatus::class,
+            MachineSparePartsInventory::class,
+            'machine_id', // Foreign key on MachineSparePartsInventory table
+            'part_id',    // Foreign key on InventoryStatus table
+            'id',         // Local key on Machine table
+            'part_id'     // Local key on MachineSparePartsInventory table
+        );
+    }
 }

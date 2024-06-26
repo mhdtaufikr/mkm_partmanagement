@@ -57,4 +57,5 @@ Route::middleware(['auth'])->group(function () {
      //mstMachine Part
      Route::get('/mst/machine/part', [MstMachinePartController::class, 'index'])->middleware(['checkRole:IT']);
      Route::get('/mst/machine/detail/{id}', [MstMachinePartController::class, 'detail'])->middleware(['checkRole:IT']);
+     Route::post('/mst/machine/repair', [MstMachinePartController::class, 'repair'])->middleware(['checkRole:IT']);
 });
