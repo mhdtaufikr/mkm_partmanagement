@@ -256,7 +256,7 @@
                                                             <div class="mb-3 form-group">
                                                                 <!-- Hidden input for the encrypted ID -->
 
-                                                                <input type="text" name="id" value="{{$part->id}}" hidden>
+                                                                <input type="text" name="id" value="{{$part->part_id}}" hidden>
                                                                 <label for="qty">Quantity</label>
                                                                 <input name="qty" class="form-control" type="number" required>
 
