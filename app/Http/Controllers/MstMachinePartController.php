@@ -69,7 +69,6 @@ class MstMachinePartController extends Controller
         'estimation_lifetime' => 'required|integer',
         'last_replace' => 'required|date',
         'safety_stock' => 'required|integer',
-        'repair_stock' => 'required|numeric',
     ]);
 
     // Retrieve the part data from the Part model
@@ -86,7 +85,6 @@ class MstMachinePartController extends Controller
     $inventory->last_replace = $validatedData['last_replace'];
     $inventory->safety_stock = $validatedData['safety_stock'];
     $inventory->sap_stock = $part->total_stock;
-    $inventory->repair_stock = $validatedData['repair_stock'];
     $inventory->created_at = now();
     $inventory->updated_at = now();
 

@@ -197,6 +197,8 @@
                                 <input name="estimation_lifetime" class="form-control" type="number" required>
                                 <label for="last_replace">Last Replace</label>
                                 <input name="last_replace" class="form-control" type="date" required>
+                                <label for="sap_stock">SAP Stock</label>
+                                <input name="sap_stock" id="sap_stock" class="form-control" type="number" step="0.01" required disabled>
                             </div>
                             <div class="col-md-6">
                                 <label for="type">Type</label>
@@ -205,19 +207,9 @@
                                 <input name="cost" id="cost" class="form-control" type="number" step="0.01" required disabled>
                                 <label for="safety_stock">Safety Stock</label>
                                 <input name="safety_stock" class="form-control" type="number" required>
-                            </div>
-                            <div class="col-md-4">
                                 <label for="total">Total</label>
                                 <input name="total" id="total" class="form-control" type="number" step="0.01" required disabled>
                                 <input type="hidden" name="total_hidden" id="total_hidden">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="repair_stock">Repair Stock</label>
-                                <input name="repair_stock" id="repair_stock" class="form-control" type="number" step="0.01" required disabled>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="sap_stock">SAP Stock</label>
-                                <input name="sap_stock" id="sap_stock" class="form-control" type="number" step="0.01" required disabled>
                             </div>
                         </div>
                     </div>

@@ -12,6 +12,7 @@ use App\Http\Controllers\MstPartRepairController;
 use App\Http\Controllers\HistoryController;
 
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -55,10 +56,10 @@ Route::middleware(['auth'])->group(function () {
      Route::get('/mst/sap/part', [MstPartSAPController::class, 'sapPart'])->middleware(['checkRole:IT']);
      Route::get('/mst/repair/part', [MstPartRepairController::class, 'repairPart'])->middleware(['checkRole:IT']);
 // Repair Parts
-Route::get('/repair-parts', [RepairPartController::class, 'repairPart'])->name('repairParts');
-Route::post('/repair-parts/store', [RepairPartController::class, 'store']);
-Route::put('/repair-parts/update/{id}', [RepairPartController::class, 'update']);
-Route::delete('/repair-parts/delete/{id}', [RepairPartController::class, 'destroy']);
+Route::get('/repair-parts', [MstPartRepairController::class, 'repairPart'])->name('repairParts');
+Route::post('/repair-parts/store', [MstPartRepairController::class, 'store']);
+Route::put('/repair-parts/update/{id}', [MstPartRepairController::class, 'update']);
+Route::delete('/repair-parts/delete/{id}', [MstPartRepairController::class, 'destroy']);
 Route::get('/get-repair-stock/{partId}', [MstMachinePartController::class, 'getRepairStock']);
 
      // mstMachine Part
@@ -71,9 +72,13 @@ Route::get('/get-repair-stock/{partId}', [MstMachinePartController::class, 'getR
 
      Route::get('/history', [HistoryController::class, 'index'])->middleware(['checkRole:IT']);
      Route::post('/history/store', [HistoryController::class, 'store']);
-    // History routes
-    Route::get('/history/spare-parts/{id}', [HistoryController::class, 'getSpareParts'])->middleware(['checkRole:IT']);
+        // web.php
+
     Route::get('/get-parts/{machineId}', [HistoryController::class, 'getParts']);
-    Route::get('/get-locations/{partId}', [HistoryController::class, 'getLocations']);
+    // web.php
+Route::get('/get-repair-locations/{partId}', [HistoryController::class, 'getRepairLocations']);
+
+
+
 
     });

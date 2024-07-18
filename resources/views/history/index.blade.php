@@ -23,16 +23,44 @@
                                     <h3 class="card-title">List of Historical Problem</h3>
                                 </div>
 
+                      <!--alert success -->
+                      @if (session('status'))
+                      <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>{{ session('status') }}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                    @endif
+
+                    @if (session('failed'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                      <strong>{{ session('failed') }}</strong>
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                  @endif
+
+                      <!--alert success -->
+                      <!--validasi form-->
+                        @if (count($errors)>0)
+                          <div class="alert alert-info alert-dismissible fade show" role="alert">
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                              <ul>
+                                  <li><strong>Data Process Failed !</strong></li>
+                                  @foreach ($errors->all() as $error)
+                                      <li><strong>{{ $error }}</strong></li>
+                                  @endforeach
+                              </ul>
+                          </div>
+                        @endif
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="mb-3 col-sm-12">
                                             <button type="button" class="btn btn-dark btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#modal-add">
-                                                <i class="fas fa-plus-square"></i> Add Machine
+                                                <i class="fas fa-plus-square"></i>
                                             </button>
                                         </div>
                                     </div>
-  <!-- Modal for Adding Historical Problem and Parts -->
-  <div class="modal fade" id="modal-add" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">
+ <!-- Modal for Adding Historical Problem and Parts -->
+<div class="modal fade" id="modal-add" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -121,24 +149,29 @@
                                     <label for="part_no_1" class="form-label">Part No</label>
                                     <select class="form-control part-no" id="part_no_1" name="part_no[]" onchange="updateStockInfo(1)"></select>
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-12">
                                             <label for="sap_stock_1" class="form-label">SAP Stock</label>
                                             <input type="number" class="form-control" id="sap_stock_1" name="sap_stock[]" readonly>
                                         </div>
-                                        <div class="col-md-6">
-                                            <label for="repair_stock_1" class="form-label">Repair Stock</label>
-                                            <input type="number" class="form-control" id="repair_stock_1" name="repair_stock[]" readonly>
-                                        </div>
+
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="stock_type_1" class="form-label">Stock Type</label>
-                                    <select class="form-control stock-type" id="stock_type_1" name="stock_type[]">
+                                    <select class="form-control stock-type" id="stock_type_1" name="stock_type[]" onchange="handleStockTypeChange(1)">
                                         <option value="sap">SAP</option>
                                         <option value="repair">Repair</option>
                                     </select>
-                                    <label for="part_qty_1" class="form-label">Quantity</label>
-                                    <input type="number" class="form-control part-qty" id="part_qty_1" name="part_qty[]">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label for="part_qty_1" class="form-label">Quantity</label>
+                                            <input type="number" class="form-control part-qty" id="part_qty_1" name="part_qty[]">
+                                        </div>
+                                        <div class="col-md-6 repair-part-location" id="repair-part-location_1" style="display: none;">
+                                            <label for="repair_location_1" class="form-label">Location</label>
+                                            <select class="form-control" id="repair_location_1" name="repair_location[]"></select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -154,104 +187,159 @@
     </div>
 </div>
 
+
 <script>
     document.getElementById('no_machine').addEventListener('change', function() {
-        const machineId = this.value;
+    const machineId = this.value;
+    fetch(`/get-parts/${machineId}`)
+        .then(response => response.json())
+        .then(data => {
+            const partsUsedContainer = document.getElementById('parts-used-container');
+            const partSelects = partsUsedContainer.querySelectorAll('.part-no');
+            partSelects.forEach(select => {
+                select.innerHTML = '<option value="">-- Select Part --</option>';
+                data.forEach(part => {
+                    const option = document.createElement('option');
+                    option.value = part.part_id;
+                    option.textContent = `${part.part_id} - ${part.critical_part}`;
+                    option.dataset.sapStock = part.sap_stock;
+                    option.dataset.repairStock = part.repair_stock;
+                    select.appendChild(option);
+                });
+            });
+        });
+});
+
+document.getElementById('add-part-button').addEventListener('click', function() {
+    const partCount = document.querySelectorAll('.part-no').length + 1;
+    const partDiv = document.createElement('div');
+    partDiv.classList.add('mb-3');
+    partDiv.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <label for="part_no_${partCount}" class="form-label">Part No</label>
+                <select class="form-control part-no" id="part_no_${partCount}" name="part_no[]" onchange="updateStockInfo(${partCount})"></select>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="sap_stock_${partCount}" class="form-label">SAP Stock</label>
+                        <input type="number" class="form-control" id="sap_stock_${partCount}" name="sap_stock[]" readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label for="stock_type_${partCount}" class="form-label">Stock Type</label>
+                <select class="form-control stock-type" id="stock_type_${partCount}" name="stock_type[]" onchange="handleStockTypeChange(${partCount})">
+                    <option value="sap">SAP</option>
+                    <option value="repair">Repair</option>
+                </select>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="part_qty_${partCount}" class="form-label">Quantity</label>
+                        <input type="number" class="form-control part-qty" id="part_qty_${partCount}" name="part_qty[]">
+                    </div>
+                    <div class="col-md-6 repair-part-location" id="repair-part-location_${partCount}" style="display: none;">
+                        <label for="repair_location_${partCount}" class="form-label">Location</label>
+                        <select class="form-control" id="repair_location_${partCount}" name="repair_location[]"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.getElementById('parts-used-container').appendChild(partDiv);
+    const machineId = document.getElementById('no_machine').value;
+    if (machineId) {
         fetch(`/get-parts/${machineId}`)
             .then(response => response.json())
             .then(data => {
-                const partsUsedContainer = document.getElementById('parts-used-container');
-                const partSelects = partsUsedContainer.querySelectorAll('.part-no');
-                partSelects.forEach(select => {
-                    select.innerHTML = '<option value="">-- Select Part --</option>';
-                    data.forEach(part => {
-                        const option = document.createElement('option');
-                        option.value = part.part_id;
-                        option.textContent = `${part.part_id} - ${part.critical_part}`;
-                        option.dataset.sapStock = part.sap_stock;
-                        option.dataset.repairStock = part.repair_stock;
-                        select.appendChild(option);
-                    });
+                const partSelect = document.getElementById(`part_no_${partCount}`);
+                partSelect.innerHTML = '<option value="">-- Select Part --</option>';
+                data.forEach(part => {
+                    const option = document.createElement('option');
+                    option.value = part.part_id;
+                    option.textContent = `${part.part_id} - ${part.critical_part}`;
+                    option.dataset.sapStock = part.sap_stock;
+                    option.dataset.repairStock = part.repair_stock;
+                    partSelect.appendChild(option);
                 });
             });
-    });
+    }
+});
 
-    document.getElementById('add-part-button').addEventListener('click', function() {
-        const partCount = document.querySelectorAll('.part-no').length + 1;
-        const partDiv = document.createElement('div');
-        partDiv.classList.add('mb-3');
-        partDiv.innerHTML = `
-            <div class="row">
-                <div class="col-md-6">
-                    <label for="part_no_${partCount}" class="form-label">Part No</label>
-                    <select class="form-control part-no" id="part_no_${partCount}" name="part_no[]" onchange="updateStockInfo(${partCount})"></select>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="sap_stock_${partCount}" class="form-label">SAP Stock</label>
-                            <input type="number" class="form-control" id="sap_stock_${partCount}" name="sap_stock[]" readonly>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="repair_stock_${partCount}" class="form-label">Repair Stock</label>
-                            <input type="number" class="form-control" id="repair_stock_${partCount}" name="repair_stock[]" readonly>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <label for="stock_type_${partCount}" class="form-label">Stock Type</label>
-                    <select class="form-control stock-type" id="stock_type_${partCount}" name="stock_type[]">
-                        <option value="sap">SAP</option>
-                        <option value="repair">Repair</option>
-                    </select>
-                    <label for="part_qty_${partCount}" class="form-label">Quantity</label>
-                    <input type="number" class="form-control part-qty" id="part_qty_${partCount}" name="part_qty[]">
-                </div>
-            </div>
-        `;
-        document.getElementById('parts-used-container').appendChild(partDiv);
-        const machineId = document.getElementById('no_machine').value;
-        if (machineId) {
-            fetch(`/get-parts/${machineId}`)
-                .then(response => response.json())
+function updateStockInfo(partCount) {
+    const partSelect = document.getElementById(`part_no_${partCount}`);
+    const selectedOption = partSelect.options[partSelect.selectedIndex];
+    const sapStock = selectedOption.dataset.sapStock || 0;
+    const repairStock = selectedOption.dataset.repairStock || 0;
+
+    document.getElementById(`sap_stock_${partCount}`).value = sapStock;
+    document.getElementById(`repair_stock_${partCount}`).value = repairStock;
+}
+
+function handleStockTypeChange(partCount) {
+    const stockTypeSelect = document.getElementById(`stock_type_${partCount}`);
+    const repairPartLocationDiv = document.getElementById(`repair-part-location_${partCount}`);
+    if (stockTypeSelect.value === 'repair') {
+        repairPartLocationDiv.style.display = 'block';
+        const partNo = document.getElementById(`part_no_${partCount}`).value;
+        console.log(`Fetching repair locations for part no: ${partNo}`);
+        if (partNo) {
+            fetch(`/get-repair-locations/${partNo}`)
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(error => {
+                            throw new Error(error.error || 'Network response was not ok');
+                        });
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    const partSelect = document.getElementById(`part_no_${partCount}`);
-                    partSelect.innerHTML = '<option value="">-- Select Part --</option>';
-                    data.forEach(part => {
+                    console.log('Repair locations data:', data);
+                    const locationSelect = document.getElementById(`repair_location_${partCount}`);
+                    locationSelect.innerHTML = '<option value="">-- Select Location --</option>';
+                    data.forEach(location => {
                         const option = document.createElement('option');
-                        option.value = part.part_id;
-                        option.textContent = `${part.part_id} - ${part.critical_part}`;
-                        option.dataset.sapStock = part.sap_stock;
-                        option.dataset.repairStock = part.repair_stock;
-                        partSelect.appendChild(option);
+                        option.value = location.sloc;
+                        option.textContent = `${location.sloc} - ${location.repaired_qty} qty`;
+                        option.dataset.repairedQty = location.repaired_qty;
+                        locationSelect.appendChild(option);
                     });
+                })
+                .catch(error => {
+                    console.error('Error fetching repair locations:', error);
+                    alert(`Error fetching repair locations: ${error.message}`);
                 });
         }
-    });
-
-    function updateStockInfo(partCount) {
-        const partSelect = document.getElementById(`part_no_${partCount}`);
-        const selectedOption = partSelect.options[partSelect.selectedIndex];
-        const sapStock = selectedOption.dataset.sapStock || 0;
-        const repairStock = selectedOption.dataset.repairStock || 0;
-
-        document.getElementById(`sap_stock_${partCount}`).value = sapStock;
-        document.getElementById(`repair_stock_${partCount}`).value = repairStock;
+    } else {
+        repairPartLocationDiv.style.display = 'none';
     }
+}
 
-    document.getElementById('start_time').addEventListener('change', calculateBalance);
-    document.getElementById('finish_time').addEventListener('change', calculateBalance);
 
-    function calculateBalance() {
-        const startTime = document.getElementById('start_time').value;
-        const finishTime = document.getElementById('finish_time').value;
 
-        if (startTime && finishTime) {
-            const start = new Date(`1970-01-01T${startTime}:00`);
-            const finish = new Date(`1970-01-01T${finishTime}:00`);
-            const diff = (finish - start) / 1000 / 60 / 60; // Difference in hours
 
-            document.getElementById('balance').value = diff;
-        }
+function updateRepairStockInfo(partCount) {
+    const locationSelect = document.getElementById(`repair_location_${partCount}`);
+    const selectedOption = locationSelect.options[locationSelect.selectedIndex];
+    const repairedQty = selectedOption.dataset.repairedQty || 0;
+    document.getElementById(`repair_stock_${partCount}`).value = repairedQty;
+}
+
+document.getElementById('start_time').addEventListener('change', calculateBalance);
+document.getElementById('finish_time').addEventListener('change', calculateBalance);
+
+function calculateBalance() {
+    const startTime = document.getElementById('start_time').value;
+    const finishTime = document.getElementById('finish_time').value;
+
+    if (startTime && finishTime) {
+        const start = new Date(`1970-01-01T${startTime}:00`);
+        const finish = new Date(`1970-01-01T${finishTime}:00`);
+        const diff = (finish - start) / 1000 / 60 / 60; // Difference in hours
+
+        document.getElementById('balance').value = diff;
     }
+}
+
 </script>
                                     <div class="table-responsive">
                                         <table id="tablehistory" class="table table-bordered table-striped">
@@ -348,6 +436,7 @@
                                                                         <th>Part No</th>
                                                                         <th>Description</th>
                                                                         <th>Quantity</th>
+                                                                        <th>Location</th>
                                                                         <th>Stock Type</th>
                                                                     </tr>
                                                                 </thead>
@@ -357,6 +446,7 @@
                                                                         <td>{{ $part->part->material }}</td>
                                                                         <td>{{ $part->part->material_description }}</td>
                                                                         <td>{{ $part->qty }}</td>
+                                                                        <td>{{ $part->location }}</td>
                                                                         <td>{{ $part->routes }}</td>
                                                                     </tr>
                                                                     @endforeach
