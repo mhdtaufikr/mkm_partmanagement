@@ -42,73 +42,88 @@
               <div class="card-header">
                 <h3 class="card-title">List of Machine</h3>
               </div>
+              <!-- Modal for Adding New Machine -->
+<div class="modal fade" id="modal-add-machine" tabindex="-1" aria-labelledby="modal-add-machine-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-add-machine-label">Add New Machine</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="machine-form" action="{{ url('/mst/machine/add') }}" method="POST">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="plant" class="form-label">Plant</label>
+                                <input type="text" class="form-control" id="plant" name="plant" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="line" class="form-label">Line</label>
+                                <input type="text" class="form-control" id="line" name="line" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="op_no" class="form-label">OP No</label>
+                                <input type="text" class="form-control" id="op_no" name="op_no" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="machine_name" class="form-label">Machine Name</label>
+                                <input type="text" class="form-control" id="machine_name" name="machine_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="process" class="form-label">Process</label>
+                                <textarea class="form-control" id="process" name="process" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="maker" class="form-label">Maker</label>
+                                <input type="text" class="form-control" id="maker" name="maker" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="model" class="form-label">Model</label>
+                                <input type="text" class="form-control" id="model" name="model" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="serial_number" class="form-label">Serial Number</label>
+                                <input type="text" class="form-control" id="serial_number" name="serial_number" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="date" class="form-label">Date</label>
+                                <input type="number" class="form-control" id="date" name="date" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="control_nc" class="form-label">Control NC</label>
+                                <input type="text" class="form-control" id="control_nc" name="control_nc">
+                            </div>
+                            <div class="mb-3">
+                                <label for="control_plc" class="form-label">Control PLC</label>
+                                <input type="text" class="form-control" id="control_plc" name="control_plc">
+                            </div>
+                            <div class="mb-3">
+                                <label for="control_servo" class="form-label">Control Servo</label>
+                                <input type="text" class="form-control" id="control_servo" name="control_servo">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
               <!-- /.card-header -->
               <div class="card-body">
                 <div class="row">
                     <div class="mb-3 col-sm-12">
-                        <button type="button" class="btn btn-dark btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#modal-add">
-                            <i class="fas fa-plus-square"></i>
-                          </button>
-
-                          <!-- Modal -->
-                          <div class="modal fade" id="modal-add" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">
-                            <div class="modal-dialog">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 class="modal-title" id="modal-add-label">Add Asset</h5>
-                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <form action="{{ url('/mst/store') }}" method="POST">
-                                  @csrf
-                                  <div class="modal-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="">Asset No.</label>
-                                                <input type="text" class="form-control" id="asset_no" name="asset_no" placeholder="Enter Asset No." required>
-                                              </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="">Asset Name</label>
-                                                <input type="text" class="form-control" id="asset_name" name="asset_name" placeholder="Enter Asset Name" required>
-                                              </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="form-group mb-3">
-                                                <label for="">Asset Description</label>
-                                                <textarea  class="form-control" name="asset_description" cols="30" rows="5" required></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group mb-3">
-                                                <label for="qty">Asset Quantity</label>
-                                                <input class="form-control" name="qty" type="number" value="0" required>
-                                            </div>
-                                        </div>
-                                        {{-- <div class="col-md-8">
-                                            <div class="form-group">
-                                                <label for="">Asset Status</label>
-                                                <select name="status" id="status" class="form-control" required>
-                                                    <option value="">- Please Select Status -</option>
-                                                    @foreach ($dropdown as $status)
-                                                        <option value="{{ $status->name_value }}">{{ $status->name_value }}</option>
-                                                    @endforeach
-                                                  </select>
-                                                </div>
-                                        </div> --}}
-                                    </div>
-                                  </div>
-                                  <div class="modal-footer">
-                                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                  </div>
-                                </form>
-                              </div>
-                            </div>
-                          </div>
-
+                        <button type="button" class="btn btn-dark btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#modal-add-machine">
+                            <i class="fas fa-plus-square"></i> Add Machine
+                        </button>
 
                       <!--alert success -->
                       @if (session('status'))

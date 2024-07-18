@@ -9,6 +9,10 @@
                     <div style="margin-left: -2px" class="nav-link-icon"><i class="fas fa-home"></i></div>
                     Home
                 </a>
+                <a class="nav-link" href="{{url('/history')}}">
+                    <div style="margin-left: -2px" class="nav-link-icon"><i class="fas fa-tools"></i></div>
+                    Historical Problem
+                </a>
                  <!-- Sidenav Menu Heading (Master)-->
                  <div class="sidenav-menu-heading">Master</div>
                  <!-- Sidenav Accordion (Master)-->

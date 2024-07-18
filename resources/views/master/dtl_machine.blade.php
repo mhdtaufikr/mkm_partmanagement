@@ -166,7 +166,111 @@
                                 @endif
                             <!--end validasi form-->
                             </div>
+                            <button type="button" class="btn btn-dark btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#modal-add">
+                                <i class="fas fa-plus-square"></i> Add Part
+                            </button>
+                        <!-- Modal for Adding New Part -->
+<div class="modal fade" id="modal-add" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-add-label">Add New Part</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url('/mst/machine/add-part') }}" enctype="multipart/form-data" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3 form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="part_id">Part</label>
+                                <input name="machine_id" type="text" value="{{ $machine->id }}" hidden>
+                                <select name="part_id" id="part_id" class="form-control" required>
+                                    <option value="">-- Select Part --</option>
+                                    @foreach($parts as $part)
+                                        <option value="{{ $part->id }}" data-type="{{ $part->type }}" data-cost="{{ $part->total_value }}" data-sap_stock="{{ $part->total_stock }}" data-repair_stock="{{ $part->total_repaired_qty ?? 0 }}">
+                                            {{ $part->material }} - {{ $part->material_description }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <label for="estimation_lifetime">Estimation Lifetime</label>
+                                <input name="estimation_lifetime" class="form-control" type="number" required>
+                                <label for="last_replace">Last Replace</label>
+                                <input name="last_replace" class="form-control" type="date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="type">Type</label>
+                                <input name="type" id="type" class="form-control" type="text" required disabled>
+                                <label for="cost">Cost</label>
+                                <input name="cost" id="cost" class="form-control" type="number" step="0.01" required disabled>
+                                <label for="safety_stock">Safety Stock</label>
+                                <input name="safety_stock" class="form-control" type="number" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="total">Total</label>
+                                <input name="total" id="total" class="form-control" type="number" step="0.01" required disabled>
+                                <input type="hidden" name="total_hidden" id="total_hidden">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="repair_stock">Repair Stock</label>
+                                <input name="repair_stock" id="repair_stock" class="form-control" type="number" step="0.01" required disabled>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="sap_stock">SAP Stock</label>
+                                <input name="sap_stock" id="sap_stock" class="form-control" type="number" step="0.01" required disabled>
+                            </div>
                         </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-dark btn-default" data-bs-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-primary" value="Submit">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('part_id').addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const type = selectedOption.getAttribute('data-type');
+        const cost = selectedOption.getAttribute('data-cost');
+        const sapStock = selectedOption.getAttribute('data-sap_stock');
+        const partId = selectedOption.value;
+
+        // Fetch the repair stock dynamically
+        fetch(`/get-repair-stock/${partId}`)
+            .then(response => response.json())
+            .then(data => {
+                const repairStock = data.repair_stock || 0;
+
+                document.getElementById('type').value = type;
+                document.getElementById('cost').value = cost;
+                document.getElementById('sap_stock').value = sapStock;
+                document.getElementById('repair_stock').value = repairStock;
+                const total = parseFloat(sapStock) + parseFloat(repairStock);
+                document.getElementById('total').value = total;
+                document.getElementById('total_hidden').value = total;
+            });
+    });
+
+    document.getElementById('repair_stock').addEventListener('input', function() {
+        const sapStock = parseFloat(document.getElementById('sap_stock').value) || 0;
+        const repairStock = parseFloat(this.value) || 0;
+        const total = sapStock + repairStock;
+        document.getElementById('total').value = total;
+        document.getElementById('total_hidden').value = total;
+    });
+</script>
+
+
+
+
+
+
+                        </div>
+
                         <table id="tableUser" class="table table-bordered table-striped">
                         <thead>
                         <tr>

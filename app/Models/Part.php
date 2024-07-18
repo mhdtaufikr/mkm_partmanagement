@@ -14,4 +14,8 @@ class Part extends Model
     {
         return $this->hasMany(MachineSparePartsInventory::class, 'part_id');
     }
+    public function repairs()
+    {
+        return $this->hasMany(RepairPart::class, 'part_id', 'id');
+    }
 }
