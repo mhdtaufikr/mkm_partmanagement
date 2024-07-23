@@ -5,16 +5,16 @@
     <header class="page-header page-header-dark bg-gradient-primary-to-secondary pb-10">
         <div class="container-fluid px-4">
             <div class="page-header-content pt-4">
-                {{-- <div class="row align-items-center justify-content-between">
+                <div class="row align-items-center justify-content-between">
                     <div class="col-auto mt-4">
                         <h1 class="page-header-title">
-                            <div class="page-header-icon"><i data-feather="tool"></i></div>
-                            Rule App Menu
+                            <div class="page-header-icon"><i class="fas fa-database"></i></div>
+                            Master Machine
                         </h1>
-                        <div class="page-header-subtitle">Use this blank page as a starting point for creating new pages inside your project!</div>
+                        <div class="page-header-subtitle">Manage Master Machine</div>
                     </div>
-                    <div class="col-12 col-xl-auto mt-4">Optional page header content</div>
-                </div> --}}
+                    {{-- <div class="col-12 col-xl-auto mt-4">Optional page header content</div> --}}
+                </div>
             </div>
         </div>
     </header>
@@ -159,7 +159,7 @@
                 <table id="tableUser" class="table table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th>Machine Name</th>
+                            <th>OP. No</th>
                             <th>Process</th>
                             <th>Model</th>
                             <th>Serial Number</th>
@@ -170,7 +170,7 @@
                     <tbody>
                         @foreach($items as $data)
                         <tr>
-                            <td>{{ $data->machine_name }}</td>
+                            <td>{{ $data->op_no }}</td>
                             <td>{{ $data->process }}</td>
                             <td>{{ $data->model }}</td>
                             <td>{{ $data->serial_number }}</td>

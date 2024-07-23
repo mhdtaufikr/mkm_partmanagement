@@ -26,4 +26,9 @@ class Machine extends Model
             'part_id'     // Local key on MachineSparePartsInventory table
         );
     }
+
+    public function historicalProblems()
+    {
+        return $this->hasMany(HistoricalProblem::class, 'id_machine');
+    }
 }

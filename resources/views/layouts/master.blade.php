@@ -50,7 +50,7 @@
         <link href="{{asset('chosen/chosen.min.css')}}" rel="stylesheet" />
 
          <!-- Include Chart CSS -->
-         <script src="{{asset('canvasjs.min.js')}}"></script>
+         {{-- <script src="{{asset('canvasjs.min.js')}}"></script> --}}
 
         <!-- Include Chosen JS -->
         <script src="{{asset('chosen/chosen.jquery.min.js')}}"></script>

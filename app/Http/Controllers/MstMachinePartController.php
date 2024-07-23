@@ -7,6 +7,7 @@ use App\Models\Machine;
 use App\Models\RepairPart;
 use App\Models\Part;
 use App\Models\MachineSparePartsInventory;
+use App\Models\HistoricalProblem;
 
 class MstMachinePartController extends Controller
 {
@@ -22,8 +23,13 @@ class MstMachinePartController extends Controller
         // Get all parts with their total repair quantities
         $parts = Part::withSum('repairs as total_repaired_qty', 'repaired_qty')->get();
 
-        return view('master.dtl_machine', compact('machine','parts'));
+        // Get all historical problems with their related spare parts and machine data
+        $items = HistoricalProblem::with(['spareParts.part', 'machine'])->where('id_machine',$id)->get();
+
+        return view('master.dtl_machine', compact('machine', 'parts', 'items'));
     }
+
+
     public function getRepairStock($partId)
     {
         $repairStock = RepairPart::where('part_id', $partId)->sum('repaired_qty');

@@ -8,16 +8,33 @@ use App\Models\Machine;
 use App\Models\RepairPart;
 use App\Models\HistoricalProblemPart;
 use App\Models\MachineSparePartsInventory;
+use DB;
 
 class HistoryController extends Controller
 {
     public function index()
     {
-        $machines = Machine::get();
-        $items = HistoricalProblem::with(['spareParts.part'])->get();
-        return view('history.index', compact('items', 'machines'));
+        $machines = Machine::all();
+        $lines = Machine::select('line')->distinct()->get();
+        $items = HistoricalProblem::with(['spareParts.part', 'machine'])->get();
+        return view('history.index', compact('items', 'machines', 'lines'));
     }
 
+    public function getOpNos($line)
+    {
+        try {
+            \Log::info('Fetching op_no for line: ' . $line);
+            $machines = Machine::where('line', $line)->select('id', 'op_no')->get();
+            \Log::info('Machines found: ' . $machines->count());
+            if ($machines->isEmpty()) {
+                return response()->json(['error' => 'No machines found for the specified line'], 404);
+            }
+            return response()->json($machines);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching op_no: ' . $e->getMessage());
+            return response()->json(['error' => 'Internal Server Error'], 500);
+        }
+    }
 
 
  // HistoryController.php
@@ -44,101 +61,121 @@ public function getRepairLocations($partId)
 }
 
 
-
-
-
 public function store(Request $request)
 {
+    // Get the necessary parameters from the request
+    $noMachine = encrypt($request->input('no_machine'));
+    $date = $request->input('date');
+    $shift = $request->input('shift');
 
-    // Validate the incoming request data
-    $validatedData = $request->validate([
-        'no_machine' => 'required|string|max:50',
-        'date' => 'required|date',
-        'shift' => 'required|string|max:10',
-        'shop' => 'required|string|max:50',
-        'problem' => 'required|string',
-        'cause' => 'required|string',
-        'action' => 'required|string',
-        'start_time' => 'required|date_format:H:i',
-        'finish_time' => 'required|date_format:H:i',
-        'balance' => 'required|integer',
-        'pic' => 'nullable|string|max:100',
-        'remarks' => 'nullable|string',
-        'status' => 'required|string|max:20',
-        'part_no' => 'required|array',
-        'part_no.*' => 'required|integer',
-        'part_qty' => 'required|array',
-        'part_qty.*' => 'required|integer',
-        'stock_type' => 'required|array',
-        'stock_type.*' => 'required|string|in:sap,repair',
-        'repair_location' => 'required_if:stock_type,repair|array',
-        'repair_location.*' => 'required_if:stock_type,repair|string',
-        'img' => 'nullable|image'
-    ]);
+    // Redirect to the specified URL with the parameters
+    return redirect()->route('form', ['no_machine' => $noMachine, 'date' => $date, 'shift' => $shift]);
 
-    $machine_no = Machine::where('id', $request->no_machine)->first();
+}
 
-    // Handle file upload
-    $imgPath = null;
-    if ($request->hasFile('img')) {
-        $file = $request->file('img');
-        $fileName = uniqid() . '_' . $file->getClientOriginalName();
-        $destinationPath = public_path('assets/img/history');
-        $file->move($destinationPath, $fileName);
-        $imgPath = 'assets/img/history/' . $fileName;
+public function form($no_machine, $date, $shift)
+    {
+        $no_machine = decrypt($no_machine);
+        $machine_name =
+
+        // Fetch spare parts related to the machine with part details
+        $spareParts = MachineSparePartsInventory::where('machine_id', $no_machine)
+                        ->with('part')
+                        ->get();
+
+        return view('history.form', compact('no_machine', 'date', 'shift', 'spareParts'));
     }
 
-    // Store the historical problem
-    $historicalProblem = HistoricalProblem::create([
-        'no_machine' => $machine_no->op_no,
-        'date' => $validatedData['date'],
-        'shift' => $validatedData['shift'],
-        'shop' => $validatedData['shop'],
-        'problem' => $validatedData['problem'],
-        'cause' => $validatedData['cause'],
-        'action' => $validatedData['action'],
-        'start_time' => $validatedData['start_time'],
-        'finish_time' => $validatedData['finish_time'],
-        'balance' => $validatedData['balance'],
-        'pic' => $validatedData['pic'],
-        'remarks' => $validatedData['remarks'],
-        'img' => $imgPath,
-        'status' => $validatedData['status'],
-    ]);
+    public function getRepairLocationsForPart($part_id)
+{
+    try {
+        $locations = RepairPart::where('part_id', $part_id)->get(['id', 'sloc', 'repaired_qty']);
+        return response()->json($locations);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Failed to retrieve locations', 'details' => $e->getMessage()], 500);
+    }
+}
 
-    // Store the parts used and update stock
-    foreach ($validatedData['part_no'] as $index => $partId) {
-        $qty = $validatedData['part_qty'][$index];
-        $stockType = $validatedData['stock_type'][$index];
-        $repairLocation = $stockType === 'repair' ? $validatedData['repair_location'][$index] : null;
 
-        // Store part used in historical problem
-        HistoricalProblemPart::create([
-            'problem_id' => $historicalProblem->id,
-            'part_id' => $partId,
-            'qty' => $qty,
-            'location' => $repairLocation,
-            'routes' => $stockType,
+public function storehp(Request $request)
+    {
+        // Validate the request data
+        $validatedData = $request->validate([
+            'id_machine' => 'required|integer',
+            'date' => 'required|date',
+            'shift' => 'required|string',
+            'shop' => 'required|string',
+            'problem' => 'required|string',
+            'cause' => 'required|string',
+            'action' => 'required|string',
+            'spare_part.*' => 'required|integer',
+            'stock_type.*' => 'required|string',
+            'repair_location.*' => 'required|integer',
+            'used_qty.*' => 'required|integer',
+            'start_time' => 'required|date_format:H:i',
+            'finish_time' => 'required|date_format:H:i',
+            'balance' => 'required|numeric',
+            'pic' => 'required|string',
+            'status' => 'required|string',
+            'remarks' => 'nullable|string',
+            'img' => 'nullable|image|max:2048',
         ]);
 
-        if ($stockType === 'repair') {
-            // Update repair stock in repair_parts table
-            $repairPart = RepairPart::where('part_id', $partId)
-                                    ->where('sloc', $repairLocation)
-                                    ->first();
+        // Handle the image upload if it exists
+        $imgPath = null;
+        if ($request->hasFile('img')) {
+            $file = $request->file('img');
+            $fileName = uniqid() . '_' . $file->getClientOriginalName();
+            $destinationPath = public_path('assets/img/history');
+            $file->move($destinationPath, $fileName);
+            $imgPath = 'assets/img/history/' . $fileName;
+        }
 
-            if ($repairPart) {
-                $repairPart->repaired_qty -= $qty;
+        // Save the main problem data
+        $problem = HistoricalProblem::create([
+            'id_machine' => $validatedData['id_machine'],
+            'date' => $validatedData['date'],
+            'shift' => $validatedData['shift'],
+            'shop' => $validatedData['shop'],
+            'problem' => $validatedData['problem'],
+            'cause' => $validatedData['cause'],
+            'action' => $validatedData['action'],
+            'start_time' => $validatedData['start_time'],
+            'finish_time' => $validatedData['finish_time'],
+            'balance' => $validatedData['balance'],
+            'pic' => $validatedData['pic'],
+            'status' => $validatedData['status'],
+            'remarks' => $validatedData['remarks'],
+            'img' => $imgPath,
+        ]);
+
+        // Save the spare parts data and update the repair parts inventory if stock type is repair
+        foreach ($validatedData['spare_part'] as $index => $sparePartId) {
+            $repairPartId = $validatedData['repair_location'][$index];
+            $repairPart = RepairPart::find($repairPartId);
+
+            $location = $repairPart ? $repairPart->sloc : null;
+
+            HistoricalProblemPart::create([
+                'problem_id' => $problem->id,
+                'part_id' => $sparePartId,
+                'qty' => $validatedData['used_qty'][$index],
+                'location' => $location,
+                'routes' => $validatedData['stock_type'][$index],
+            ]);
+
+            // Update the repair parts inventory only if the stock type is repair
+            if ($validatedData['stock_type'][$index] === 'repair' && $repairPart) {
+                $repairPart->repaired_qty -= $validatedData['used_qty'][$index];
                 $repairPart->save();
-            } else {
-                // Handle case where repair part is not found (optional)
-                throw new \Exception("Repair part not found for part ID $partId and location $repairLocation");
             }
         }
+
+        return redirect()->route('history')->with('status', 'Historical problem recorded successfully');
     }
 
-    return redirect()->back()->with('status', 'Historical problem and parts added successfully!');
-}
+
+
 
 
 }

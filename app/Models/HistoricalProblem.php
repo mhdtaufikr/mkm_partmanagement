@@ -12,9 +12,14 @@ class HistoricalProblem extends Model
     {
         return $this->hasMany(HistoricalProblemPart::class, 'historical_problem_id');
     }
+
     public function spareParts()
     {
         return $this->hasMany(HistoricalProblemPart::class, 'problem_id');
     }
-}
 
+    public function machine()
+    {
+        return $this->belongsTo(Machine::class, 'id_machine');
+    }
+}
