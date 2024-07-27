@@ -11,7 +11,7 @@
                 </a>
                 <a class="nav-link" href="{{url('/history')}}">
                     <div style="margin-left: -2px" class="nav-link-icon"><i class="fas fa-tools"></i></div>
-                    Historical Problem
+                    Daily Report
                 </a>
                  <!-- Sidenav Menu Heading (Master)-->
                  <div class="sidenav-menu-heading">Master</div>
@@ -30,6 +30,9 @@
                      </nav>
                      <nav class="sidenav-menu-nested nav">
                         <a class="nav-link" href="{{url('/mst/repair/part')}}">Repair Part</a>
+                     </nav>
+                     <nav class="sidenav-menu-nested nav">
+                        <a class="nav-link" href="{{url('/mst/preventive')}}">Preventive Maintanance Form</a>
                      </nav>
                  </div>
                 @if(\Auth::user()->role === 'IT')

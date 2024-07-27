@@ -10,6 +10,7 @@ use App\Http\Controllers\MstPartSAPController;
 use App\Http\Controllers\MstMachinePartController;
 use App\Http\Controllers\MstPartRepairController;
 use App\Http\Controllers\HistoryController;
+use App\Http\Controllers\PreventiveController;
 
 
 
@@ -83,5 +84,18 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/historical-problems/store', [HistoryController::class, 'storehp'])->name('historical');
 
 
+    //Preventive Maintanance Master
+    //Master Mechine
+    Route::get('/mst/preventive', [PreventiveController::class, 'index'])->middleware(['checkRole:IT,Super Admin']);
+    Route::post('/mst/preventive/store', [PreventiveController::class, 'store'])->middleware(['checkRole:IT,Super Admin']);
+    Route::get('/mst/preventive/detail/{id}', [PreventiveController::class, 'detail'])->name('machine.detail')->middleware(['checkRole:IT,Super Admin']);
+    Route::post('/mst/checksheet/type/store', [PreventiveController::class, 'storeChecksheet'])->middleware(['checkRole:IT,Super Admin']);
+    Route::post('/mst/checksheet/item/store', [PreventiveController::class, 'storeItemChecksheet'])->middleware(['checkRole:IT,Super Admin']);
+    Route::delete('/mst/delete/checksheet/{id}', [PreventiveController::class, 'deleteChecksheet'])->middleware(['checkRole:IT,Super Admin']);
+    Route::delete('/mst/delete/checksheet/item/{id}', [PreventiveController::class, 'deleteChecksheetItem'])->middleware(['checkRole:IT,Super Admin']);
+    Route::patch('/mst/checksheet/update/{id}', [PreventiveController::class, 'updateChecksheet'])->middleware(['checkRole:IT,Super Admin']);
+    Route::patch('/mst/checksheet/item/update/{id}', [PreventiveController::class, 'updateChecksheetItem'])->middleware(['checkRole:IT,Super Admin']);
+    Route::get('/checksheet/template', [PreventiveController::class, 'template'])->middleware(['checkRole:IT,Super Admin']);
+    Route::post('/checksheet/upload', [PreventiveController::class, 'upload'])->middleware(['checkRole:IT,Super Admin']);
 
     });

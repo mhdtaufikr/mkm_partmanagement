@@ -98,7 +98,7 @@
                                     <button style="color: black" class="nav-link active" id="part-list-tab" data-bs-toggle="tab" data-bs-target="#part-list" type="button" role="tab" aria-controls="part-list" aria-selected="true">Part List</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button style="color: black" class="nav-link" id="daily-report-tab" data-bs-toggle="tab" data-bs-target="#daily-report" type="button" role="tab" aria-controls="daily-report" aria-selected="false">Daily Report</button>
+                                    <button style="color: black" class="nav-link" id="daily-report-tab" data-bs-toggle="tab" data-bs-target="#daily-report" type="button" role="tab" aria-controls="daily-report" aria-selected="false">Machine History</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button style="color: black" class="nav-link" id="documentation-tab" data-bs-toggle="tab" data-bs-target="#documentation" type="button" role="tab" aria-controls="documentation" aria-selected="false">Documentation</button>
