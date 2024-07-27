@@ -13,8 +13,8 @@ class ChecksheetFormHead extends Model
         'id'
     ];
 
-    public function machine()
+    public function preventiveMaintenance()
     {
-        return $this->belongsTo(Machine::class, 'machine_id');
+        return $this->belongsTo(PreventiveMaintenanceView::class, 'preventive_maintenances_id', 'id');
     }
 }

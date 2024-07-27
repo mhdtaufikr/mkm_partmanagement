@@ -13,6 +13,10 @@
                     <div style="margin-left: -2px" class="nav-link-icon"><i class="fas fa-tools"></i></div>
                     Daily Report
                 </a>
+                <a class="nav-link" href="{{url('/checksheet')}}">
+                    <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                    Preventive Maintenance
+                </a>
                  <!-- Sidenav Menu Heading (Master)-->
                  <div class="sidenav-menu-heading">Master</div>
                  <!-- Sidenav Accordion (Master)-->

@@ -11,6 +11,8 @@ use App\Http\Controllers\MstMachinePartController;
 use App\Http\Controllers\MstPartRepairController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\PreventiveController;
+use App\Http\Controllers\ChecksheetController;
+
 
 
 
@@ -97,5 +99,31 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/mst/checksheet/item/update/{id}', [PreventiveController::class, 'updateChecksheetItem'])->middleware(['checkRole:IT,Super Admin']);
     Route::get('/checksheet/template', [PreventiveController::class, 'template'])->middleware(['checkRole:IT,Super Admin']);
     Route::post('/checksheet/upload', [PreventiveController::class, 'upload'])->middleware(['checkRole:IT,Super Admin']);
+
+
+    //checksheet
+    //Master Checksheet form/checksheet/scan
+    Route::get('/checksheet', [ChecksheetController::class, 'index'])->middleware(['checkRole:IT,Super Admin,Approval,Checker,User'])->name('machine');
+    Route::post('/checksheet/scan', [ChecksheetController::class, 'checksheetScan'])->middleware(['checkRole:IT,Super Admin,User']);
+    Route::post('/checksheet/store', [ChecksheetController::class, 'storeHeadForm'])->middleware(['checkRole:IT,Super Admin,User']);
+    Route::get('/checksheet/fill/{id}', [ChecksheetController::class, 'checksheetfill'])->middleware(['checkRole:IT,Super Admin,User'])->name('fill');
+    Route::post('/checksheet/store/detail', [ChecksheetController::class, 'storeDetailForm'])->middleware(['checkRole:IT,Super Admin,User']);
+    Route::get('/checksheet/detail/{id}', [ChecksheetController::class, 'checksheetDetail'])->middleware(['checkRole:IT,Approval,Checker,Super Admin,User']);
+    Route::post('/checksheet/signature', [ChecksheetController::class, 'checksheetSignature'])->middleware(['checkRole:IT,Super Admin,User']);
+
+    Route::get('/checksheet/approve/{id}', [ChecksheetController::class, 'checksheetApprove'])->middleware(['checkRole:IT,Super Admin,Approval']);
+    Route::post('/checksheet/approve/store', [ChecksheetController::class, 'checksheetApproveStore'])->middleware(['checkRole:IT,Super Admin,Approval']);
+    Route::get('checksheet/update/{id}', [ChecksheetController::class, 'checksheetUpdate'])->middleware(['checkRole:IT,Super Admin,User']);
+    Route::post('/checksheet/update/detail', [ChecksheetController::class, 'checksheetUpdateDetail'])->middleware(['checkRole:IT,Super Admin,User']);
+
+    Route::get('/checksheet/checkher/{id}', [ChecksheetController::class, 'checksheetChecker'])->middleware(['checkRole:IT,Super Admin,Checker']);
+    Route::post('/checksheet/checker/store', [ChecksheetController::class, 'checksheetCheckerStore'])->middleware(['checkRole:IT,Super Admin,Checker']);
+
+    Route::get('checksheet/generate-pdf/{id}', [ChecksheetController::class, 'generatePdf'])->middleware(['checkRole:IT,Super Admin,Approval,Checker,User']);
+    Route::get('/get-locations', [ChecksheetController::class, 'getLocations']);
+    Route::get('/get-lines', [ChecksheetController::class, 'getLines']);
+    Route::get('/get-opnos', [ChecksheetController::class, 'getOpNos']);
+
+
 
     });
