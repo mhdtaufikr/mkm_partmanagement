@@ -13,7 +13,79 @@
                         </h1>
                         <div class="page-header-subtitle">Manage Master Machine</div>
                     </div>
-                    {{-- <div class="col-12 col-xl-auto mt-4">Optional page header content</div> --}}
+                    <div class="col-12 col-xl-auto mt-4">
+                        <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#uploadMasterMachine">
+                            <i class="fas fa-file-excel"></i> Master Machine
+                        </button>
+                        <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#uploadMasterPart">
+                            <i class="fas fa-file-excel"></i> Master Part Machine
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="uploadMasterMachine" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modal-add-label">Upload Master Machine</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <form action="{{ url('/mst/machine/upload') }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <input type="file" class="form-control" id="csvFile" name="excel-file" accept=".csv, .xlsx">
+                                                <p class="text-danger">*file must be .xlsx or .csv</p>
+                                            </div>
+                                            @error('excel-file')
+                                                <div class="alert alert-danger" role="alert">
+                                                    {{ $message }}
+                                                </div>
+                                            @enderror
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a href="{{url('/mst/machine/template')}}" class="btn btn-link">
+                                                Download Excel Format
+                                            </a>
+                                            <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                         <!-- Modal -->
+                         <div class="modal fade" id="uploadMasterPart" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modal-add-label">Upload Master Part</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <form action="{{ url('/mst/part/upload') }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <input type="file" class="form-control" id="csvFile" name="excel-file" accept=".csv, .xlsx">
+                                                <p class="text-danger">*file must be .xlsx or .csv</p>
+                                            </div>
+                                            @error('excel-file')
+                                                <div class="alert alert-danger" role="alert">
+                                                    {{ $message }}
+                                                </div>
+                                            @enderror
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a href="{{url('/mst/part/template')}}" class="btn btn-link">
+                                                Download Excel Format
+                                            </a>
+                                            <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -182,7 +254,7 @@
                                         Actions
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li>
+                                        {{-- <li>
                                             <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-update{{ $data->id }}">
                                                 <i class="fas fa-edit"></i> Edit
                                             </button>
@@ -191,7 +263,7 @@
                                             <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-delete{{ $data->id }}">
                                                 <i class="fas fa-trash-alt"></i> Delete
                                             </button>
-                                        </li>
+                                        </li> --}}
                                         <li>
                                             <a class="dropdown-item" href="{{ url('/mst/machine/detail/'.encrypt($data->id)) }}">
                                                 <i class="fas fa-info"></i> Detail

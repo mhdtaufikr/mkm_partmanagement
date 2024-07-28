@@ -15,13 +15,20 @@ use App\Imports\ChecksheetImport;
 
 class PreventiveController extends Controller
 {
-    public function index(){
+    public function index()
+{
+    // Get machine IDs that are already in the preventive_maintenances table
+    $existingMachineIds = PreventiveMaintenance::pluck('machine_id')->toArray();
 
-        $item = PreventiveMaintenanceView::get();
-        $dropdown = Dropdown::where('category','Category')->get();
-        $machine =  Machine::get();
-        return view('master.preventive.index',compact('item','dropdown','machine'));
-    }
+    // Get the list of machines excluding those that already exist in preventive_maintenances
+    $machine = Machine::whereNotIn('id', $existingMachineIds)->get();
+
+    $item = PreventiveMaintenanceView::get();
+    $dropdown = Dropdown::where('category', 'Category')->get();
+
+    return view('master.preventive.index', compact('item', 'dropdown', 'machine'));
+}
+
 
 
     public function store(Request $request) {

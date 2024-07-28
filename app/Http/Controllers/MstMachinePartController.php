@@ -8,6 +8,12 @@ use App\Models\RepairPart;
 use App\Models\Part;
 use App\Models\MachineSparePartsInventory;
 use App\Models\HistoricalProblem;
+use App\Exports\MachineTemplateExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\MachinesImport;
+use Exception;
+use App\Exports\PartTemplateExport;
+use App\Imports\PartsImport;
 
 class MstMachinePartController extends Controller
 {
@@ -121,6 +127,122 @@ class MstMachinePartController extends Controller
 
         return redirect()->back()->with('status', 'Machine added successfully!');
     }
+
+    public function machineTemplate()
+    {
+        return Excel::download(new MachineTemplateExport, 'machine_template.xlsx');
+    }
+
+    public function machineUpload(Request $request)
+    {
+        // Validate the uploaded file
+        $request->validate([
+            'excel-file' => 'required|mimes:xlsx,xls'
+        ]);
+
+        try {
+            // Import the data
+            Excel::import(new MachinesImport, $request->file('excel-file'));
+
+            return redirect()->back()->with('status', 'Machines imported successfully.');
+        } catch (Exception $e) {
+            // Return with error message if import fails
+            return redirect()->back()->with('failed', $e->getMessage());
+        }
+    }
+
+    public function partTemplate()
+    {
+        return Excel::download(new PartTemplateExport, 'part_template.xlsx');
+    }
+
+    public function partUpload(Request $request)
+    {
+        // Validate the uploaded file
+        $request->validate([
+            'excel-file' => 'required|mimes:xlsx,xls'
+        ]);
+
+        try {
+            // Import the data
+            Excel::import(new PartsImport, $request->file('excel-file'));
+
+            return redirect()->back()->with('status', 'Parts imported successfully.');
+        } catch (Exception $e) {
+            // Return with error message if import fails
+            return redirect()->back()->with('failed', $e->getMessage());
+        }
+    }
+
+    public function addImage(Request $request)
+{
+    // Validate the incoming request
+    $request->validate([
+        'id' => 'required|exists:machines,id', // Ensure the machine ID exists
+        'new_images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048', // Validate the image files
+    ]);
+
+    // Retrieve the machine
+    $machine = Machine::findOrFail($request->id);
+
+    $imagePaths = $machine->img ? json_decode($machine->img, true) : [];
+
+    // Check if the request has any new images
+    if ($request->hasFile('new_images')) {
+        foreach ($request->file('new_images') as $file) {
+            // Generate a unique file name for each image
+            $fileName = uniqid() . '_' . $file->getClientOriginalName();
+
+            // Move the uploaded image to the storage directory
+            $destinationPath = public_path('assets/img/machine');
+            $file->move($destinationPath, $fileName);
+
+            // Store the image path in the array
+            $imagePaths[] = 'assets/img/machine/' . $fileName;
+        }
+
+        // Save the updated machine with the new image paths
+        $machine->img = json_encode($imagePaths); // Convert back to JSON before saving
+        $machine->save();
+    }
+
+    // Redirect back with a success message
+    return redirect()->back()->with('success', 'Images uploaded successfully.');
+}
+
+public function deleteImage(Request $request)
+{
+    // Retrieve the image path and machine ID from the request data
+    $imgPath = $request->input('img_path');
+    $machineId = $request->input('id');
+
+    // Find the machine by ID
+    $machine = Machine::findOrFail($machineId);
+
+    // Decode the image paths from JSON
+    $imagePaths = json_decode($machine->img, true);
+
+    // Find the index of the image path to delete
+    $index = array_search($imgPath, $imagePaths);
+
+    // If the image path exists, remove it from the array
+    if ($index !== false) {
+        unset($imagePaths[$index]);
+
+        // Update the image paths in the database
+        $machine->img = json_encode(array_values($imagePaths));
+        $machine->save();
+
+        // Delete the image file from the server
+        $imageFilePath = public_path($imgPath);
+        if (file_exists($imageFilePath)) {
+            unlink($imageFilePath);
+        }
+    }
+
+    // Redirect back with a success message
+    return redirect()->back()->with('success', 'Image deleted successfully.');
+}
 
 
 }

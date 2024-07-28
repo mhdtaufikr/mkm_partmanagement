@@ -5,16 +5,20 @@
     <header class="page-header page-header-dark bg-gradient-primary-to-secondary pb-10">
         <div class="container-fluid px-4">
             <div class="page-header-content pt-4">
-                {{-- <div class="row align-items-center justify-content-between">
+                <div class="row align-items-center justify-content-between">
                     <div class="col-auto mt-4">
                         <h1 class="page-header-title">
-                            <div class="page-header-icon"><i data-feather="tool"></i></div>
-                            Dropdown App Menu
+                            <div class="page-header-icon"><i class="fas fa-clipboard-list"></i></div>
+                           Preventive Maintanance Form Master
                         </h1>
-                        <div class="page-header-subtitle">Use this blank page as a starting point for creating new pages inside your project!</div>
+                        <div class="page-header-subtitle">Manage Master Preventive Maintanance Form Master</div>
                     </div>
-                    <div class="col-12 col-xl-auto mt-4">Optional page header content</div>
-                </div> --}}
+                    <div class="col-12 col-xl-auto mt-4">
+                        <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#uploadPlannedModal">
+                            <i class="fas fa-file-excel"></i> Master Checksheet
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -40,7 +44,7 @@
           <div class="col-12">
             <div class="card">
               <div class="card-header">
-                <h3 class="card-title">List Machine</h3>
+                <h3 class="card-title">List Checksheet</h3>
               </div>
 
               <!-- /.card-header -->
@@ -50,9 +54,7 @@
                         <button type="button" class="btn btn-dark btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#modal-add">
                             <i class="fas fa-plus-square"></i>
                           </button>
-                          <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#uploadPlannedModal">
-                            <i class="fas fa-file-excel"></i> Master Checksheet
-                        </button>
+
 
                         <!-- Modal -->
                         <div class="modal fade" id="uploadPlannedModal" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">

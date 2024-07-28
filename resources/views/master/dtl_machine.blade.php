@@ -1,13 +1,13 @@
 @extends('layouts.master')
 
 @section('content')
-<style>
+{{-- <style>
     .btn {
         width: 100px; /* Adjust width as needed */
         height: 40px; /* Adjust height as needed */
         font-size: 14px; /* Adjust font size as needed */
     }
-</style>
+</style> --}}
 <main>
     <header class="page-header page-header-dark bg-gradient-primary-to-secondary pb-10">
         <div class="container-fluid px-4">
@@ -55,17 +55,50 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-3 text-center">
+                                    <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                                        <div class="carousel-inner">
+                                            @php
+                                            $imagePaths = $machine->img ? json_decode($machine->img) : [];
+                                            @endphp
+
+                                            @foreach($imagePaths as $key => $imagePath)
+                                            <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
+                                                <img src="{{ asset($imagePath) }}" class="d-block w-100" alt="Image {{ $key + 1 }}">
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Previous</span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Next</span>
+                                        </button>
+                                    </div>
+
+                                    <h3 class="text-center">{{ $machine->machine_name }}</h3>
+
+                                    <!-- Button trigger modal -->
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#imageModal">
+                                        Manage Images
+                                    </button>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <strong>OP No.</strong>
+                                    <p>{{ $machine->op_no }}</p>
                                     <strong>Machine Name</strong>
                                     <p>{{ $machine->machine_name }}</p>
                                     <strong>Plant</strong>
                                     <p>{{ $machine->plant }}</p>
                                     <strong>Line</strong>
                                     <p>{{ $machine->line }}</p>
-                                    <strong>OP No.</strong>
-                                    <p>{{$machine->op_no}}</p>
+                                    <strong>Asset No.</strong>
+                                    <p>{{ $machine->asset_no }}</p>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <strong>Process</strong>
                                     <p>{{ $machine->process }}</p>
                                     <strong>Maker</strong>
@@ -74,18 +107,70 @@
                                     <p>{{ $machine->model }}</p>
                                     <strong>Serial Number</strong>
                                     <p>{{ $machine->serial_number }}</p>
+                                    <strong>Install Date</strong>
+                                    <p>{{ $machine->install_date }}</p>
                                 </div>
-                                <div class="col-md-4">
-                                    <strong>Date</strong>
-                                    <p>{{ $machine->date }}</p>
-                                    <strong>Control Nc</strong>
-                                    <p>{{ $machine->control_nc }}</p>
-                                    <strong>Control Plc</strong>
-                                    <p>{{ $machine->control_plc }}</p>
-                                    <strong>Control Servo</strong>
-                                    <p>{{ $machine->control_servo }}</p>
+                                <div class="col-md-3">
+                                    <strong>Mfg Date</strong>
+                                    <p>{{ $machine->mfg_date }}</p>
+                                    <strong>Electrical Control</strong>
+                                    <p>{{ $machine->electrical_co }}</p>
+                                    <strong>Location</strong>
+                                    <p>{{ $machine->location }}</p>
                                 </div>
                             </div>
+
+                            {{-- Modal Image CRUD --}}
+                            <!-- Modal -->
+                            <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="imageModalLabel">Manage Images</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <!-- Add a container for the "Add New" row -->
+                                            <div class="mb-3">
+                                                <form id="searchForm" action="{{ url('/mst/machine/add/image') }}" method="POST" enctype="multipart/form-data">
+                                                    @csrf
+                                                    <h5>Add New Images</h5>
+                                                    <input name="id" type="text" value="{{ $machine->id }}" hidden>
+                                                    <div class="input-group">
+                                                        <input type="file" class="form-control" name="new_images[]" multiple>
+                                                        <button class="btn btn-primary" type="submit">Upload</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="row">
+                                                <!-- Loop through the images and display them in a grid -->
+                                                @foreach($imagePaths as $key => $imagePath)
+                                                <div class="col-md-4 mb-3">
+                                                    <div class="card">
+                                                        <img src="{{ asset($imagePath) }}" class="card-img-top" alt="Image {{ $key + 1 }}" style="height: 200px; width: auto;">
+                                                        <div class="card-body">
+                                                            <!-- Use a form to delete the image -->
+                                                            <form action="{{ route('machine.delete.image') }}" method="POST">
+                                                                @csrf
+                                                                <input type="hidden" name="img_path" value="{{ $imagePath }}">
+                                                                <input type="hidden" name="id" value="{{ $machine->id }}">
+                                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <!-- Add buttons for saving changes or performing other actions -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
                         </div>
                     </div>
                 </div>

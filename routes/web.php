@@ -71,7 +71,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/mst/machine/repair', [MstMachinePartController::class, 'repair'])->middleware(['checkRole:IT']);
     Route::post('/mst/machine/add-part', [MstMachinePartController::class, 'store'])->middleware(['checkRole:IT']);
     Route::post('/mst/machine/add', [MstMachinePartController::class, 'storeMachine'])->middleware(['checkRole:IT']);
-
+    Route::get('/mst/machine/template', [MstMachinePartController::class, 'machineTemplate'])->middleware(['checkRole:IT']);
+    Route::post('/mst/machine/upload', [MstMachinePartController::class, 'machineUpload'])->middleware(['checkRole:IT']);
+    Route::get('/mst/part/template', [MstMachinePartController::class, 'partTemplate'])->middleware(['checkRole:IT']);
+    Route::post('/mst/part/upload', [MstMachinePartController::class, 'partUpload'])->middleware(['checkRole:IT']);
+    Route::post('/mst/machine/add/image', [MstMachinePartController::class, 'addImage'])->middleware(['checkRole:IT']);
+    Route::post('mst/machine/delete/image', [MstMachinePartController::class, 'deleteImage'])->name('machine.delete.image');
 
     Route::get('/history', [HistoryController::class, 'index'])->middleware(['checkRole:IT'])->name('history');
      Route::post('/history/store', [HistoryController::class, 'store']);

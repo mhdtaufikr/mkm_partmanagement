@@ -126,19 +126,6 @@ class ChecksheetController extends Controller
         return response()->json($opNos);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
    public function checksheetScan(Request $request){
         if (empty($request->$request->no_mechine)) {
             $item = PreventiveMaintenanceView::where('plant', $request->plant)
