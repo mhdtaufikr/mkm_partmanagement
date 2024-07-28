@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Part;
+use App\Exports\PartsSAPTemplateExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\PartsSAPImport;
+use Illuminate\Support\Facades\DB;
 
 
 class MstPartSAPController extends Controller
@@ -13,5 +17,21 @@ class MstPartSAPController extends Controller
         return view('master.sap',compact('item'));
     }
 
+    public function sapTemplate()
+    {
+        return Excel::download(new PartsSAPTemplateExport, 'parts_sap_template.xlsx');
+    }
+
+    public function sapUpload(Request $request)
+    {
+        try {
+            DB::transaction(function () use ($request) {
+                Excel::import(new PartsSAPImport, $request->file('excel-file'));
+            });
+            return redirect()->back()->with('status', 'File imported successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('failed', 'Failed to import file: ' . $e->getMessage());
+        }
+    }
 
 }
