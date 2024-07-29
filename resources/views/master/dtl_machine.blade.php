@@ -475,134 +475,196 @@
                                         <div class="col-12">
                                             <div class="card">
                                                 <div class="card-body">
-                                                    <div class="row">
-                                                        <div class="mb-3 col-sm-12">
-                                                        </div>
-
-                                                        <div class="table-responsive">
-                                                            <table id="tablehistory" class="table table-bordered table-striped">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>No</th>
-                                                                        <th>Machine No</th>
-                                                                        <th>Date</th>
-                                                                        <th>Shift</th>
-                                                                        <th>Shop</th>
-                                                                        <th>Problem</th>
-                                                                        <th>Cause</th>
-                                                                        <th>Action</th>
-                                                                        <th>Start Time</th>
-                                                                        <th>Finish Time</th>
-                                                                        <th>Balance</th>
-                                                                        <th>PIC</th>
-                                                                        <th>Remarks</th>
-                                                                        <th>Status</th>
-                                                                        <th>Action</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    @php
-                                                                        $no = 1;
-                                                                    @endphp
-                                                                    @foreach ($items as $data)
-                                                                    <tr>
-                                                                        <td>{{ $no++ }}</td>
-                                                                        <td>{{ $data->machine->op_no }}</td>
-                                                                        <td>{{ $data->date }}</td>
-                                                                        <td>{{ $data->shift }}</td>
-                                                                        <td>{{ $data->shop }}</td>
-                                                                        <td>{{ $data->problem }}</td>
-                                                                        <td>{{ $data->cause }}</td>
-                                                                        <td>{{ $data->action }}</td>
-                                                                        <td>{{ $data->start_time }}</td>
-                                                                        <td>{{ $data->finish_time }}</td>
-                                                                        <td>{{ $data->balance }} Hour</td>
-                                                                        <td>{{ $data->pic }}</td>
-                                                                        <td>{{ $data->remarks }}</td>
-                                                                        <td>{{ $data->status }}</td>
-                                                                        <td>
-                                                                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-detail-{{ $data->id }}">Detail</button>
-                                                                        </td>
-                                                                    </tr>
-                                                                    @endforeach
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
+                                                    <div class="table-responsive">
+                                                        <table id="combinedTable" class="table table-bordered table-striped">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>No</th>
+                                                                    <th>Date</th>
+                                                                    <th>Type</th>
+                                                                    <th>Details</th>
+                                                                    <th>Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @php
+                                                                    $no = 1;
+                                                                @endphp
+                                                                @foreach ($combinedData as $data)
+                                                                <tr>
+                                                                    <td>{{ $no++ }}</td>
+                                                                    <td>{{ $data->date }}</td>
+                                                                    <td>{{ $data->type }}</td>
+                                                                    <td>
+                                                                        @if ($data->type == 'Daily Report')
+                                                                            Machine No: {{ $data->data->machine->op_no }}<br>
+                                                                            Problem: {{ $data->data->problem }}<br>
+                                                                            <!-- Add more details if needed -->
+                                                                        @else
+                                                                            Machine Name: {{ $data->data->machine_name }}<br>
+                                                                            Department: {{ $data->data->dept }}<br>
+                                                                            <!-- Add more details if needed -->
+                                                                        @endif
+                                                                    </td>
+                                                                    <td>
+                                                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-detail-{{ $data->data->id }}">Detail</button>
+                                                                    </td>
+                                                                </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                @foreach ($items as $data)
-                                <!-- Modal for showing spare parts used in historical problem -->
-                                <div class="modal fade" id="modal-detail-{{ $data->id }}" tabindex="-1" aria-labelledby="modal-detail-label-{{ $data->id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="modal-detail-label-{{ $data->id }}">Detail of Historical Problem</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="row mb-3">
-                                                    <div class="col-md-6">
-                                                        <h6><strong>Machine No:</strong> {{ $data->no_machine }}</h6>
-                                                        <h6><strong>Date:</strong> {{ $data->date }}</h6>
-                                                        <h6><strong>Shift:</strong> {{ $data->shift }}</h6>
-                                                        <h6><strong>Shop:</strong> {{ $data->shop }}</h6>
-                                                        <h6><strong>Problem:</strong> {{ $data->problem }}</h6>
-                                                        <h6><strong>Cause:</strong> {{ $data->cause }}</h6>
-                                                        <h6><strong>Action:</strong> {{ $data->action }}</h6>
+                                <!-- Modals for details -->
+                                @foreach ($combinedData as $data)
+                                @if ($data->type == 'Daily Report')
+                                    <!-- Modal for Daily Report -->
+                                    <div class="modal fade" id="modal-detail-{{ $data->data->id }}" tabindex="-1" aria-labelledby="modal-detail-label-{{ $data->data->id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="modal-detail-label-{{ $data->data->id }}">Detail of Daily Report</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-6">
+                                                            <h6><strong>Machine No:</strong> {{ $data->data->machine->op_no }}</h6>
+                                                            <h6><strong>Date:</strong> {{ $data->data->date }}</h6>
+                                                            <h6><strong>Shift:</strong> {{ $data->data->shift }}</h6>
+                                                            <h6><strong>Shop:</strong> {{ $data->data->shop }}</h6>
+                                                            <h6><strong>Problem:</strong> {{ $data->data->problem }}</h6>
+                                                            <h6><strong>Cause:</strong> {{ $data->data->cause }}</h6>
+                                                            <h6><strong>Action:</strong> {{ $data->data->action }}</h6>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <h6><strong>Start Time:</strong> {{ $data->data->start_time }}</h6>
+                                                            <h6><strong>Finish Time:</strong> {{ $data->data->finish_time }}</h6>
+                                                            <h6><strong>Balance:</strong> {{ $data->data->balance }} Hour</h6>
+                                                            <h6><strong>PIC:</strong> {{ $data->data->pic }}</h6>
+                                                            <h6><strong>Remarks:</strong> {{ $data->data->remarks }}</h6>
+                                                            <h6><strong>Status:</strong> {{ $data->data->status }}</h6>
+                                                        </div>
                                                     </div>
-                                                    <div class="col-md-6">
-                                                        <h6><strong>Start Time:</strong> {{ $data->start_time }}</h6>
-                                                        <h6><strong>Finish Time:</strong> {{ $data->finish_time }}</h6>
-                                                        <h6><strong>Balance:</strong> {{ $data->balance }} Hour</h6>
-                                                        <h6><strong>PIC:</strong> {{ $data->pic }}</h6>
-                                                        <h6><strong>Remarks:</strong> {{ $data->remarks }}</h6>
-                                                        <h6><strong>Status:</strong> {{ $data->status }}</h6>
+                                                    @if($data->data->img)
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-12 text-center">
+                                                            <img src="{{ asset( $data->data->img) }}" class="img-fluid" alt="Problem Image">
+                                                        </div>
+                                                    </div>
+                                                    @endif
+                                                    <hr>
+                                                    <h5 class="mb-3">Spare Parts Used</h5>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered table-striped">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Part No</th>
+                                                                    <th>Description</th>
+                                                                    <th>Quantity</th>
+                                                                    <th>Location</th>
+                                                                    <th>Stock Type</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ($data->data->spareParts as $part)
+                                                                <tr>
+                                                                    <td>{{ $part->part->material }}</td>
+                                                                    <td>{{ $part->part->material_description }}</td>
+                                                                    <td>{{ $part->qty }}</td>
+                                                                    <td>{{ $part->location }}</td>
+                                                                    <td>{{ $part->routes }}</td>
+                                                                </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
                                                     </div>
                                                 </div>
-                                                @if($data->img)
-                                                <div class="row mb-3">
-                                                    <div class="col-md-12 text-center">
-                                                        <img src="{{ asset( $data->img) }}" class="img-fluid" alt="Problem Image">
-                                                    </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                 </div>
-                                                @endif
-                                                <hr>
-                                                <h5 class="mb-3">Spare Parts Used</h5>
-                                                <div class="table-responsive">
-                                                    <table class="table table-bordered table-striped">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Part No</th>
-                                                                <th>Description</th>
-                                                                <th>Quantity</th>
-                                                                <th>Location</th>
-                                                                <th>Stock Type</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach ($data->spareParts as $part)
-                                                            <tr>
-                                                                <td>{{ $part->part->material }}</td>
-                                                                <td>{{ $part->part->material_description }}</td>
-                                                                <td>{{ $part->qty }}</td>
-                                                                <td>{{ $part->location }}</td>
-                                                                <td>{{ $part->routes }}</td>
-                                                            </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                @else
+                                    <!-- Modal for Preventive Maintenance -->
+                                    <div class="modal fade" id="modal-detail-{{ $data->data->checksheet_id }}" tabindex="-1" aria-labelledby="modal-detail-label-{{ $data->data->checksheet_id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="modal-detail-label-{{ $data->data->checksheet_id }}">Detail of Preventive Maintenance</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-6">
+                                                            <h6><strong>Machine Name:</strong> {{ $data->data->machine_name }}</h6>
+                                                            <h6><strong>Department:</strong> {{ $data->data->dept }}</h6>
+                                                            <h6><strong>Shop:</strong> {{ $data->data->shop }}</h6>
+                                                            <h6><strong>Effective Date:</strong> {{ $data->data->effective_date }}</h6>
+                                                            <h6><strong>Mfg Date:</strong> {{ $data->data->mfg_date }}</h6>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <h6><strong>Type:</strong> {{ $data->data->type }}</h6>
+                                                            <h6><strong>Revision:</strong> {{ $data->data->revision }}</h6>
+                                                            <h6><strong>Procedure No:</strong> {{ $data->data->no_procedure }}</h6>
+                                                            <h6><strong>Planning Date:</strong> {{ $data->data->planning_date }}</h6>
+                                                            <h6><strong>Actual Date:</strong> {{ $data->data->actual_date }}</h6>
+                                                            <h6><strong>Status:</strong> {{ $data->data->status }}</h6>
+                                                        </div>
+                                                    </div>
+                                                    <hr>
+                                                    <h5 class="mb-3">Checksheet Logs</h5>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered table-striped">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>No</th>
+                                                                    <th>User</th>
+                                                                    <th>Action</th>
+                                                                    <th>Remark</th>
+                                                                    <th>Date</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ($data->data->logs as $log)
+                                                                <tr>
+                                                                    <td>{{ $loop->iteration }}</td>
+                                                                    <td>{{ $log->user->name }}</td>
+                                                                    <td>
+                                                                        @if($log->action == 0)
+                                                                            <span class="badge bg-primary">Update</span>
+                                                                        @elseif($log->action == 1)
+                                                                            <span class="badge bg-info">Check</span>
+                                                                        @elseif($log->action == 2)
+                                                                            <span class="badge bg-warning">Waiting Approval</span>
+                                                                        @elseif($log->action == 3)
+                                                                            <span class="badge bg-danger">Remand</span>
+                                                                        @elseif($log->action == 4)
+                                                                            <span class="badge bg-success">Done</span>
+                                                                        @else
+                                                                            <span class="badge bg-secondary">Unknown Status</span>
+                                                                        @endif
+                                                                    </td>
+                                                                    <td>{{ $log->remark }}</td>
+                                                                    <td>{{ $log->created_at }}</td>
+                                                                </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                                 @endforeach
 
                                 <!-- Documentation Tab -->
