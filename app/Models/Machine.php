@@ -31,4 +31,9 @@ class Machine extends Model
     {
         return $this->hasMany(HistoricalProblem::class, 'id_machine');
     }
+
+    public function pmSchedules()
+{
+    return $this->hasMany(PmScheduleMaster::class);
+}
 }

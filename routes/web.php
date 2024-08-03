@@ -106,6 +106,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/mst/checksheet/item/update/{id}', [PreventiveController::class, 'updateChecksheetItem'])->middleware(['checkRole:IT,Super Admin']);
     Route::get('/checksheet/template', [PreventiveController::class, 'template'])->middleware(['checkRole:IT,Super Admin']);
     Route::post('/checksheet/upload', [PreventiveController::class, 'upload'])->middleware(['checkRole:IT,Super Admin']);
+    Route::get('/mst/preventive/schedule', [PreventiveController::class, 'pmSchedule'])->middleware(['checkRole:IT,Super Admin']);
 
 
     //checksheet
@@ -127,9 +128,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/checksheet/checker/store', [ChecksheetController::class, 'checksheetCheckerStore'])->middleware(['checkRole:IT,Super Admin,Checker']);
 
     Route::get('checksheet/generate-pdf/{id}', [ChecksheetController::class, 'generatePdf'])->middleware(['checkRole:IT,Super Admin,Approval,Checker,User']);
-    Route::get('/get-locations', [ChecksheetController::class, 'getLocations']);
-    Route::get('/get-lines', [ChecksheetController::class, 'getLines']);
-    Route::get('/get-opnos', [ChecksheetController::class, 'getOpNos']);
+    Route::get('/get-plants', [ChecksheetController::class, 'getPlants'])->name('get.plants');
+    Route::get('/get-shops', [ChecksheetController::class, 'getShops'])->name('get.shops');
+    Route::get('/get-opNos', [ChecksheetController::class, 'getOpNos'])->name('get.opNos');
+    Route::get('/get-machineNames', [ChecksheetController::class, 'getMachineNames'])->name('get.machineNames');
+
 
 
 

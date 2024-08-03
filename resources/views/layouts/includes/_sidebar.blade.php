@@ -36,7 +36,10 @@
                         <a class="nav-link" href="{{url('/mst/repair/part')}}">Repair Part</a>
                      </nav>
                      <nav class="sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{url('/mst/preventive')}}">Preventive Maintanance Form</a>
+                        <a class="nav-link" href="{{url('/mst/preventive')}}">PM Form</a>
+                     </nav>
+                     <nav class="sidenav-menu-nested nav">
+                        <a class="nav-link" href="{{url('/mst/preventive/schedule')}}">PM Schedule Master</a>
                      </nav>
                  </div>
                 @if(\Auth::user()->role === 'IT')

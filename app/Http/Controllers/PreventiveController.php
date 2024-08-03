@@ -8,6 +8,7 @@ use App\Models\PreventiveMaintenanceView;
 use App\Models\Checksheet;
 use App\Models\ChecksheetItem;
 use App\Models\Dropdown;
+use App\Models\PmScheduleMaster;
 use App\Models\Machine;
 use App\Exports\TemplateExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -255,5 +256,33 @@ class PreventiveController extends Controller
                 return back()->with('failed', 'Error importing file: ' . $e->getMessage());
             }
         }
+
+        public function pmSchedule()
+        {
+            $items = PmScheduleMaster::with(['details', 'preventiveMaintenance.machine'])
+                ->get()
+                ->groupBy(function ($item) {
+                    return $item->preventiveMaintenance->type ?? 'Unknown';
+                })
+                ->map(function ($group) {
+                    return $group->groupBy(function ($item) {
+                        return $item->preventiveMaintenance->machine->line ?? 'Unknown';
+                    });
+                });
+
+            return view('master.schedule.index', compact('items'));
+        }
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

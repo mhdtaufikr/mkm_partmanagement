@@ -89,16 +89,20 @@
                                 <div class="col-md-3">
                                     <strong>OP No.</strong>
                                     <p>{{ $machine->op_no }}</p>
-                                    <strong>Machine Name</strong>
-                                    <p>{{ $machine->machine_name }}</p>
-                                    <strong>Plant</strong>
-                                    <p>{{ $machine->plant }}</p>
+
+
                                     <strong>Line</strong>
                                     <p>{{ $machine->line }}</p>
+                                    <strong>Plant</strong>
+                                    <p>{{ $machine->plant }}</p>
+                                    <strong>Location</strong>
+                                    <p>{{ $machine->location }}</p>
                                     <strong>Asset No.</strong>
                                     <p>{{ $machine->asset_no }}</p>
                                 </div>
                                 <div class="col-md-3">
+                                    <strong>Machine Name</strong>
+                                    <p>{{ $machine->machine_name }}</p>
                                     <strong>Process</strong>
                                     <p>{{ $machine->process }}</p>
                                     <strong>Maker</strong>
@@ -107,16 +111,16 @@
                                     <p>{{ $machine->model }}</p>
                                     <strong>Serial Number</strong>
                                     <p>{{ $machine->serial_number }}</p>
-                                    <strong>Install Date</strong>
-                                    <p>{{ $machine->install_date }}</p>
+
                                 </div>
                                 <div class="col-md-3">
                                     <strong>Mfg Date</strong>
                                     <p>{{ $machine->mfg_date }}</p>
-                                    <strong>Electrical Control</strong>
+                                    <strong>Install Date</strong>
+                                    <p>{{ $machine->install_date }}</p>
+                                    <strong>Specification (Electrical Controll)</strong>
                                     <p>{{ $machine->electrical_co }}</p>
-                                    <strong>Location</strong>
-                                    <p>{{ $machine->location }}</p>
+
                                 </div>
                             </div>
 

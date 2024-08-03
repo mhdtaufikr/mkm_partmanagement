@@ -5,20 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PreventiveMaintenance extends Model
+class PmScheduleMaster extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'machine_id',
-        'no_document',
-        'type',
-        'dept',
-        'shop',
-        'effective_date',
-        'mfg_date',
-        'revision',
-        'no_procedure',
+        'pm_id',
+        'frequency',
         'created_at',
         'updated_at',
     ];
@@ -26,5 +19,14 @@ class PreventiveMaintenance extends Model
     public function machine()
     {
         return $this->belongsTo(Machine::class);
+    }
+
+    public function preventiveMaintenance()
+    {
+        return $this->belongsTo(PreventiveMaintenance::class, 'pm_id');
+    }
+    public function details()
+    {
+        return $this->hasMany(PmScheduleDetail::class);
     }
 }

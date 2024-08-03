@@ -55,6 +55,9 @@
         <!-- Include Chosen JS -->
         <script src="{{asset('chosen/chosen.jquery.min.js')}}"></script>
 
+        <!-- Day Pilot JS -->
+        <link type="text/css" rel="stylesheet" href="https://cdn.daypilot.org/daypilot-all.min.css" />
+    <script src="https://cdn.daypilot.org/daypilot-all.min.js"></script>
 
 
     </head>

@@ -17,4 +17,8 @@ class ChecksheetFormHead extends Model
     {
         return $this->belongsTo(PreventiveMaintenanceView::class, 'preventive_maintenances_id', 'id');
     }
+    public function detail()
+    {
+        return $this->hasOne(PmScheduleDetail::class, 'checksheet_form_heads_id');
+    }
 }

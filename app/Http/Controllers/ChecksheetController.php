@@ -23,114 +23,126 @@ use App\Mail\CheckerReminder;
 use App\Mail\ChecksheetApprovalNotification;
 use DB;
 use PDF;
+use App\Models\PmFilterView; // Ensure this model is imported
 
 class ChecksheetController extends Controller
 {
-    public function index(Request $request)
-    {
-        // Build the base query from preventive_maintenance_view
-        $query = PreventiveMaintenanceView::select(
-                'preventive_maintenance_view.id',
-                'preventive_maintenance_view.machine_no',
-                'preventive_maintenance_view.op_name',
-                'preventive_maintenance_view.machine_name',
-                'preventive_maintenance_view.no_document',
-                'preventive_maintenance_view.type',
-                'preventive_maintenance_view.dept',
-                'preventive_maintenance_view.shop',
-                'preventive_maintenance_view.effective_date',
-                'preventive_maintenance_view.mfg_date',
-                'preventive_maintenance_view.process',
-                'preventive_maintenance_view.revision',
-                'preventive_maintenance_view.no_procedure',
-                'preventive_maintenance_view.plant',
-                'preventive_maintenance_view.location',
-                'preventive_maintenance_view.line',
-                'preventive_maintenance_view.created_at',
-                'preventive_maintenance_view.updated_at',
-                'checksheet_form_heads.id as checksheet_id',
-                'checksheet_form_heads.planning_date',
-                'checksheet_form_heads.actual_date',
-                'checksheet_form_heads.pic',
-                'checksheet_form_heads.status',
-                'checksheet_form_heads.created_by',
-                'checksheet_form_heads.remark',
-                'checksheet_form_heads.created_at as checksheet_created_at',
-                'checksheet_form_heads.updated_at as checksheet_updated_at'
-            )
-            ->join('checksheet_form_heads', 'preventive_maintenance_view.id', '=', 'checksheet_form_heads.preventive_maintenances_id');
 
-        // Apply role-based filters
-        if (Auth::user()->role == "Checker" || Auth::user()->role == "Approval") {
-            $items = $query->orderBy('checksheet_form_heads.created_at', 'desc')->get();
-        } elseif (Auth::user()->role == "user") {
-            $items = $query->where('checksheet_form_heads.created_by', Auth::user()->name)->orderBy('checksheet_form_heads.created_at', 'desc')->get();
-        } else {
-            $items = $query->orderBy('checksheet_form_heads.created_at', 'desc')->get();
-        }
 
-        // Attach logs to each item
-        foreach ($items as $item) {
-            $item->logs = ChecksheetJourneyLog::where('checksheet_id', $item->checksheet_id)
-                ->orderBy('created_at', 'desc')->get();
-        }
+public function index(Request $request)
+{
+    // Retrieve all distinct types
+    $types = PmFilterView::select('type')->distinct()->get();
 
-        // Retrieve all preventive maintenance records
-        $machines = PreventiveMaintenanceView::all();
+    // Retrieve unique plants, shops, op_nos, and machine names
+    $plants = PmFilterView::select('plant')->distinct()->get();
+    $shops = PmFilterView::select('shop')->distinct()->get();
+    $opNos = PmFilterView::select('op_no')->distinct()->get();
+    $machines = PmFilterView::select('machine_name')->distinct()->get();
 
-        // Retrieve unique plants from preventive maintenance records
-        $plants = PreventiveMaintenanceView::select('plant')->distinct()->get();
+    // Build the base query from preventive_maintenance_view
+    $query = PreventiveMaintenanceView::select(
+        'preventive_maintenance_view.id',
+        'preventive_maintenance_view.machine_no',
+        'preventive_maintenance_view.op_name',
+        'preventive_maintenance_view.machine_name',
+        'preventive_maintenance_view.no_document',
+        'preventive_maintenance_view.type',
+        'preventive_maintenance_view.dept',
+        'preventive_maintenance_view.shop',
+        'preventive_maintenance_view.effective_date',
+        'preventive_maintenance_view.mfg_date',
+        'preventive_maintenance_view.process',
+        'preventive_maintenance_view.revision',
+        'preventive_maintenance_view.no_procedure',
+        'preventive_maintenance_view.plant',
+        'preventive_maintenance_view.location',
+        'preventive_maintenance_view.line',
+        'preventive_maintenance_view.created_at',
+        'preventive_maintenance_view.updated_at',
+        'checksheet_form_heads.id as checksheet_id',
+        'checksheet_form_heads.planning_date',
+        'checksheet_form_heads.actual_date',
+        'checksheet_form_heads.pic',
+        'checksheet_form_heads.status',
+        'checksheet_form_heads.created_by',
+        'checksheet_form_heads.remark',
+        'checksheet_form_heads.created_at as checksheet_created_at',
+        'checksheet_form_heads.updated_at as checksheet_updated_at'
+    )
+    ->join('checksheet_form_heads', 'preventive_maintenance_view.id', '=', 'checksheet_form_heads.preventive_maintenances_id');
 
-        return view('checksheet.index', compact('items', 'machines', 'plants'));
-    }
+// Apply role-based filters
+if (Auth::user()->role == "Checker" || Auth::user()->role == "Approval") {
+    $items = $query->orderBy('checksheet_form_heads.created_at', 'desc')->get();
+} elseif (Auth::user()->role == "user") {
+    $items = $query->where('checksheet_form_heads.created_by', Auth::user()->name)->orderBy('checksheet_form_heads.created_at', 'desc')->get();
+} else {
+    $items = $query->orderBy('checksheet_form_heads.created_at', 'desc')->get();
+}
 
-    public function getLocations(Request $request)
-    {
-        $locations = PreventiveMaintenanceView::where('plant', $request->input('plant'))
-            ->select('location')
-            ->distinct()
-            ->get();
+// Attach logs to each item
+foreach ($items as $item) {
+    $item->logs = ChecksheetJourneyLog::where('checksheet_id', $item->checksheet_id)
+        ->orderBy('created_at', 'desc')->get();
+}
 
-        // Log data untuk debugging
-        \Log::info('Fetched locations:', $locations->toArray());
 
-        return response()->json($locations);
-    }
 
-    public function getLines(Request $request)
-    {
-        $lines = PreventiveMaintenanceView::where('plant', $request->input('plant'))
-            ->where('location', $request->input('location'))
-            ->select('line')
-            ->distinct()
-            ->get();
 
-        // Log data untuk debugging
-        \Log::info('Fetched lines:', $lines->toArray());
+    return view('checksheet.index', compact('types', 'plants', 'shops', 'opNos', 'machines', 'items'));
+}
 
-        return response()->json($lines);
-    }
+public function getPlants(Request $request)
+{
+    $plants = PmFilterView::where('type', $request->input('type'))
+        ->select('plant')
+        ->distinct()
+        ->get();
 
-    public function getOpNos(Request $request)
-    {
-        $opNos = PreventiveMaintenanceView::where('plant', $request->input('plant'))
-            ->where('location', $request->input('location'))
-            ->where('line', $request->input('line'))
-            ->select('op_name', 'machine_name')
-            ->distinct()
-            ->get();
+    return response()->json($plants);
+}
 
-        // Log data untuk debugging
-        \Log::info('Fetched opNos:', $opNos->toArray());
+public function getShops(Request $request)
+{
+    $shops = PmFilterView::where('type', $request->input('type'))
+        ->where('plant', $request->input('plant'))
+        ->select('shop')
+        ->distinct()
+        ->get();
 
-        return response()->json($opNos);
-    }
+    return response()->json($shops);
+}
+
+public function getOpNos(Request $request)
+{
+    $opNos = PmFilterView::where('type', $request->input('type'))
+        ->where('plant', $request->input('plant'))
+        ->where('shop', $request->input('shop'))
+        ->select('op_no')
+        ->distinct()
+        ->get();
+
+    return response()->json($opNos);
+}
+
+public function getMachineNames(Request $request)
+{
+    $machines = PmFilterView::where('type', $request->input('type'))
+        ->where('plant', $request->input('plant'))
+        ->where('shop', $request->input('shop'))
+        ->where('op_no', $request->input('op_no'))
+        ->select('machine_name')
+        ->distinct()
+        ->get();
+
+    return response()->json($machines);
+}
+
 
    public function checksheetScan(Request $request){
         if (empty($request->$request->no_mechine)) {
             $item = PreventiveMaintenanceView::where('plant', $request->plant)
-            ->where('location', $request->location)
-            ->where('line', $request->line)
             ->where('op_name', $request->op_no)
             ->first();
         }else {
