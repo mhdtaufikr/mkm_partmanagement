@@ -273,6 +273,29 @@ class PreventiveController extends Controller
             return view('master.schedule.index', compact('items'));
         }
 
+        public function pmScheduleDetail($month)
+        {
+            $items = PmScheduleMaster::with(['details' => function ($query) use ($month) {
+                $query->whereMonth('annual_date', $month);
+            }, 'preventiveMaintenance.machine'])
+            ->whereHas('details', function ($query) use ($month) {
+                $query->whereMonth('annual_date', $month);
+            })
+            ->get()
+            ->groupBy(function ($item) {
+                return $item->preventiveMaintenance->type ?? 'Unknown';
+            })
+            ->map(function ($group) {
+                return $group->groupBy(function ($item) {
+                    return $item->preventiveMaintenance->machine->line ?? 'Unknown';
+                });
+            });
+
+            return view('master.schedule.detail', compact('items', 'month'));
+        }
+
+
+
 
 
 

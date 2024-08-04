@@ -87,63 +87,7 @@
                             <i class="fas fa-plus-square"></i>
                           </button>
 
-                          <!-- Modal -->
-                          <div class="modal fade" id="modal-add" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">
-                            <div class="modal-dialog">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 class="modal-title" id="modal-add-label">Add Asset</h5>
-                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <form action="{{ url('/mst/store') }}" method="POST">
-                                  @csrf
-                                  <div class="modal-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="">Asset No.</label>
-                                                <input type="text" class="form-control" id="asset_no" name="asset_no" placeholder="Enter Asset No." required>
-                                              </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="">Asset Name</label>
-                                                <input type="text" class="form-control" id="asset_name" name="asset_name" placeholder="Enter Asset Name" required>
-                                              </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="form-group mb-3">
-                                                <label for="">Asset Description</label>
-                                                <textarea  class="form-control" name="asset_description" cols="30" rows="5" required></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group mb-3">
-                                                <label for="qty">Asset Quantity</label>
-                                                <input class="form-control" name="qty" type="number" value="0" required>
-                                            </div>
-                                        </div>
-                                        {{-- <div class="col-md-8">
-                                            <div class="form-group">
-                                                <label for="">Asset Status</label>
-                                                <select name="status" id="status" class="form-control" required>
-                                                    <option value="">- Please Select Status -</option>
-                                                    @foreach ($dropdown as $status)
-                                                        <option value="{{ $status->name_value }}">{{ $status->name_value }}</option>
-                                                    @endforeach
-                                                  </select>
-                                                </div>
-                                        </div> --}}
-                                    </div>
-                                  </div>
-                                  <div class="modal-footer">
-                                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                  </div>
-                                </form>
-                              </div>
-                            </div>
-                          </div>
+
 
 
                       <!--alert success -->
@@ -215,138 +159,34 @@
                                     <td>{{ $data->total_stock }} {{ $data->bun }}</td>
                                     <td>{{ $data->currency }} {{ number_format($data->total_value, 2) }}</td>
                                <td>
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="dropdown">
+                                    <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                         Actions
                                     </button>
-                                    <ul class="dropdown-menu">
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                         <li>
-                                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-update{{ $data->id }}">
-                                                <i class="fas fa-edit"></i> Edit Part
+                                            <button title="Edit Part" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-update{{ $data->id }}">
+                                                <i class="fas fa-edit me-2"></i>Edit Part
                                             </button>
                                         </li>
                                         <li>
-                                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-delete{{ $data->id }}">
-                                                <i class="fas fa-trash-alt"></i> Delete Part
+                                            <button title="Delete Part" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-delete{{ $data->id }}">
+                                                <i class="fas fa-trash-alt me-2"></i>Delete Part
                                             </button>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a title="Detail Part" class="dropdown-item" href="{{ url('/mst/sap/part/info/' . encrypt($data->id)) }}">
+                                                <i class="fas fa-info me-2"></i>Detail Part
+                                            </a>
                                         </li>
                                     </ul>
                                 </div>
+
                             </td>
                             </tr>
 
-                    {{-- Modal Update --}}
-                    <div class="modal fade" id="modal-update{{ $data->id }}" tabindex="-1" aria-labelledby="modal-update{{ $data->id }}-label" aria-hidden="true">
-                        <div class="modal-dialog">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h4 class="modal-title" id="modal-update{{ $data->id }}-label">Edit Rule</h4>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <form action="{{ url('/mst/update/'.encrypt($data->id)) }}" method="POST">
-                              @csrf
-                              @method('post')
-                              <div class="modal-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-3">
-                                            <label for="">Asset No.</label>
-                                            <input value="{{$data->asset_no}}" type="text" class="form-control" id="asset_no" name="asset_no" placeholder="Enter Asset No." required>
-                                          </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-3">
-                                            <label for="">Asset Name</label>
-                                            <input value="{{$data->name}}" type="text" class="form-control" id="asset_name" name="asset_name" placeholder="Enter Asset Name" required>
-                                          </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="form-group mb-3">
-                                            <label for="">Asset Description</label>
-                                            <textarea  class="form-control" name="asset_description" cols="30" rows="5" required>{{$data->description}}</textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group mb-3">
-                                            <label for="qty">Asset Quantity</label>
-                                            <input value="{{$data->qty}}" class="form-control" name="qty" type="number" value="0" required>
-                                        </div>
-                                    </div>
-                                    {{-- <div class="col-md-8">
-                                        <div class="form-group">
-                                            <label for="">Asset Status</label>
-                                            <select name="status" id="status" class="form-control" required>
-                                                <option value="{{$data->status}}">{{$data->status}}</option>
-                                                @foreach ($dropdown as $status)
-                                                    <option value="{{ $status->name_value }}">{{ $status->name_value }}</option>
-                                                @endforeach
-                                              </select>
-                                            </div>
-                                    </div> --}}
-                                </div>
-                              </div>
-                              <div class="modal-footer">
-                                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Update</button>
-                              </div>
-                            </form>
-                          </div>
-                        </div>
-                      </div>
-                    {{-- Modal Update --}}
 
-                    {{-- Modal Delete --}}
-                    <div class="modal fade" id="modal-delete{{ $data->id }}" tabindex="-1" aria-labelledby="modal-delete{{ $data->id }}-label" aria-hidden="true">
-                        <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                            <h4 class="modal-title" id="modal-delete{{ $data->id }}-label">Delete Asset</h4>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <form action="{{ url('/mst/delete/'.encrypt($data->id)) }}" method="POST">
-                            @csrf
-                            @method('post')
-                            <div class="modal-body">
-                                <div class="form-group">
-                                Are you sure you want to delete <label for="rule">{{ $data->name }}</label>?
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </div>
-                            </form>
-                        </div>
-                        </div>
-                    </div>
-                    {{-- Modal Delete --}}
-
-                    {{-- Modal Access --}}
-                    <div class="modal fade" id="modal-access}">
-                      <div class="modal-dialog">
-                          <div class="modal-content">
-                          <div class="modal-header">
-                              <h4 class="modal-title">Give User Access</h4>
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                              <span aria-hidden="true">&times;</span>
-                              </button>
-                          </div>
-                          <form action="{{ url('') }}" enctype="multipart/form-data" method="GET">
-                          @csrf
-                          <div class="modal-body">
-
-                          </div>
-                          <div class="modal-footer justify-content-between">
-                            <button type="button" class="btn btn-dark btn-default" data-dismiss="modal">Close</button>
-                            <input type="submit" class="btn btn-primary" value="Submit">
-                          </div>
-                          </form>
-                          </div>
-                          <!-- /.modal-content -->
-                      </div>
-                    <!-- /.modal-dialog -->
-                    </div>
-                    {{-- Modal Revoke --}}
 
                     @endforeach
                   </tbody>

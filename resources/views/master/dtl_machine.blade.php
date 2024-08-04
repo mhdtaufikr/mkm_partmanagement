@@ -87,41 +87,102 @@
                                 </div>
 
                                 <div class="col-md-3">
-                                    <strong>OP No.</strong>
-                                    <p>{{ $machine->op_no }}</p>
+                                    <div class="card mb-2 border border-dark rounded">
+                                        <div class="card-body p-2">
+                                            <strong>OP No.</strong>
+                                            <p>{{ $machine->op_no }}</p>
+                                        </div>
+                                    </div>
 
+                                    <div class="card mb-2 border border-dark rounded">
+                                        <div class="card-body p-2">
+                                            <strong>Plant</strong>
+                                            <p>{{ $machine->plant }}</p>
+                                        </div>
+                                    </div>
 
-                                    <strong>Line</strong>
-                                    <p>{{ $machine->line }}</p>
-                                    <strong>Plant</strong>
-                                    <p>{{ $machine->plant }}</p>
-                                    <strong>Location</strong>
-                                    <p>{{ $machine->location }}</p>
-                                    <strong>Asset No.</strong>
-                                    <p>{{ $machine->asset_no }}</p>
+                                    <div class="card mb-2 border border-dark rounded">
+                                        <div class="card-body p-2">
+                                            <strong>Line</strong>
+                                            <p>{{ $machine->line }}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2 border border-dark rounded">
+                                        <div class="card-body p-2">
+                                            <strong>Location</strong>
+                                            <p>{{ $machine->location }}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2 border border-dark rounded">
+                                        <div class="card-body p-2">
+                                            <strong>Asset No.</strong>
+                                            <p>{{ $machine->asset_no }}</p>
+                                        </div>
+                                    </div>
                                 </div>
+
                                 <div class="col-md-3">
-                                    <strong>Machine Name</strong>
-                                    <p>{{ $machine->machine_name }}</p>
-                                    <strong>Process</strong>
-                                    <p>{{ $machine->process }}</p>
-                                    <strong>Maker</strong>
-                                    <p>{{ $machine->maker }}</p>
-                                    <strong>Model</strong>
-                                    <p>{{ $machine->model }}</p>
-                                    <strong>Serial Number</strong>
-                                    <p>{{ $machine->serial_number }}</p>
+                                    <div class="card mb-2 border border-dark rounded">
+                                        <div class="card-body p-2">
+                                            <strong>Machine Name</strong>
+                                            <p>{{ $machine->machine_name }}</p>
+                                        </div>
+                                    </div>
 
+                                    <div class="card mb-2 border border-dark rounded">
+                                        <div class="card-body p-2">
+                                            <strong>Process</strong>
+                                            <p>{{ $machine->process }}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2 border border-dark rounded">
+                                        <div class="card-body p-2">
+                                            <strong>Maker</strong>
+                                            <p>{{ $machine->maker }}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2 border border-dark rounded">
+                                        <div class="card-body p-2">
+                                            <strong>Model</strong>
+                                            <p>{{ $machine->model }}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2 border border-dark rounded">
+                                        <div class="card-body p-2">
+                                            <strong>Serial Number</strong>
+                                            <p>{{ $machine->serial_number }}</p>
+                                        </div>
+                                    </div>
                                 </div>
+
                                 <div class="col-md-3">
-                                    <strong>Mfg Date</strong>
-                                    <p>{{ $machine->mfg_date }}</p>
-                                    <strong>Install Date</strong>
-                                    <p>{{ $machine->install_date }}</p>
-                                    <strong>Specification (Electrical Controll)</strong>
-                                    <p>{{ $machine->electrical_co }}</p>
+                                    <div class="card mb-2 border border-dark rounded">
+                                        <div class="card-body p-2">
+                                            <strong>Mfg Date</strong>
+                                            <p>{{ $machine->mfg_date }}</p>
+                                        </div>
+                                    </div>
 
+                                    <div class="card mb-2 border border-dark rounded">
+                                        <div class="card-body p-2">
+                                            <strong>Install Date</strong>
+                                            <p>{{ $machine->install_date }}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2 border border-dark rounded">
+                                        <div class="card-body p-2">
+                                            <strong>Specification (Electrical Control)</strong>
+                                            <p>{{ $machine->electrical_co }}</p>
+                                        </div>
+                                    </div>
                                 </div>
+
                             </div>
 
                             {{-- Modal Image CRUD --}}
@@ -173,10 +234,21 @@
                                     </div>
                                 </div>
                             </div>
-
-
                         </div>
                     </div>
+
+                    <style>
+                        .card-body p {
+                            margin: 0;
+                        }
+                        .card-body {
+                            padding: 0.5rem;
+                        }
+                        .card {
+                            margin-bottom: 0.5rem;
+                        }
+                    </style>
+
                 </div>
 
                 <div class="container-fluid">
@@ -344,6 +416,7 @@
                                                                         $no=1;
                                                                     @endphp
                                                                     @foreach ($machine->spareParts as $part)
+
                                                                         <tr>
                                                                             @php
                                                                                 $status = $machine->inventoryStatus->firstWhere('part_id', $part->part_id);
@@ -372,23 +445,30 @@
                                                                                 @endif
                                                                             </td>
                                                                             <td>
-                                                                                <div class="btn-group">
-                                                                                    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                                <div class="dropdown">
+                                                                                    <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                                                                         Actions
                                                                                     </button>
-                                                                                    <ul class="dropdown-menu">
+                                                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                                                         <li>
-                                                                                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-repair{{ $part->id }}">
-                                                                                                <i class="fas fa-tools"></i>Repair
+                                                                                            <button title="Repair Part" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-repair{{ $part->id }}">
+                                                                                                <i class="fas fa-tools me-2"></i>Repair Part
                                                                                             </button>
                                                                                         </li>
                                                                                         <li>
-                                                                                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-detail{{ $part->id }}">
-                                                                                                <i class="fas fa-info"></i> Detail
+                                                                                            <button title="Detail Part" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-detail{{ $part->id }}">
+                                                                                                <i class="fas fa-info me-2"></i>Detail Part
                                                                                             </button>
+                                                                                        </li>
+                                                                                        <li><hr class="dropdown-divider"></li>
+                                                                                        <li>
+                                                                                            <a target="_blank" title="Master Part" class="dropdown-item" href="{{ url('/mst/sap/part/info/' . encrypt($part->part_id)) }}">
+                                                                                                <i class="fas fa-info me-2"></i>Master Part
+                                                                                            </a>
                                                                                         </li>
                                                                                     </ul>
                                                                                 </div>
+
 
                                                                                 {{-- Modal Update --}}
                                                                                 <div class="modal fade" id="modal-repair{{ $part->id }}" tabindex="-1" aria-labelledby="modal-repair{{ $part->id }}-label" aria-hidden="true">

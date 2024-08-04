@@ -57,8 +57,10 @@ Route::middleware(['auth'])->group(function () {
 
      //mstSAP Part
      Route::get('/mst/sap/part', [MstPartSAPController::class, 'sapPart'])->middleware(['checkRole:IT']);
+     Route::get('/mst/sap/part/info/{id}', [MstPartSAPController::class, 'sapPartDetail'])->middleware(['checkRole:IT']);
      Route::get('/mst/part/sap/template', [MstPartSAPController::class, 'sapTemplate'])->middleware(['checkRole:IT']);
      Route::post('/mst/part/sap/upload', [MstPartSAPController::class, 'sapUpload'])->middleware(['checkRole:IT']);
+
 
     // Repair Parts
     Route::get('/repair-parts', [MstPartRepairController::class, 'repairPart'])->name('repairParts');
@@ -107,6 +109,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checksheet/template', [PreventiveController::class, 'template'])->middleware(['checkRole:IT,Super Admin']);
     Route::post('/checksheet/upload', [PreventiveController::class, 'upload'])->middleware(['checkRole:IT,Super Admin']);
     Route::get('/mst/preventive/schedule', [PreventiveController::class, 'pmSchedule'])->middleware(['checkRole:IT,Super Admin']);
+    Route::get('/mst/preventive/schedule/detail/{month}', [PreventiveController::class, 'pmScheduleDetail'])->middleware(['checkRole:IT,Super Admin']);
 
 
     //checksheet

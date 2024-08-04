@@ -25,8 +25,11 @@
             <div class="card-body">
                 @foreach($items as $type => $lines)
                     <h2>{{ $type }}</h2>
+                    <div class="table-responsive">
+
+
                     <table class="table table-striped table-bordered">
-                        <thead class="text-center align-middle table-info">
+                        <thead class="text-center align-middle ">
                             <tr>
                                 <th rowspan="2">No.</th>
                                 <th rowspan="2">Line</th>
@@ -38,7 +41,10 @@
                             </tr>
                             <tr>
                                 @for($month = 1; $month <= 12; $month++)
-                                    <th>{{ DateTime::createFromFormat('!m', $month)->format('M') }}</th>
+                                <th>
+                                    <a target="_blank" href="{{ url('/mst/preventive/schedule/detail/' . $month) }}">
+                                        {{ DateTime::createFromFormat('!m', $month)->format('M') }}
+                                    </a>
                                 @endfor
                             </tr>
                         </thead>
@@ -88,6 +94,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
                 @endforeach
             </div>
         </div>

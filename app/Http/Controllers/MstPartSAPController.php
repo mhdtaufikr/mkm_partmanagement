@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Part;
+use App\Models\RepairPart;
+use App\Models\MachineSparePartsInventory;
 use App\Exports\PartsSAPTemplateExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\PartsSAPImport;
@@ -33,5 +35,21 @@ class MstPartSAPController extends Controller
             return redirect()->back()->with('failed', 'Failed to import file: ' . $e->getMessage());
         }
     }
+
+    public function sapPartDetail($id) {
+        $id = decrypt($id);
+
+        // Fetch part details
+        $part = Part::find($id);
+
+        // Fetch repair part details
+        $repairParts = RepairPart::where('part_id', $id)->get();
+
+        // Fetch machine details using the part
+        $machineParts = MachineSparePartsInventory::where('part_id', $id)->with('machine')->get();
+
+        return view('master.sapdtl', compact('part', 'repairParts', 'machineParts'));
+    }
+
 
 }
