@@ -110,6 +110,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/checksheet/upload', [PreventiveController::class, 'upload'])->middleware(['checkRole:IT,Super Admin']);
     Route::get('/mst/preventive/schedule', [PreventiveController::class, 'pmSchedule'])->middleware(['checkRole:IT,Super Admin']);
     Route::get('/mst/preventive/schedule/detail/{month}', [PreventiveController::class, 'pmScheduleDetail'])->middleware(['checkRole:IT,Super Admin']);
+    Route::get('/annual/schedule/template', [PreventiveController::class, 'scheduleTemplate'])->middleware(['checkRole:IT,Super Admin']);
+    Route::post('/annual/schedule/upload', [PreventiveController::class, 'scheduleUpload'])->middleware(['checkRole:IT,Super Admin']);
+    Route::put('/annual/schedule/update', [PreventiveController::class, 'updateSchedule'])->name('annual.schedule.update');
 
 
     //checksheet

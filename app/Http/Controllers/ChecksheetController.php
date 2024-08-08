@@ -140,16 +140,25 @@ public function getMachineNames(Request $request)
 }
 
 
-   public function checksheetScan(Request $request){
-        if (empty($request->$request->no_mechine)) {
-            $item = PreventiveMaintenanceView::where('plant', $request->plant)
-            ->where('op_name', $request->op_no)
-            ->first();
-        }else {
-            $item =PreventiveMaintenanceView::where('machine_no',$request->no_mechine)->first();
-        }
-        return view('checksheet.form',compact('item'));
+public function checksheetScan(Request $request){
+    if (empty($request->no_mechine)) {
+        $item = PreventiveMaintenanceView::where('plant', $request->plant)
+        ->where('op_name', $request->op_no)
+        ->first();
+    }else {
+        $item = PreventiveMaintenanceView::where('machine_no', $request->no_mechine)->first();
     }
+
+    $plannedDates = DB::table('pm_schedule_details')
+    ->where('pm_schedule_master_id', $item->id)
+    ->whereNull('actual_date')
+    ->select('id', 'annual_date')
+    ->get();
+
+
+    return view('checksheet.form', compact('item', 'plannedDates'));
+}
+
 
 
     public function storeHeadForm(Request $request)

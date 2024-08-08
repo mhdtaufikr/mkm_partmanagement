@@ -89,17 +89,4 @@
         </div>
     </div>
 </main>
-<style>
-    .table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-.table-container {
-    transform: scale(0.66); /* Adjust this value to scale the table */
-    transform-origin: top left;
-    margin-bottom: -50px;
-}
-
-</style>
 @endsection

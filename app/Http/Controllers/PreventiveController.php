@@ -13,6 +13,10 @@ use App\Models\Machine;
 use App\Exports\TemplateExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ChecksheetImport;
+use App\Imports\ScheduleImport;
+use App\Exports\ScheduleTemplateExport;
+use Illuminate\Support\Facades\Validator;
+use DB;
 
 class PreventiveController extends Controller
 {
@@ -294,6 +298,71 @@ class PreventiveController extends Controller
             return view('master.schedule.detail', compact('items', 'month'));
         }
 
+
+
+        public function scheduleTemplate()
+    {
+        return Excel::download(new ScheduleTemplateExport, 'annual_schedule_template.xlsx');
+    }
+
+        public function scheduleUpload(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'excel-file' => 'required|mimes:xlsx,csv',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Import the file using the custom import class
+            Excel::import(new ScheduleImport, $request->file('excel-file'));
+
+            DB::commit();
+
+            return redirect()->back()->with('status', 'File imported successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('failed', 'Import failed: ' . $e->getMessage());
+        }
+    }
+
+    public function updateSchedule(Request $request)
+    {
+        $scheduleId = $request->input('schedule_id');
+        $frequency = $request->input('frequency');
+        $annualDates = $request->input('annual_dates');
+
+        $schedule = PmScheduleMaster::find($scheduleId);
+        if (!$schedule) {
+            return redirect()->back()->with('failed', 'Schedule not found');
+        }
+
+        DB::transaction(function () use ($schedule, $frequency, $annualDates) {
+            // Update the frequency
+            $schedule->frequency = $frequency;
+            $schedule->save();
+
+            // Delete existing details
+            PmScheduleDetail::where('pm_schedule_master_id', $schedule->id)->delete();
+
+            // Insert new details
+            foreach ($annualDates as $id => $annualDate) {
+                if (!empty($annualDate)) {
+                    PmScheduleDetail::create([
+                        'pm_schedule_master_id' => $schedule->id,
+                        'annual_date' => $annualDate,
+                        'status' => 'Planned', // Set default status
+                    ]);
+                }
+            }
+        });
+
+        return redirect()->back()->with('status', 'Schedule updated successfully');
+    }
 
 
 
