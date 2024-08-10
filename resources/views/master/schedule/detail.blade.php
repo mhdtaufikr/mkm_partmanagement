@@ -60,7 +60,7 @@
                                                             $detail = $schedule->details->firstWhere('annual_date', now()->setMonth($month)->setDay($day)->format('Y-m-d'));
                                                         @endphp
                                                         @if($detail)
-                                                            {!! $detail->actual_date ? '<i class="fas fa-dot-circle"></i>' : '<i class="far fa-dot-circle"></i>' !!}
+                                                            {!! $detail->actual_date ? '<i class="fas fa-circle"></i>' : '<i class="far fa-circle"></i>' !!}
                                                         @endif
                                                     </td>
                                                 @endfor

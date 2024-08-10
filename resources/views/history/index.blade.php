@@ -110,7 +110,7 @@
                             </div>
                             <div>
                                 <label for="date" class="form-label">Date</label>
-                                <input type="date" class="form-control" id="date" name="date" required>
+                                <input type="date" class="form-control" id="date" name="date" value="{{ date('Y-m-d') }}" required>
                             </div>
                         </div>
                     </div>

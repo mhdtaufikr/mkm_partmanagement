@@ -10,6 +10,7 @@ use App\Models\ChecksheetItem;
 use App\Models\Dropdown;
 use App\Models\PmScheduleMaster;
 use App\Models\Machine;
+use App\Models\PmScheduleDetail;
 use App\Exports\TemplateExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ChecksheetImport;
@@ -26,7 +27,7 @@ class PreventiveController extends Controller
     $existingMachineIds = PreventiveMaintenance::pluck('machine_id')->toArray();
 
     // Get the list of machines excluding those that already exist in preventive_maintenances
-    $machine = Machine::whereNotIn('id', $existingMachineIds)->get();
+    $machine = Machine::get();
 
     $item = PreventiveMaintenanceView::get();
     $dropdown = Dropdown::where('category', 'Category')->get();
@@ -59,8 +60,9 @@ class PreventiveController extends Controller
         }
 
         // Check if the preventive maintenance record already exists
-        $existingRecord = PreventiveMaintenance::where('machine_id', $request->id)->first();
-
+        $existingRecord = PreventiveMaintenance::where('machine_id', $request->id)
+        ->where('type',$request->type)
+        ->first();
         if ($existingRecord) {
             // Handle the case where the preventive maintenance record already exists
             return redirect()->back()->with('failed', 'Preventive maintenance record for this machine already exists.');
@@ -263,7 +265,9 @@ class PreventiveController extends Controller
 
         public function pmSchedule()
         {
-            $items = PmScheduleMaster::with(['details', 'preventiveMaintenance.machine'])
+            $items = PmScheduleMaster::with(['details' => function ($query) {
+                $query->orderBy('annual_date'); // Sorting details by date
+            }, 'preventiveMaintenance.machine'])
                 ->get()
                 ->groupBy(function ($item) {
                     return $item->preventiveMaintenance->type ?? 'Unknown';
@@ -274,8 +278,43 @@ class PreventiveController extends Controller
                     });
                 });
 
-            return view('master.schedule.index', compact('items'));
+            $types = DB::table('pm_filter_view')->distinct()->pluck('type');
+
+            return view('master.schedule.index', compact('items', 'types'));
         }
+
+                    public function fetchPlants($type)
+            {
+                $plants = DB::table('pm_filter_view')
+                    ->where('type', $type)
+                    ->distinct()
+                    ->pluck('plant');
+
+                return response()->json($plants);
+            }
+
+            public function fetchShops($type, $plant)
+            {
+                $shops = DB::table('pm_filter_view')
+                    ->where('type', $type)
+                    ->where('plant', $plant)
+                    ->distinct()
+                    ->pluck('shop');
+
+                return response()->json($shops);
+            }
+
+            public function fetchOpNos($type, $plant, $shop)
+            {
+                $opNos = DB::table('pm_filter_view')
+                    ->where('type', $type)
+                    ->where('plant', $plant)
+                    ->where('shop', $shop)
+                    ->distinct()
+                    ->pluck('op_no');
+
+                return response()->json($opNos);
+            }
 
         public function pmScheduleDetail($month)
         {
@@ -331,50 +370,109 @@ class PreventiveController extends Controller
     }
 
     public function updateSchedule(Request $request)
-    {
-        $scheduleId = $request->input('schedule_id');
-        $frequency = $request->input('frequency');
-        $annualDates = $request->input('annual_dates');
+{
+    $scheduleId = $request->input('schedule_id');
+    $annualDates = $request->input('annual_dates');
 
-        $schedule = PmScheduleMaster::find($scheduleId);
-        if (!$schedule) {
-            return redirect()->back()->with('failed', 'Schedule not found');
-        }
-
-        DB::transaction(function () use ($schedule, $frequency, $annualDates) {
-            // Update the frequency
-            $schedule->frequency = $frequency;
-            $schedule->save();
-
-            // Delete existing details
-            PmScheduleDetail::where('pm_schedule_master_id', $schedule->id)->delete();
-
-            // Insert new details
-            foreach ($annualDates as $id => $annualDate) {
-                if (!empty($annualDate)) {
-                    PmScheduleDetail::create([
-                        'pm_schedule_master_id' => $schedule->id,
-                        'annual_date' => $annualDate,
-                        'status' => 'Planned', // Set default status
-                    ]);
-                }
-            }
-        });
-
-        return redirect()->back()->with('status', 'Schedule updated successfully');
+    $schedule = PmScheduleMaster::find($scheduleId);
+    if (!$schedule) {
+        return redirect()->back()->with('failed', 'Schedule not found');
     }
 
+    DB::transaction(function () use ($schedule, $annualDates) {
+        // Fetch all existing schedule details for the current schedule
+        $existingDetails = PmScheduleDetail::where('pm_schedule_master_id', $schedule->id)->get();
+
+        // Update or keep existing details
+        foreach ($annualDates as $id => $annualDate) {
+            $detail = PmScheduleDetail::find($id);
+            if ($detail) {
+                $detail->annual_date = $annualDate;
+                $detail->save();
+            }
+        }
+
+        // Identify and delete any existing details that are not in the current request
+        foreach ($existingDetails as $detail) {
+            if (!in_array($detail->id, array_keys($annualDates))) {
+                if (is_null($detail->actual_date) && is_null($detail->checksheet_form_heads_id)) {
+                    $detail->delete();
+                }
+            }
+        }
+    });
+
+    return redirect()->back()->with('status', 'Schedule updated successfully');
+}
 
 
 
 
+    public function scheduleStore(Request $request)
+{
+    // Step 1: Query the pm_filter_view to get pm_id and machine_id
+    $filter = DB::table('pm_filter_view')
+        ->where('type', $request->type)
+        ->where('plant', $request->plant)
+        ->where('shop', $request->shop)
+        ->where('op_no', $request->op_no)
+        ->first(['pm_id', 'machine_id']);
 
+    if (!$filter) {
+        return redirect()->back()->with('error', 'Invalid selection. Please try again.');
+    }
 
+    // Step 2: Check if the schedule already exists
+    $existingSchedule = DB::table('pm_schedule_masters')
+        ->where('pm_id', $filter->pm_id)
+        ->whereIn('id', function ($query) use ($filter) {
+            $query->select('pm_schedule_master_id')
+                ->from('pm_schedule_details')
+                ->where('pm_schedule_masters.pm_id', $filter->pm_id);
+        })
+        ->first();
 
+    if ($existingSchedule) {
+        return redirect()->back()->with('failed', 'Schedule for this PM ID and Machine ID already exists.');
+    }
 
+    // Step 3: Insert into pm_schedule_masters
+    $pmScheduleMasterId = DB::table('pm_schedule_masters')->insertGetId([
+        'pm_id' => $filter->pm_id,
+        'frequency' => $request->frequency,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
 
+    // Step 4: Calculate and insert the schedule details
+    $frequency = (int)$request->frequency;
+    $date = $request->date;
+    $year = now()->year;
 
+    $months = [];
+    for ($i = 0; $i < 12; $i += $frequency) {
+        $month = $i + $frequency;
+        if ($month <= 12) {
+            $months[] = $month;
+        }
+    }
 
+    $scheduleDetails = [];
+    foreach ($months as $month) {
+        $scheduleDetails[] = [
+            'pm_schedule_master_id' => $pmScheduleMasterId,
+            'annual_date' => \Carbon\Carbon::createFromDate($year, $month, $date)->toDateString(),
+            'status' => 'Scheduled',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+    }
+
+    // Insert the schedule details
+    DB::table('pm_schedule_details')->insert($scheduleDetails);
+
+    return redirect()->back()->with('status', 'Schedule added successfully.');
+}
 
 
 }

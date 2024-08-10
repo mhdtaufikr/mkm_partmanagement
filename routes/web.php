@@ -113,14 +113,21 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/annual/schedule/template', [PreventiveController::class, 'scheduleTemplate'])->middleware(['checkRole:IT,Super Admin']);
     Route::post('/annual/schedule/upload', [PreventiveController::class, 'scheduleUpload'])->middleware(['checkRole:IT,Super Admin']);
     Route::put('/annual/schedule/update', [PreventiveController::class, 'updateSchedule'])->name('annual.schedule.update');
+    Route::get('/fetch-plants/{type}', [PreventiveController::class, 'fetchPlants']);
+    Route::get('/fetch-shops/{type}/{plant}', [PreventiveController::class, 'fetchShops']);
+    Route::get('/fetch-opnos/{type}/{plant}/{shop}', [PreventiveController::class, 'fetchOpNos']);
+    Route::post('/schedule/store', [PreventiveController::class, 'scheduleStore']);
+
+
 
 
     //checksheet
     //Master Checksheet form/checksheet/scan
     Route::get('/checksheet', [ChecksheetController::class, 'index'])->middleware(['checkRole:IT,Super Admin,Approval,Checker,User'])->name('machine');
     Route::post('/checksheet/scan', [ChecksheetController::class, 'checksheetScan'])->middleware(['checkRole:IT,Super Admin,User']);
-    Route::post('/checksheet/store', [ChecksheetController::class, 'storeHeadForm'])->middleware(['checkRole:IT,Super Admin,User']);
-    Route::get('/checksheet/fill/{id}', [ChecksheetController::class, 'checksheetfill'])->middleware(['checkRole:IT,Super Admin,User'])->name('fill');
+    Route::post('/checksheet/store', [ChecksheetController::class, 'storeHeadForm'])->name('checksheet.store');
+    Route::get('/checksheet/fill/{id}', [ChecksheetController::class, 'checksheetfill'])->middleware(['checkRole:IT,Super Admin,User'])->name('fillForm');
+
     Route::post('/checksheet/store/detail', [ChecksheetController::class, 'storeDetailForm'])->middleware(['checkRole:IT,Super Admin,User']);
     Route::get('/checksheet/detail/{id}', [ChecksheetController::class, 'checksheetDetail'])->middleware(['checkRole:IT,Approval,Checker,Super Admin,User']);
     Route::post('/checksheet/signature', [ChecksheetController::class, 'checksheetSignature'])->middleware(['checkRole:IT,Super Admin,User']);

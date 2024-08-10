@@ -150,10 +150,12 @@ public function checksheetScan(Request $request){
     }
 
     $plannedDates = DB::table('pm_schedule_details')
-    ->where('pm_schedule_master_id', $item->id)
-    ->whereNull('actual_date')
-    ->select('id', 'annual_date')
+    ->join('pm_schedule_masters', 'pm_schedule_details.pm_schedule_master_id', '=', 'pm_schedule_masters.id')
+    ->where('pm_schedule_masters.pm_id', $item->id)
+    ->whereNull('pm_schedule_details.actual_date')
+    ->select('pm_schedule_details.id', 'pm_schedule_details.annual_date')
     ->get();
+
 
 
     return view('checksheet.form', compact('item', 'plannedDates'));
@@ -161,20 +163,26 @@ public function checksheetScan(Request $request){
 
 
 
-    public function storeHeadForm(Request $request)
-    {
-        // Validate the incoming request data
-        $request->validate([
-            'id' => 'required|exists:preventive_maintenances,id',
-            'planning_date' => 'required|date',
-            'actual_date' => 'required|date',
-        ]);
+public function storeHeadForm(Request $request)
+{
+    // Validate the incoming request data
+    $request->validate([
+        'id' => 'required|exists:preventive_maintenances,id',
+        'planning_date' => 'required|exists:pm_schedule_details,id', // Validate as the ID in pm_schedule_details
+        'actual_date' => 'required|date',
+    ]);
+
+    DB::beginTransaction(); // Start the transaction
+
+    try {
         // Create a new instance of ChecksheetFormHead model
         $checksheetHead = new ChecksheetFormHead();
 
         // Assign values from the request to the model attributes
         $checksheetHead->preventive_maintenances_id = $request->id;
-        $checksheetHead->planning_date = $request->planning_date;
+        $checksheetHead->planning_date = DB::table('pm_schedule_details')
+                                          ->where('id', $request->planning_date)
+                                          ->value('annual_date'); // Get the actual date from the schedule detail
         $checksheetHead->actual_date = $request->actual_date;
         $checksheetHead->status = 0; // Set status to 0
         $checksheetHead->created_by = Auth::user()->name;
@@ -182,16 +190,45 @@ public function checksheetScan(Request $request){
         // Save the data to the database
         $checksheetHead->save();
 
-        // Get the ID of the newly created record
-        $id = $request->id;
+        // Update the pm_schedule_details table with the actual date and checksheet_form_heads_id
+        $updateResult = DB::table('pm_schedule_details')
+            ->where('id', $request->planning_date)
+            ->update([
+                'checksheet_form_heads_id' => $checksheetHead->id,
+                'actual_date' => $checksheetHead->actual_date,
+                'status' => 'Completed', // Assuming status should be updated as well
+                'updated_at' => now(),
+            ]);
 
+        // If the update fails, throw an exception to trigger the rollback
+        if ($updateResult === 0) {
+            throw new \Exception('Failed to update PM schedule details');
+        }
+
+        // Commit the transaction
+        DB::commit();
+        $checksheetHead->id = $checksheetHead->preventive_maintenances_id;
         // Redirect the user to the 'fill' route with the ID as a parameter
-        return redirect()->route('fill', ['id' => encrypt($id)])->with('status', 'Checksheet head form submitted successfully.');
+        return redirect()->route('fillForm', ['id' => encrypt($checksheetHead->id)])->with('status', 'Checksheet head form submitted successfully.');
+
+    } catch (\Exception $e) {
+        // Rollback the transaction
+        DB::rollBack();
+
+        // Redirect back with an error message
+        return redirect()->back()->with('failed', 'Transaction failed: ' . $e->getMessage());
     }
+}
+
+
+
+
+
 
 
 
     public function checksheetfill($id){
+
         $id = decrypt($id);
 
         // Fetch the preventive maintenance record based on the given ID
@@ -237,56 +274,90 @@ public function checksheetScan(Request $request){
 
     public function storeDetailForm(Request $request)
     {
-        // Mendapatkan data dari request
-        $formData = $request->all();
+        // Validate the incoming request data
+        $request->validate([
+            'pic' => 'required|string|max:45',
+            'remarks' => 'nullable|string|max:255',
+            'file_upload' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'status' => 'required|string|in:Open,Close',
+            'id_header' => 'required|exists:checksheet_form_heads,id',
+            'items' => 'required|array',
+            'items.*.checksheet_category' => 'required|string',
+            'items.*.checksheet_type' => 'required|string',
+        ]);
 
-        // Mendapatkan id header
-        $idHeader = $formData['id_header'];
+        DB::beginTransaction();
 
-        // Mendapatkan item-item yang akan disimpan
-        $items = $formData['items'];
-
-        // Mendapatkan nilai pic dan remarks dari request
-        $pic = $formData['pic'];
-        $remarks = $formData['remarks'];
-
-        $getMail = Rule::where('rule_name', 'Checker')->get();
-
-        // Update pic and remarks for the header id
-        $checksheetHead = ChecksheetFormHead::find($idHeader);
-        if ($checksheetHead) {
-            $checksheetHead->pic = $pic;
-            $checksheetHead->remark = $remarks;
-            $checksheetHead->status = 1; // Update status to 1
-            $checksheetHead->save();
-        }
-
-        // Menyimpan setiap item ke dalam tabel
-        foreach ($items as $itemName => $itemData) {
-            $checksheetDetail = new ChecksheetFormDetail();
-            $checksheetDetail->id_header = $idHeader;
-            $checksheetDetail->checksheet_category = $itemData['checksheet_category']; // Add checksheet category
-            $checksheetDetail->item_name = $itemName;
-            $checksheetDetail->checksheet_type = $itemData['checksheet_type'];
-            $checksheetDetail->act = $itemData['act'] ?? null;
-            $checksheetDetail->B = isset($itemData['B']) ? $itemData['B'] : 0;
-            $checksheetDetail->R = isset($itemData['R']) ? $itemData['R'] : 0;
-            $checksheetDetail->G = isset($itemData['G']) ? $itemData['G'] : 0;
-            $checksheetDetail->PP = isset($itemData['PP']) ? $itemData['PP'] : 0;
-            $checksheetDetail->judge = $itemData['judge'] ?? null;
-            $checksheetDetail->remarks = $itemData['remarks'] ?? null;
-            $checksheetDetail->save();
-        }
-
-        foreach ($getMail as $mail) {
-            if ($checksheetHead && $checksheetHead->status == 1) {
-                Mail::to($mail->rule_value)->send(new CheckerReminder($checksheetHead));
+        try {
+            // Handle the image upload if it exists
+            $imgPath = null;
+            if ($request->hasFile('file_upload')) {
+                $file = $request->file('file_upload');
+                $fileName = uniqid() . '_' . $file->getClientOriginalName();
+                $destinationPath = public_path('assets/img/pm');
+                $file->move($destinationPath, $fileName);
+                $imgPath = 'assets/img/pm/' . $fileName;
             }
-        }
 
-        // Redirect atau response sesuai kebutuhan Anda
-        return redirect()->route('machine')->with('status', 'Checksheet submitted successfully.');
+            // Get the id header
+            $idHeader = $request->input('id_header');
+
+            // Get the items to be saved
+            $items = $request->input('items');
+
+            // Get the values for pic and remarks from the request
+            $pic = $request->input('pic');
+            $remarks = $request->input('remarks');
+            $pmStatus = $request->input('status');
+
+            // Update pic, remarks, pm_status, and img for the header id
+            $checksheetHead = ChecksheetFormHead::find($idHeader);
+            if ($checksheetHead) {
+                $checksheetHead->pic = $pic;
+                $checksheetHead->remark = $remarks;
+                $checksheetHead->status = 1; // Update status to 1
+                $checksheetHead->pm_status = $pmStatus; // Update pm_status
+                $checksheetHead->img = $imgPath; // Update the image path
+                $checksheetHead->save();
+            }
+
+            // Save each item to the table
+            foreach ($items as $itemName => $itemData) {
+                $checksheetDetail = new ChecksheetFormDetail();
+                $checksheetDetail->id_header = $idHeader;
+                $checksheetDetail->checksheet_category = $itemData['checksheet_category']; // Add checksheet category
+                $checksheetDetail->item_name = $itemName;
+                $checksheetDetail->checksheet_type = $itemData['checksheet_type'];
+                $checksheetDetail->act = $itemData['act'] ?? null;
+                $checksheetDetail->B = isset($itemData['B']) ? $itemData['B'] : 0;
+                $checksheetDetail->R = isset($itemData['R']) ? $itemData['R'] : 0;
+                $checksheetDetail->G = isset($itemData['G']) ? $itemData['G'] : 0;
+                $checksheetDetail->PP = isset($itemData['PP']) ? $itemData['PP'] : 0;
+                $checksheetDetail->judge = $itemData['judge'] ?? null;
+                $checksheetDetail->remarks = $itemData['remarks'] ?? null;
+                $checksheetDetail->save();
+            }
+
+            // Send email notifications if status is 1
+            $getMail = Rule::where('rule_name', 'Checker')->get();
+            foreach ($getMail as $mail) {
+                if ($checksheetHead && $checksheetHead->status == 1) {
+                    Mail::to($mail->rule_value)->send(new CheckerReminder($checksheetHead));
+                }
+            }
+
+            // Commit the transaction if everything is successful
+            DB::commit();
+
+            // Redirect with success message
+            return redirect()->route('machine')->with('status', 'Checksheet submitted successfully.');
+        } catch (\Exception $e) {
+            // Rollback the transaction on error
+            DB::rollBack();
+            return redirect()->back()->with('failed', 'An error occurred while submitting the checksheet. Please try again.');
+        }
     }
+
 
 
 

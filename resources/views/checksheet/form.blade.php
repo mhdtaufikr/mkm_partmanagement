@@ -148,7 +148,7 @@
                                                         <div class="col-md-4 mb-2">
                                                             <div class="form-group">
                                                                 <label for="">Actual Date</label>
-                                                                <input type="date" class="form-control" id="actual_date" name="actual_date" placeholder="Enter Actual Date" required>
+                                                                <input value="{{ date('Y-m-d') }}" type="date" class="form-control" id="actual_date" name="actual_date" placeholder="Enter Actual Date" required>
                                                             </div>
                                                         </div>
                                                     </div>

@@ -19,7 +19,7 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="mb-3 col-sm-12">
-                            <form action="{{ url('/checksheet/store/detail') }}" method="POST">
+                            <form action="{{ url('/checksheet/store/detail') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -30,32 +30,45 @@
                                     </div>
 
                                     <!-- Modal structure -->
-                                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">Input Details</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <form>
-                                                        <div class="mb-3">
-                                                            <label for="pic" class="form-label">PIC</label>
-                                                            <input type="text" class="form-control" id="pic" name="pic">
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label for="remarks" class="form-label">Remarks</label>
-                                                            <textarea class="form-control" id="remarks" name="remarks"></textarea>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                    <button type="submit" class="btn btn-primary" id="oneClickButton">Save changes</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Input Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                    @csrf
+                    <div class="mb-3">
+                        <label for="pic" class="form-label">PIC</label>
+                        <input type="text" class="form-control" id="pic" name="pic">
+                    </div>
+                    <div class="mb-3">
+                        <label for="remarks" class="form-label">Remarks</label>
+                        <textarea class="form-control" id="remarks" name="remarks"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="file_upload" class="form-label">Upload File</label>
+                        <input type="file" class="form-control" id="file_upload" name="file_upload">
+                    </div>
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="Open">Open</option>
+                            <option value="Close">Close</option>
+                        </select>
+                    </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" id="oneClickButton">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
                                     <div class="col-sm-12">
                                         <!-- Alert messages -->
