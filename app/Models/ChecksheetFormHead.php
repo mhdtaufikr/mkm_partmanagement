@@ -21,4 +21,14 @@ class ChecksheetFormHead extends Model
     {
         return $this->hasOne(PmScheduleDetail::class, 'checksheet_form_heads_id');
     }
+    public function journeyLogs()
+    {
+        return $this->hasMany(ChecksheetJourneyLog::class, 'checksheet_id');
+    }
+
+    public function statusLogs()
+    {
+        return $this->hasMany(ChecksheetStatusLog::class, 'checksheet_header_id');
+    }
+
 }

@@ -657,11 +657,11 @@
                                                             <tbody>
                                                                 @foreach ($data->data->spareParts as $part)
                                                                 <tr>
-                                                                    <td>{{ $part->part->material }}</td>
-                                                                    <td>{{ $part->part->material_description }}</td>
-                                                                    <td>{{ $part->qty }}</td>
-                                                                    <td>{{ $part->location }}</td>
-                                                                    <td>{{ $part->routes }}</td>
+                                                                    <td>{{ $part->part->material ?? null}}</td>
+                                                                    <td>{{ $part->part->material_description  ?? null}}</td>
+                                                                    <td>{{ $part->qty  ?? null}}</td>
+                                                                    <td>{{ $part->location  ?? null}}</td>
+                                                                    <td>{{ $part->routes ?? null }}</td>
                                                                 </tr>
                                                                 @endforeach
                                                             </tbody>

@@ -6,9 +6,13 @@ use Illuminate\Http\Request;
 use App\Models\HistoricalProblem;
 use App\Models\Machine;
 use App\Models\RepairPart;
+use App\Models\PreventiveMaintenance;
+use App\Models\ChecksheetFormHead;
 use App\Models\HistoricalProblemPart;
+use App\Models\ChecksheetStatusLog;
 use App\Models\MachineSparePartsInventory;
 use DB;
+
 
 class HistoryController extends Controller
 {
@@ -63,6 +67,7 @@ public function getRepairLocations($partId)
 
 public function store(Request $request)
 {
+
     // Get the necessary parameters from the request
     $noMachine = encrypt($request->input('no_machine'));
     $date = $request->input('date');
@@ -76,7 +81,7 @@ public function store(Request $request)
 public function form($no_machine, $date, $shift)
     {
         $no_machine = decrypt($no_machine);
-        $machine_name =
+
 
         // Fetch spare parts related to the machine with part details
         $spareParts = MachineSparePartsInventory::where('machine_id', $no_machine)
@@ -109,9 +114,9 @@ public function storehp(Request $request)
         'problem' => 'required|string',
         'cause' => 'required|string',
         'action' => 'required|string',
-        'spare_part.*' => 'required|integer',
-        'stock_type.*' => 'required|string',
-        'used_qty.*' => 'required|integer',
+        'spare_part.*' => 'nullable|integer',  // Updated to allow null
+        'stock_type.*' => 'nullable|string',   // Updated to allow null
+        'used_qty.*' => 'nullable|integer',    // Updated to allow null
         'start_time' => 'required|date_format:H:i',
         'finish_time' => 'required|date_format:H:i',
         'balance' => 'required|numeric',
@@ -119,6 +124,7 @@ public function storehp(Request $request)
         'status' => 'required|string',
         'remarks' => 'nullable|string',
         'img' => 'nullable|image|max:2048',
+        'checksheet_head_id' => 'nullable|integer', // Add validation for checksheet_head_id
     ]);
 
     // Handle the image upload if it exists
@@ -188,11 +194,37 @@ public function storehp(Request $request)
         ]);
     }
 
-    return redirect()->route('history')->with('status', 'Historical problem recorded successfully');
+    // If checksheet_head_id exists, log the status change
+    if ($request->has('checksheet_head_id')) {
+        ChecksheetStatusLog::create([
+            'historical_id' => $problem->id,
+            'checksheet_header_id' => $request->checksheet_head_id,
+            'created_by' => $validatedData['pic'],
+            'change_date' => $validatedData['date'],
+        ]);
+
+        // Optionally, you can update the checksheet form head status to 'Close' here
+        ChecksheetFormHead::where('id', $request->checksheet_head_id)
+            ->update(['pm_status' => 'Close']);
+    }
+
+    return redirect()->route('machine')->with('status', 'Historical problem recorded successfully');
 }
 
 
 
+    public function formStatus($no_machine, $date, $shift,$pm_id,$checksheet_head_id){
+        $no_machine = decrypt($no_machine);
+        $machine = Machine::where('id',$no_machine)->first();
+        $pm_item = PreventiveMaintenance::where('id',$pm_id)->first();
+        // Fetch spare parts related to the machine with part details
+        $spareParts = MachineSparePartsInventory::where('machine_id', $no_machine)
+                        ->with('part')
+                        ->get();
+
+        return view('history.formStatus', compact('pm_item','machine','no_machine', 'date', 'shift', 'spareParts','pm_id','checksheet_head_id'));
+
+    }
 
 
 

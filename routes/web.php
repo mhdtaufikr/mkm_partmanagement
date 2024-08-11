@@ -93,6 +93,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/form/{no_machine}/{date}/{shift}', [HistoryController::class, 'form'])->name('form');
     Route::get('/get-repair-locations-for-part/{part_id}', [HistoryController::class, 'getRepairLocationsForPart']);
     Route::post('/historical-problems/store', [HistoryController::class, 'storehp'])->name('historical');
+    Route::get('/form/{no_machine}/{date}/{shift}/{id_pm}/{id_checksheet_head}', [HistoryController::class, 'formStatus'])->name('formStatus');
 
 
     //Preventive Maintanance Master
@@ -145,6 +146,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/get-shops', [ChecksheetController::class, 'getShops'])->name('get.shops');
     Route::get('/get-opNos', [ChecksheetController::class, 'getOpNos'])->name('get.opNos');
     Route::get('/get-machineNames', [ChecksheetController::class, 'getMachineNames'])->name('get.machineNames');
+    Route::post('checksheet/change-status', [ChecksheetController::class, 'changeStatus'])->middleware(['checkRole:IT,Super Admin,Checker']);
 
 
 

@@ -25,7 +25,7 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">Insert Historical Problem</h3>
+                                    <h3 class="card-title">Insert Historical Problem - {{$machine->op_no}}</h3>
                                 </div>
                                 <!-- /.card-header -->
                                 <div class="card-body">
@@ -67,16 +67,14 @@
                                                 <input type="hidden" name="id_machine" value="{{ $no_machine }}">
                                                 <input type="hidden" name="date" value="{{ $date }}">
                                                 <input type="hidden" name="shift" value="{{ $shift }}">
-
+                                                <input type="hidden" name="pm_id" value="{{ $pm_id }}">
+                                                <input type="hidden" name="checksheet_head_id" value="{{ $checksheet_head_id }}">
 
                                                 <div class="row mb-4">
                                                     <div class="col-md-3">
                                                         <div class="form-group">
                                                             <label for="shop">Shop</label>
-                                                            <select class="form-control" id="shop" name="shop" required>
-                                                                <option value="Electric">Electric</option>
-                                                                <option value="Mechanic">Mechanic</option>
-                                                            </select>
+                                                            <input readonly class="form-control" value="{{$pm_item->shop}}" type="text" name="shop" id="">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-3">
@@ -104,7 +102,7 @@
                                                         <div class="col-md-3">
                                                             <div class="form-group">
                                                                 <label for="spare_part">Spare Part</label>
-                                                                <select class="form-control spare_part" name="spare_part[]" required>
+                                                                <select class="form-control spare_part" name="spare_part[]" >
                                                                     <option value="">Select Spare Part</option>
                                                                     @foreach($spareParts as $part)
                                                                         <option value="{{ $part->part_id }}" data-sap="{{ $part->sap_stock }}" data-repair="{{ $part->repair_stock }}">{{ $part->part->material }}</option>
@@ -115,7 +113,7 @@
                                                         <div class="col-md-3">
                                                             <div class="form-group">
                                                                 <label for="stock_type">Stock Type</label>
-                                                                <select class="form-control stock_type" name="stock_type[]" required>
+                                                                <select class="form-control stock_type" name="stock_type[]" >
                                                                     <option value="sap">New (SAP)</option>
                                                                     <option value="repair">Repair (Extend)</option>
                                                                 </select>
