@@ -25,7 +25,7 @@
                         <div class="col-12 mb-4">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">{{$itemHead->machine_name}}</h3>
+                                    <h3 class="card-title">{{$itemHead->preventiveMaintenance->machine->machine_name}}</h3>
                                 </div>
 
                               <!-- /.card-header -->
@@ -85,13 +85,13 @@
                                                 <div class="col-md-4 mb-2">
                                                     <div class="form-group">
                                                         <label for="">OP No.</label>
-                                                        <input type="text" class="form-control" id="op_number" name="op_number" placeholder="Enter OP No." value="{{$itemHead->op_name}}" readonly required>
+                                                        <input type="text" class="form-control" id="op_number" name="op_number" placeholder="Enter OP No." value="{{$itemHead->preventiveMaintenance->machine->op_no}}" readonly required>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4 mb-2">
                                                     <div class="form-group">
                                                         <label for="">Mfg Date</label>
-                                                        <input readonly value="{{$itemHead->manufacturing_date}}" type="date" class="form-control" id="mfg_date" name="mfg_date" placeholder="Enter MFG Date" required>
+                                                        <input readonly value="{{$itemHead->preventiveMaintenance->machine->mfg_date}}" type="date" class="form-control" id="mfg_date" name="mfg_date" placeholder="Enter MFG Date" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4 mb-2">
@@ -109,7 +109,7 @@
                                                 <div class="col-md-4 mb-2">
                                                     <div class="form-group">
                                                         <label for="">Process</label>
-                                                        <input type="text" class="form-control" id="process" name="process" value="{{$itemHead->process}}" readonly placeholder="Enter Process" required>
+                                                        <input type="text" class="form-control" id="process" name="process" value="{{$itemHead->preventiveMaintenance->machine->process}}" readonly placeholder="Enter Process" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4 mb-2">
@@ -136,72 +136,58 @@
                                     <h3 class="card-title">{{ $itemHead->machine_name }}</h3>
                                 </div>
 
+                                <!-- Legend Section -->
+                                <div class="top-0 end-0 bg-white p-3 border rounded shadow">
+                                    <span style="padding: 10px">B : Bagus</span>
+                                    <span style="padding: 10px">R : Repair</span>
+                                    <span style="padding: 10px">G : Ganti</span>
+                                    <span style="padding: 10px">PP: Perlu Perbaikan</span>
+                                </div>
+
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="mb-3 col-sm-12">
                                             <div class="table-responsive">
-                                                <ul class="nav nav-tabs" id="checksheetTabs" role="tablist">
-                                                    <!-- Tab for each asset category -->
-                                                    @foreach ($groupedResults as $checksheetCategory => $items)
-                                                        <li class="nav-item">
-                                                            <a style="color: black" class="nav-link {{ $loop->first ? 'active' : '' }}" id="{{ Str::slug($checksheetCategory) }}-tab"
-                                                                data-bs-toggle="tab" href="#{{ Str::slug($checksheetCategory) }}-content"
-                                                                role="tab" aria-controls="{{ Str::slug($checksheetCategory) }}-content"
-                                                                aria-selected="{{ $loop->first ? 'true' : 'false' }}">{{ $checksheetCategory }}</a>
-                                                        </li>
-                                                    @endforeach
-                                                </ul>
-                                                <div class="tab-content" id="checksheetTabsContent">
-                                                    <!-- Tab panel for each asset category -->
-                                                    @foreach ($groupedResults as $checksheetCategory => $items)
-                                                    @php
-                                                        $checksheetType = $items[0]['checksheet_type'];
-                                                    @endphp
-                                                        <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="{{ Str::slug($checksheetCategory) }}-content" role="tabpanel"
-                                                            aria-labelledby="{{ Str::slug($checksheetCategory) }}-tab">
-                                                            <br>
-                                                            <h1>{{ $checksheetType }}</h1> <!-- Display the asset category -->
-                                                            <table class="table table-bordered table-striped">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Description</th>
-                                                                        <th>Spec</th>
-                                                                        <th>Act</th>
-                                                                        <th>B</th>
-                                                                        <th>R</th>
-                                                                        <th>G</th>
-                                                                        <th>PP</th>
-                                                                        <th>Judge</th>
-                                                                        <th>Remarks</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    @foreach ($items as $item)
-                                                                        <tr>
-                                                                            <td>{{ $item->item_name }}</td>
-                                                                            <td>{{ $item->spec }}</td>
-                                                                            <td>{{ $item->act }}</td>
-                                                                            <td><input type="checkbox" {{ $item->B ? 'checked' : '' }} disabled></td>
-                                                                            <td><input type="checkbox" {{ $item->R ? 'checked' : '' }} disabled></td>
-                                                                            <td><input type="checkbox" {{ $item->G ? 'checked' : '' }} disabled></td>
-                                                                            <td><input type="checkbox" {{ $item->PP ? 'checked' : '' }} disabled></td>
-                                                                            <td>{{ $item->judge }}</td>
-                                                                            <td>{{ $item->remarks }}</td>
-                                                                        </tr>
-                                                                    @endforeach
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
+                                                <!-- Display all grouped items in one view -->
+                                                @foreach ($groupedResults as $checksheetCategory => $items)
+                                                    <h1>{{ $checksheetCategory }} - {{ $items[0]['checksheet_type'] }}</h1>
+                                                    <table class="table table-bordered table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Description</th>
+                                                                <th>Spec</th>
+                                                                <th>Act</th>
+                                                                <th>B</th>
+                                                                <th>R</th>
+                                                                <th>G</th>
+                                                                <th>PP</th>
+                                                                <th>Judge</th>
+                                                                <th>Remarks</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($items as $item)
+                                                                <tr>
+                                                                    <td>{{ $item->item_name }}</td>
+                                                                    <td>{{ $item->spec }}</td>
+                                                                    <td>{{ $item->act }}</td>
+                                                                    <td><input type="checkbox" {{ $item->B ? 'checked' : '' }} disabled></td>
+                                                                    <td><input type="checkbox" {{ $item->R ? 'checked' : '' }} disabled></td>
+                                                                    <td><input type="checkbox" {{ $item->G ? 'checked' : '' }} disabled></td>
+                                                                    <td><input type="checkbox" {{ $item->PP ? 'checked' : '' }} disabled></td>
+                                                                    <td>{{ $item->judge }}</td>
+                                                                    <td>{{ $item->remarks }}</td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                @endforeach
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <!-- /.card-body -->
                             </div>
-                            <!-- /.card -->
-                        </div>
                         <!-- /.col -->
                     </div>
                     <!-- /.row -->

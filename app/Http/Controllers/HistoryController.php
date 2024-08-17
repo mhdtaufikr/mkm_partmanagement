@@ -20,7 +20,11 @@ class HistoryController extends Controller
     {
         $machines = Machine::all();
         $lines = Machine::select('line')->distinct()->get();
-        $items = HistoricalProblem::with(['spareParts.part', 'machine'])->get();
+        $items = HistoricalProblem::with(['spareParts.part', 'machine'])
+            ->orderBy('date', 'desc')       // Sort by date in descending order
+            ->orderBy('start_time', 'desc') // Then sort by start time in descending order
+            ->get();
+
         return view('history.index', compact('items', 'machines', 'lines'));
     }
 

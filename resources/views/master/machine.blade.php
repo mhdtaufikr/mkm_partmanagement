@@ -231,22 +231,25 @@
                 <table id="tableUser" class="table table-bordered table-striped">
                     <thead>
                         <tr>
+                            <th>No.</th>
+                            <th>Line</th>
                             <th>OP. No</th>
                             <th>Process</th>
-                            <th>Model</th>
-                            <th>Serial Number</th>
-                            <th>Date</th>
+                            <th>Maker</th>
+                            <th>Mfg. Date</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($items as $data)
+                        @foreach($items as $index => $data)
                         <tr>
-                            <td>{{ $data->op_no }}</td>
-                            <td>{{ $data->process }}</td>
-                            <td>{{ $data->model }}</td>
-                            <td>{{ $data->serial_number }}</td>
-                            <td>{{ $data->date }}</td>
+                            <td>{{ $index + 1 }}</td> <!-- No. -->
+                            <td>{{ $data->line }}</td> <!-- Line -->
+                            <td>{{ $data->op_no }}</td> <!-- OP. No -->
+                            <td>{{ $data->process }}</td> <!-- Process -->
+                            <td>{{ $data->maker }}</td> <!-- Maker -->
+                            <td>{{ $data->mfg_date ? $data->mfg_date->format('Y-m-d') : 'N/A' }}</td> <!-- Mfg. Date -->
+
 
                                <td>
                                 <div class="btn-group">
@@ -268,8 +271,6 @@
                                             <a class="dropdown-item" href="{{ url('/mst/machine/detail/'.encrypt($data->id)) }}">
                                                 <i class="fas fa-info"></i> Detail
                                             </a>
-
-
                                         </li>
                                     </ul>
                                 </div>

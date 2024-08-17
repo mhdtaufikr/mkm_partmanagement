@@ -151,6 +151,7 @@ h6, .h6 {
 p {
   margin-top: 0;
   margin-bottom: 1rem;
+  color: black;
 }
 
 abbr[title],
@@ -325,6 +326,10 @@ th {
   border-color: inherit;
   border-style: solid;
   border-width: 0;
+}
+thead{
+    background-color: rgba(0, 103, 127, 0.8);
+    color: white;
 }
 
 label {
@@ -5551,7 +5556,7 @@ textarea.form-control-lg {
 .nav-link {
   display: block;
   padding: 0.5rem 1rem;
-  color: #0061f2;
+  color: white;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -5560,7 +5565,7 @@ textarea.form-control-lg {
   }
 }
 .nav-link:hover, .nav-link:focus {
-  color: #004ec2;
+  color: white;
   text-decoration: none;
 }
 .nav-link.disabled {
@@ -5590,8 +5595,8 @@ textarea.form-control-lg {
 }
 .nav-tabs .nav-link.active,
 .nav-tabs .nav-item.show .nav-link {
-  color: #4a515b;
-  background-color: #f2f6fc;
+  color: rgba(0, 103, 127, 2);
+  background-color: white;
   border-color: #d4dae3 #d4dae3 #f2f6fc;
 }
 .nav-tabs .dropdown-menu {
@@ -5998,6 +6003,7 @@ textarea.form-control-lg {
 
 .card-title {
   margin-bottom: 0.5rem;
+  color: white;
 }
 
 .card-subtitle {
@@ -6019,7 +6025,7 @@ textarea.form-control-lg {
 .card-header {
   padding: 0.1rem 0.1rem;
   margin-bottom: 0;
-  background-color: rgba(33, 40, 50, 0.03);
+  background-color: rgba(0, 103, 127, 0.8);
   border-bottom: 1px solid rgba(33, 40, 50, 0.125);
 }
 .card-header:first-child {
@@ -6028,7 +6034,7 @@ textarea.form-control-lg {
 
 .card-footer {
   padding: 1rem 1.35rem;
-  background-color: rgba(33, 40, 50, 0.03);
+  background-color: rgba(0, 103, 127, 0.8);
   border-top: 1px solid rgba(33, 40, 50, 0.125);
 }
 .card-footer:last-child {
@@ -8116,6 +8122,15 @@ textarea.form-control-lg {
           backface-visibility: hidden;
   transition: transform 0.6s ease-in-out;
 }
+
+
+    .carousel-image {
+        width: 100%;
+        height: 400px; /* Adjust this value as needed */
+        object-fit: cover;
+    }
+
+
 @media (prefers-reduced-motion: reduce) {
   .carousel-item {
     transition: none;

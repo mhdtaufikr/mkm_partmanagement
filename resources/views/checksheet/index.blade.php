@@ -153,14 +153,14 @@
                             <!-- List Checksheet Card -->
                             <div class="card mt-4">
                                 <div class="card-header">
-                                    <h3 class="card-title">List Checksheet</h3>
+                                    <h3 class="card-title">List Preventive Maintenance</h3>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="table-responsive">
                                                 <table id="tableUser" class="table table-bordered table-striped">
-                                                    <thead>
+                                                    <thead >
                                                         <tr>
                                                             <th>No</th>
                                                             <th>Machine Name (OP No.)</th>
@@ -168,8 +168,8 @@
                                                             <th>Planning Date</th> <!-- Planning Date Column -->
                                                             <th>Actual Date</th> <!-- Actual Date Column -->
                                                             <th>Created By</th> <!-- Created By Column -->
-                                                            <th>Status</th> <!-- Status Column -->
-                                                            <th>PM Status</th> <!-- PM Status Column -->
+                                                            <th>Approval</th> <!-- Status Column -->
+                                                            <th>Status</th> <!-- PM Status Column -->
                                                             <th>Action</th> <!-- Action Column -->
                                                         </tr>
                                                     </thead>
@@ -180,9 +180,9 @@
                                                             <td>{{ $no++ }}</td>
                                                             <td>{{ $data->machine_name ?? '' }} ({{ $data->op_name ?? '' }})</td>
                                                             <td>{{ $data->type ?? 'Unknown' }}</td> <!-- Display Type -->
-                                                            <td>{{ $data->planning_date ?? '' }}</td> <!-- Display Planning Date -->
                                                             <td>{{ $data->planning_date ? date('d/m/Y', strtotime($data->planning_date)) : '' }}</td> <!-- Planning Date -->
                                                             <td>{{ $data->actual_date ? date('d/m/Y', strtotime($data->actual_date)) : '' }}</td> <!-- Actual Date -->
+                                                            <td>{{ $data->created_by }}</td>
                                                             <td>
                                                                 @if($data->status == 0)
                                                                     <span class="badge bg-primary">Update</span>
@@ -214,7 +214,7 @@
                                                                     </button>
                                                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $data->id }}">
                                                                         <li>
-                                                                            <a title="Detail" class="dropdown-item" href="checksheet/detail/{{ encrypt($data->id) }}">
+                                                                            <a title="Detail" class="dropdown-item" href="checksheet/detail/{{ encrypt($data->id_ch) }}">
                                                                                 <i class="fas fa-info me-2"></i>Detail
                                                                             </a>
                                                                         </li>
@@ -271,7 +271,7 @@
                                                                         <!-- Button to show journey logs -->
                                                                         <li>
                                                                             <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#journeyModal{{ $data->id }}">
-                                                                                <i class="fas fa-history me-2"></i>View Journey
+                                                                                <i class="fas fa-history me-2"></i>Approval Route
                                                                             </a>
                                                                         </li>
 

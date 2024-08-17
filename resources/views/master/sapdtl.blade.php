@@ -19,7 +19,7 @@
     <div class="container-fluid px-4 mt-n10">
         <div class="card mb-4">
             <div class="card-header">
-                <h1>{{ $part->material }} - {{ $part->material_description }}</h1>
+                <h1 style="color: white">{{ $part->material }} - {{ $part->material_description }}</h1>
             </div>
             <div class="card-body">
                 <div class="row mb-4">

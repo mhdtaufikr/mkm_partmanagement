@@ -23,9 +23,9 @@
                 <div class="container-fluid">
                     <div class="card card-header-actions mb-4">
                         <div class="card-header text-dark">
-                            <h3>Machine Details</h3>
+                            <h3 style="color: white">Machine Details</h3>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body mt-3">
                             <div class="col-sm-12">
                                 @if (session('status'))
                                     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -64,7 +64,7 @@
 
                                             @foreach($imagePaths as $key => $imagePath)
                                             <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
-                                                <img src="{{ asset($imagePath) }}" class="d-block w-100" alt="Image {{ $key + 1 }}">
+                                                <img src="{{ asset($imagePath) }}" class="d-block w-100 carousel-image" alt="Image {{ $key + 1 }}">
                                             </div>
                                             @endforeach
                                         </div>
@@ -87,101 +87,128 @@
                                 </div>
 
                                 <div class="col-md-3">
-                                    <div class="card mb-2 border border-dark rounded">
-                                        <div class="card-body p-2">
+                                    <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                        <div style="position: absolute; top: -10px; left: 10px; background-color: rgba(0, 103, 127, 1); color: white; padding: 3px 10px; border-radius: 15px;">
                                             <strong>OP No.</strong>
-                                            <p>{{ $machine->op_no }}</p>
+                                        </div>
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1" style="text-align: center;">
+                                            <p style="margin: 0;">{{ $machine->op_no ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-2 border border-dark rounded">
-                                        <div class="card-body p-2">
+                                    <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                        <div style="position: absolute; top: -10px; left: 10px; background-color: rgba(0, 103, 127, 1); color: white; padding: 3px 10px; border-radius: 15px;">
                                             <strong>Plant</strong>
-                                            <p>{{ $machine->plant }}</p>
+                                        </div>
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1" style="text-align: center;">
+                                            <p style="margin: 0;">{{ $machine->plant ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-2 border border-dark rounded">
-                                        <div class="card-body p-2">
+                                    <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                        <div style="position: absolute; top: -10px; left: 10px; background-color: rgba(0, 103, 127, 1); color: white; padding: 3px 10px; border-radius: 15px;">
                                             <strong>Line</strong>
-                                            <p>{{ $machine->line }}</p>
+                                        </div>
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1" style="text-align: center;">
+                                            <p style="margin: 0;">{{ $machine->line ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-2 border border-dark rounded">
-                                        <div class="card-body p-2">
+                                    <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                        <div style="position: absolute; top: -10px; left: 10px; background-color: rgba(0, 103, 127, 1); color: white; padding: 3px 10px; border-radius: 15px;">
                                             <strong>Location</strong>
-                                            <p>{{ $machine->location }}</p>
+                                        </div>
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1" style="text-align: center;">
+                                            <p style="margin: 0;">{{ $machine->location ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-2 border border-dark rounded">
-                                        <div class="card-body p-2">
+                                    <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                        <div style="position: absolute; top: -10px; left: 10px; background-color: rgba(0, 103, 127, 1); color: white; padding: 3px 10px; border-radius: 15px;">
                                             <strong>Asset No.</strong>
-                                            <p>{{ $machine->asset_no }}</p>
+                                        </div>
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1" style="text-align: center;">
+                                            <p style="margin: 0;">{{ $machine->asset_no ?? 'N/A' }}</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="col-md-3">
-                                    <div class="card mb-2 border border-dark rounded">
-                                        <div class="card-body p-2">
+                                    <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                        <div style="position: absolute; top: -10px; left: 10px; background-color: rgba(0, 103, 127, 1); color: white; padding: 3px 10px; border-radius: 15px;">
                                             <strong>Machine Name</strong>
-                                            <p>{{ $machine->machine_name }}</p>
+                                        </div>
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1" style="text-align: center;">
+                                            <p style="margin: 0;">{{ $machine->machine_name ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-2 border border-dark rounded">
-                                        <div class="card-body p-2">
+                                    <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                        <div style="position: absolute; top: -10px; left: 10px; background-color: rgba(0, 103, 127, 1); color: white; padding: 3px 10px; border-radius: 15px;">
                                             <strong>Process</strong>
-                                            <p>{{ $machine->process }}</p>
+                                        </div>
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1" style="text-align: center;">
+                                            <p style="margin: 0;">{{ $machine->process ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-2 border border-dark rounded">
-                                        <div class="card-body p-2">
+                                    <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                        <div style="position: absolute; top: -10px; left: 10px; background-color: rgba(0, 103, 127, 1); color: white; padding: 3px 10px; border-radius: 15px;">
                                             <strong>Maker</strong>
-                                            <p>{{ $machine->maker }}</p>
+                                        </div>
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1" style="text-align: center;">
+                                            <p style="margin: 0;">{{ $machine->maker ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-2 border border-dark rounded">
-                                        <div class="card-body p-2">
+                                    <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                        <div style="position: absolute; top: -10px; left: 10px; background-color: rgba(0, 103, 127, 1); color: white; padding: 3px 10px; border-radius: 15px;">
                                             <strong>Model</strong>
-                                            <p>{{ $machine->model }}</p>
+                                        </div>
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1" style="text-align: center;">
+                                            <p style="margin: 0;">{{ $machine->model ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-2 border border-dark rounded">
-                                        <div class="card-body p-2">
+                                    <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                        <div style="position: absolute; top: -10px; left: 10px; background-color: rgba(0, 103, 127, 1); color: white; padding: 3px 10px; border-radius: 15px;">
                                             <strong>Serial Number</strong>
-                                            <p>{{ $machine->serial_number }}</p>
+                                        </div>
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1" style="text-align: center;">
+                                            <p style="margin: 0;">{{ $machine->serial_number ?? 'N/A' }}</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="col-md-3">
-                                    <div class="card mb-2 border border-dark rounded">
-                                        <div class="card-body p-2">
+                                    <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                        <div style="position: absolute; top: -10px; left: 10px; background-color: rgba(0, 103, 127, 1); color: white; padding: 3px 10px; border-radius: 15px;">
                                             <strong>Mfg Date</strong>
-                                            <p>{{ $machine->mfg_date }}</p>
+                                        </div>
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1" style="text-align: center;">
+                                            <p style="margin: 0;">{{ $machine->mfg_date ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-2 border border-dark rounded">
-                                        <div class="card-body p-2">
+                                    <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                        <div style="position: absolute; top: -10px; left: 10px; background-color: rgba(0, 103, 127, 1); color: white; padding: 3px 10px; border-radius: 15px;">
                                             <strong>Install Date</strong>
-                                            <p>{{ $machine->install_date }}</p>
+                                        </div>
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1" style="text-align: center;">
+                                            <p style="margin: 0;">{{ $machine->install_date ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-2 border border-dark rounded">
-                                        <div class="card-body p-2">
+                                    <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                        <div style="position: absolute; top: -10px; left: 10px; background-color: rgba(0, 103, 127, 1); color: white; padding: 3px 10px; border-radius: 15px;">
                                             <strong>Specification (Electrical Control)</strong>
-                                            <p>{{ $machine->electrical_co }}</p>
+                                        </div>
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1" style="text-align: center;">
+                                            <p style="margin: 0;">{{ $machine->electrical_co ?? 'N/A' }}</p>
                                         </div>
                                     </div>
                                 </div>
+
 
                             </div>
 
@@ -256,13 +283,13 @@
                         <div class="card-header">
                             <ul class="nav nav-tabs" id="myTab" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                    <button style="color: black" class="nav-link active" id="part-list-tab" data-bs-toggle="tab" data-bs-target="#part-list" type="button" role="tab" aria-controls="part-list" aria-selected="true">Part List</button>
+                                    <button class="nav-link active" id="part-list-tab" data-bs-toggle="tab" data-bs-target="#part-list" type="button" role="tab" aria-controls="part-list" aria-selected="true">Part List</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button style="color: black" class="nav-link" id="daily-report-tab" data-bs-toggle="tab" data-bs-target="#daily-report" type="button" role="tab" aria-controls="daily-report" aria-selected="false">Machine History</button>
+                                    <button class="nav-link" id="daily-report-tab" data-bs-toggle="tab" data-bs-target="#daily-report" type="button" role="tab" aria-controls="daily-report" aria-selected="false">Machine History</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button style="color: black" class="nav-link" id="documentation-tab" data-bs-toggle="tab" data-bs-target="#documentation" type="button" role="tab" aria-controls="documentation" aria-selected="false">Documentation</button>
+                                    <button class="nav-link" id="documentation-tab" data-bs-toggle="tab" data-bs-target="#documentation" type="button" role="tab" aria-controls="documentation" aria-selected="false">Documentation</button>
                                 </li>
                             </ul>
                         </div>
@@ -405,7 +432,7 @@
                                                                         <th>Type</th>
                                                                         <th>SAP Stock</th>
                                                                         <th>Repair Stock</th>
-                                                                        <th>Total</th>
+                                                                        <th>Total Stock</th>
                                                                         <th>Safety Stock</th>
                                                                         <th>Status</th>
                                                                         <th>Action</th>
@@ -565,8 +592,15 @@
                                                                 <tr>
                                                                     <th>No</th>
                                                                     <th>Date</th>
-                                                                    <th>Type</th>
-                                                                    <th>Details</th>
+                                                                    <th>Shift</th>
+                                                                    <th>Shop</th>
+                                                                    <th>Problem</th>
+                                                                    <th>Analysis & Cause</th>
+                                                                    <th>Action Taken</th>
+                                                                    <th>Repair Hours</th>
+                                                                    <th>Remarks</th>
+                                                                    <th>Person In Charge</th>
+                                                                    <th>Status</th> <!-- Added Status column -->
                                                                     <th>Action</th>
                                                                 </tr>
                                                             </thead>
@@ -578,18 +612,58 @@
                                                                 <tr>
                                                                     <td>{{ $no++ }}</td>
                                                                     <td>{{ $data->date }}</td>
-                                                                    <td>{{ $data->type }}</td>
+                                                                    <td>{{ $data->data->shift ?? '-' }}</td>
+                                                                    <td>{{ $data->data->shop }}</td>
                                                                     <td>
-                                                                        @if ($data->type == 'Daily Report')
-                                                                            Machine No: {{ $data->data->machine->op_no }}<br>
-                                                                            Problem: {{ $data->data->problem }}<br>
-                                                                            <!-- Add more details if needed -->
+                                                                        @if($data->type == 'Daily Report')
+                                                                            {{ $data->data->problem }}
                                                                         @else
-                                                                            Machine Name: {{ $data->data->machine_name }}<br>
-                                                                            Department: {{ $data->data->dept }}<br>
-                                                                            <!-- Add more details if needed -->
+                                                                           PM schedule
                                                                         @endif
                                                                     </td>
+                                                                    <td>
+                                                                        @if($data->type == 'Daily Report')
+                                                                            {{ $data->data->cause }}
+                                                                        @else
+                                                                           PM schedule
+                                                                        @endif
+                                                                    </td>
+                                                                    <td>
+                                                                        @if($data->type == 'Daily Report')
+                                                                            {{ $data->data->action }}
+                                                                        @else
+                                                                           PM schedule
+                                                                        @endif
+                                                                    </td>
+                                                                    <td>
+                                                                        {{ $data->data->start_time ? date('H:i', strtotime($data->data->start_time)) : '-' }} -
+                                                                        {{ $data->data->finish_time ? date('H:i', strtotime($data->data->finish_time)) : '-' }}
+                                                                        @if($data->data->balance)
+                                                                            (Total: {{ number_format($data->data->balance, 2) }} hours)
+                                                                        @endif
+                                                                    </td>
+
+                                                                    <td>{{ $data->data->remarks ?? 'OK' }}</td>
+                                                                    <td>{{ $data->data->pic ?? 'Hmd. Prod' }}</td>
+                                                                    <td>
+                                                                        @if($data->type == 'Daily Report')
+                                                                            @if($data->data->status == 'Open')
+                                                                                <span class="badge bg-warning">Open</span>
+                                                                            @elseif($data->data->status == 'Close')
+                                                                                <span class="badge bg-success">Close</span>
+                                                                            @else
+                                                                                <span class="badge bg-secondary">Unknown Status</span>
+                                                                            @endif
+                                                                        @else
+                                                                            @if($data->data->pm_status == 'Open')
+                                                                                <span class="badge bg-warning">Open</span>
+                                                                            @elseif($data->data->pm_status == 'Close')
+                                                                                <span class="badge bg-success">Close</span>
+                                                                            @else
+                                                                                <span class="badge bg-secondary">Unknown Status</span>
+                                                                            @endif
+                                                                        @endif
+                                                                    </td> <!-- Status with conditional badge based on type -->
                                                                     <td>
                                                                         <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-detail-{{ $data->data->id }}">Detail</button>
                                                                     </td>
@@ -597,6 +671,7 @@
                                                                 @endforeach
                                                             </tbody>
                                                         </table>
+
                                                     </div>
                                                 </div>
                                             </div>

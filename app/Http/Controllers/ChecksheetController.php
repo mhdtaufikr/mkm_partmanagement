@@ -44,6 +44,8 @@ class ChecksheetController extends Controller
 
         $query = PreventiveMaintenanceView::select(
             'preventive_maintenance_view.id',
+            'preventive_maintenance_view.id_ch',
+            'preventive_maintenance_view.machine_id',
             'preventive_maintenance_view.machine_no',
             'preventive_maintenance_view.op_name',
             'preventive_maintenance_view.machine_name',
@@ -372,9 +374,18 @@ public function storeHeadForm(Request $request)
 
 
 
-    public function checksheetDetail($id){
+    public function checksheetDetail($id) {
         $id = decrypt($id);
-        $itemHead = ChecksheetFormHead::where('id', $id)->first();
+
+        // Retrieve the ChecksheetFormHead along with related PreventiveMaintenance and Machine in one query
+        $itemHead = ChecksheetFormHead::with('preventiveMaintenance.machine')->where('id', $id)->first();
+
+        // Check if itemHead is found
+        if (!$itemHead) {
+            return redirect()->back()->with('error', 'Checksheet not found.');
+        }
+
+        // Retrieve the ChecksheetFormDetails
         $itemDetail = ChecksheetFormDetail::where('id_header', $id)->get();
 
         // Group item details based on asset categories
@@ -391,6 +402,7 @@ public function storeHeadForm(Request $request)
 
         return view('checksheet.detail', compact('itemHead', 'groupedResults', 'id'));
     }
+
 
 
 

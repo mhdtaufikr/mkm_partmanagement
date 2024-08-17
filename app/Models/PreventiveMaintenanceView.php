@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class PreventiveMaintenanceView extends Model
 {
-    // Menentukan nama tabel view
+    // Specify the name of the view
     protected $table = 'preventive_maintenance_view';
 
-    // Menentukan bahwa tabel ini tidak memiliki kolom timestamps
+    // Indicate that the view doesn't have timestamps
     public $timestamps = false;
 
-    // Menentukan kolom-kolom yang dapat diisi
+    // Define fillable columns
     protected $fillable = [
         'id',
         'machine_no',
@@ -33,4 +33,10 @@ class PreventiveMaintenanceView extends Model
         'created_at',
         'updated_at'
     ];
+
+    // Define the relationship to the Machine model
+    public function machine()
+    {
+        return $this->belongsTo(Machine::class, 'machine_id', 'id');
+    }
 }

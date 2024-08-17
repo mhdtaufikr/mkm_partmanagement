@@ -21,11 +21,15 @@ use Illuminate\Support\Facades\Auth;
 class MstMachinePartController extends Controller
 {
     public function index(){
-        $items = Machine::get();
+        $items = Machine::get()->sortBy([
+            ['line', 'asc'],
+            ['op_no', 'asc']
+        ]);
+
        return view('master.machine',compact('items'));
     }
 
-    public function detail($id){
+    public function detail($id) {
         $id = decrypt($id);
         $machine = Machine::with(['inventoryStatus', 'spareParts', 'spareParts.repairs'])->where('id', $id)->first();
 
@@ -34,8 +38,8 @@ class MstMachinePartController extends Controller
 
         // Fetch historical problems for the specified machine ID
         $historicalProblems = HistoricalProblem::with(['spareParts.part', 'machine'])
-        ->where('id_machine', $id)
-        ->get();
+            ->where('id_machine', $id)
+            ->get();
 
         // Fetch preventive maintenance records for the specified machine ID
         $query = PreventiveMaintenanceView::select(
@@ -61,6 +65,7 @@ class MstMachinePartController extends Controller
             'checksheet_form_heads.planning_date',
             'checksheet_form_heads.actual_date',
             'checksheet_form_heads.pic',
+            'checksheet_form_heads.pm_status', // Added this line to include pm_status
             'checksheet_form_heads.status',
             'checksheet_form_heads.created_by',
             'checksheet_form_heads.remark',
@@ -110,6 +115,7 @@ class MstMachinePartController extends Controller
 
         return view('master.dtl_machine', compact('machine', 'parts', 'combinedData'));
     }
+
 
 
     public function getRepairStock($partId)

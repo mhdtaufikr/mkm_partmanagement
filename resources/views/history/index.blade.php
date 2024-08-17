@@ -65,7 +65,7 @@
                                     <div class="row">
                                         <div class="mb-3 col-sm-12">
                                             <button type="button" class="btn btn-dark btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#modal-add">
-                                                <i class="fas fa-plus-square"></i>
+                                                <i class="fas fa-plus-square"></i>  Input Daily Report
                                             </button>
                                         </div>
                                     </div>
@@ -150,7 +150,7 @@
 
 
                                     <div class="table-responsive">
-                                        <table id="tablehistory" class="table table-bordered table-striped">
+                                        <table id="tablehistory" class="table table-bordered table-striped ">
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
@@ -189,7 +189,33 @@
                                                     <td>{{ $data->balance }} Hour</td>
                                                     <td>{{ $data->pic }}</td>
                                                     <td>{{ $data->remarks }}</td>
-                                                    <td>{{ $data->status }}</td>
+                                                    @php
+                                                    $statusClass = '';
+                                                    switch ($data->status) {
+                                                        case 'Close':
+                                                            $statusClass = 'btn-success';
+                                                            break;
+                                                        case 'Open':
+                                                            $statusClass = 'btn-primary';
+                                                            break;
+                                                        case 'Delay':
+                                                            $statusClass = 'btn-warning';
+                                                            break;
+                                                        case 'Ongoing':
+                                                            $statusClass = 'btn-info';
+                                                            break;
+                                                        default:
+                                                            $statusClass = 'btn-danger'; // Default case, if status is unrecognized
+                                                            break;
+                                                    }
+                                                @endphp
+
+                                                <td>
+                                                    <button class="btn {{ $statusClass }} btn-sm">
+                                                        {{ $data->status }}
+                                                    </button>
+                                                </td>
+
                                                     <td>
                                                         <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-detail-{{ $data->id }}">Detail</button>
                                                     </td>
