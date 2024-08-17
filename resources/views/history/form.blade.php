@@ -104,7 +104,7 @@
                                                         <div class="col-md-3">
                                                             <div class="form-group">
                                                                 <label for="spare_part">Spare Part</label>
-                                                                <select class="form-control spare_part" name="spare_part[]" required>
+                                                                <select class="form-control spare_part" name="spare_part[]" >
                                                                     <option value="">Select Spare Part</option>
                                                                     @foreach($spareParts as $part)
                                                                         <option value="{{ $part->part_id }}" data-sap="{{ $part->sap_stock }}" data-repair="{{ $part->repair_stock }}">{{ $part->part->material }}</option>
@@ -115,7 +115,7 @@
                                                         <div class="col-md-3">
                                                             <div class="form-group">
                                                                 <label for="stock_type">Stock Type</label>
-                                                                <select class="form-control stock_type" name="stock_type[]" required>
+                                                                <select class="form-control stock_type" name="stock_type[]" >
                                                                     <option value="sap">New (SAP)</option>
                                                                     <option value="repair">Repair (Extend)</option>
                                                                 </select>

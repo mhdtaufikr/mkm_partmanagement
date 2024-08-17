@@ -32,84 +32,88 @@ class ChecksheetController extends Controller
 
 
     public function index(Request $request)
-    {
-        // Retrieve all distinct types
-        $types = PmFilterView::select('type')->distinct()->get();
+{
+    // Retrieve all distinct types
+    $types = PmFilterView::select('type')->distinct()->get();
 
-        // Retrieve unique plants, shops, op_nos, and machine names
-        $plants = PmFilterView::select('plant')->distinct()->get();
-        $shops = PmFilterView::select('shop')->distinct()->get();
-        $opNos = PmFilterView::select('op_no')->distinct()->get();
-        $machines = PmFilterView::select('machine_name')->distinct()->get();
+    // Retrieve unique plants, shops, op_nos, and machine names
+    $plants = PmFilterView::select('plant')->distinct()->get();
+    $shops = PmFilterView::select('shop')->distinct()->get();
+    $opNos = PmFilterView::select('op_no')->distinct()->get();
+    $machines = PmFilterView::select('machine_name')->distinct()->get();
 
-        $query = PreventiveMaintenanceView::select(
-            'preventive_maintenance_view.id',
-            'preventive_maintenance_view.id_ch',
-            'preventive_maintenance_view.machine_id',
-            'preventive_maintenance_view.machine_no',
-            'preventive_maintenance_view.op_name',
-            'preventive_maintenance_view.machine_name',
-            'preventive_maintenance_view.no_document',
-            'preventive_maintenance_view.type',
-            'preventive_maintenance_view.dept',
-            'preventive_maintenance_view.shop',
-            'preventive_maintenance_view.effective_date',
-            'preventive_maintenance_view.mfg_date',
-            'preventive_maintenance_view.process',
-            'preventive_maintenance_view.revision',
-            'preventive_maintenance_view.no_procedure',
-            'preventive_maintenance_view.plant',
-            'preventive_maintenance_view.location',
-            'preventive_maintenance_view.line',
-            'preventive_maintenance_view.created_at',
-            'preventive_maintenance_view.updated_at',
-            'checksheet_form_heads.id as checksheet_id',
-            'checksheet_form_heads.planning_date',
-            'checksheet_form_heads.actual_date',
-            'checksheet_form_heads.pic',
-            'checksheet_form_heads.status',
-            'checksheet_form_heads.pm_status',
-            'checksheet_form_heads.created_by',
-            'checksheet_form_heads.remark',
-            'checksheet_form_heads.created_at as checksheet_created_at',
-            'checksheet_form_heads.updated_at as checksheet_updated_at'
-        )
-        ->join('checksheet_form_heads', 'preventive_maintenance_view.id', '=', 'checksheet_form_heads.preventive_maintenances_id');
+    // Main query with refined join to get the most recent checksheet_form_heads record
+    $query = PreventiveMaintenanceView::select(
+        'preventive_maintenance_view.id',
+        'preventive_maintenance_view.id_ch',
+        'preventive_maintenance_view.machine_id',
+        'preventive_maintenance_view.machine_no',
+        'preventive_maintenance_view.op_name',
+        'preventive_maintenance_view.machine_name',
+        'preventive_maintenance_view.no_document',
+        'preventive_maintenance_view.type',
+        'preventive_maintenance_view.dept',
+        'preventive_maintenance_view.shop',
+        'preventive_maintenance_view.effective_date',
+        'preventive_maintenance_view.mfg_date',
+        'preventive_maintenance_view.process',
+        'preventive_maintenance_view.revision',
+        'preventive_maintenance_view.no_procedure',
+        'preventive_maintenance_view.plant',
+        'preventive_maintenance_view.location',
+        'preventive_maintenance_view.line',
+        'preventive_maintenance_view.created_at',
+        'preventive_maintenance_view.updated_at',
+        'checksheet_form_heads.id as checksheet_id',
+        'checksheet_form_heads.planning_date',
+        'checksheet_form_heads.actual_date',
+        'checksheet_form_heads.pic',
+        'checksheet_form_heads.status',
+        'checksheet_form_heads.pm_status',
+        'checksheet_form_heads.created_by',
+        'checksheet_form_heads.remark',
+        'checksheet_form_heads.created_at as checksheet_created_at',
+        'checksheet_form_heads.updated_at as checksheet_updated_at'
+    )
+    ->join('checksheet_form_heads', function ($join) {
+        $join->on('preventive_maintenance_view.id', '=', 'checksheet_form_heads.preventive_maintenances_id')
+             ->whereRaw('checksheet_form_heads.id = (SELECT MAX(id) FROM checksheet_form_heads WHERE preventive_maintenances_id = preventive_maintenance_view.id)');
+    })
+    ->orderBy('checksheet_form_heads.created_at', 'desc');
 
-
-        // Apply role-based filters
-        if (Auth::user()->role == "Checker" || Auth::user()->role == "Approval") {
-            $items = $query->orderBy('checksheet_form_heads.created_at', 'desc')->get();
-        } elseif (Auth::user()->role == "user") {
-            $items = $query->where('checksheet_form_heads.created_by', Auth::user()->name)->orderBy('checksheet_form_heads.created_at', 'desc')->get();
-        } else {
-            $items = $query->orderBy('checksheet_form_heads.created_at', 'desc')->get();
-        }
-
-        // Attach logs and status_logs to each item
-        foreach ($items as $item) {
-            $item->logs = ChecksheetJourneyLog::where('checksheet_id', $item->checksheet_id)
-                ->orderBy('created_at', 'desc')->get();
-
-            $item->status_logs = ChecksheetStatusLog::where('checksheet_header_id', $item->checksheet_id)
-                ->orderBy('change_date', 'desc')->get();
-
-            // Check if status_logs is not empty before querying HistoricalProblem
-            if ($item->status_logs->isNotEmpty()) {
-                $logStatus = HistoricalProblem::with(['spareParts.part', 'machine'])
-                    ->where('id', $item->status_logs[0]->historical_id)
-                    ->first();
-
-                // Attach logStatus to the item
-                $item->logStatus = $logStatus;
-            } else {
-                $item->logStatus = null; // No logStatus if status_logs is empty
-            }
-        }
-
-
-        return view('checksheet.index', compact('types', 'plants', 'shops', 'opNos', 'machines', 'items','logStatus'));
+    // Apply role-based filters
+    if (Auth::user()->role == "Checker" || Auth::user()->role == "Approval") {
+        $items = $query->get();
+    } elseif (Auth::user()->role == "user") {
+        $items = $query->where('checksheet_form_heads.created_by', Auth::user()->name)->get();
+    } else {
+        $items = $query->get();
     }
+
+    // Attach logs and status_logs to each item
+    foreach ($items as $item) {
+        $item->logs = ChecksheetJourneyLog::where('checksheet_id', $item->checksheet_id)
+            ->orderBy('created_at', 'desc')->get();
+
+        $item->status_logs = ChecksheetStatusLog::where('checksheet_header_id', $item->checksheet_id)
+            ->orderBy('change_date', 'desc')->get();
+
+        // Check if status_logs is not empty before querying HistoricalProblem
+        if ($item->status_logs->isNotEmpty()) {
+            $logStatus = HistoricalProblem::with(['spareParts.part', 'machine'])
+                ->where('id', $item->status_logs[0]->historical_id)
+                ->first();
+
+            // Attach logStatus to the item
+            $item->logStatus = $logStatus;
+        } else {
+            $item->logStatus = null; // No logStatus if status_logs is empty
+        }
+    }
+
+    return view('checksheet.index', compact('types', 'plants', 'shops', 'opNos', 'machines', 'items', 'logStatus'));
+}
+
 
 
 

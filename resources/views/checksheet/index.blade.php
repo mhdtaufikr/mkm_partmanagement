@@ -22,37 +22,7 @@
                                 <h3 class="card-title">Scan QR Machine</h3>
                             </div>
                             <div class="card-body">
-                                <div class="col-sm-12">
-                                    <!-- Alert success -->
-                                    @if (session('status'))
-                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                        <strong>{{ session('status') }}</strong>
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                    @endif
-
-                                    @if (session('failed'))
-                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                        <strong>{{ session('failed') }}</strong>
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                    @endif
-
-                                    <!-- Form validation errors -->
-                                    @if (count($errors) > 0)
-                                    <div class="alert alert-info alert-dismissible fade show" role="alert">
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                        <ul>
-                                            <li><strong>Data Process Failed !</strong></li>
-                                            @foreach ($errors->all() as $error)
-                                            <li><strong>{{ $error }}</strong></li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                    @endif
-                                    <!-- End form validation errors -->
-                                </div>
-
+                                @include('partials.alert')
                                 <form action="{{ url('/checksheet/scan') }}" method="POST">
                                     @csrf
                                     <div class="row mb-4">
@@ -162,7 +132,7 @@
                                                     <thead>
                                                         <tr>
                                                             <th>No</th>
-                                                            <th>Machine Name (OP No.)</th>
+                                                            <th>OP No. (Machine Name)</th>
                                                             <th>Type</th>
                                                             <th>Planning Date</th>
                                                             <th>Actual Date</th>
@@ -177,7 +147,7 @@
                                                         @foreach ($items as $data)
                                                         <tr>
                                                             <td>{{ $no++ }}</td>
-                                                            <td>{{ $data->machine_name ?? '' }} ({{ $data->op_name ?? '' }})</td>
+                                                            <td>{{ $data->op_name ?? '' }}({{ $data->machine_name ?? '' }}) </td>
                                                             <td>{{ $data->type ?? 'Unknown' }}</td>
                                                             <td>{{ $data->planning_date ? date('d/m/Y', strtotime($data->planning_date)) : '' }}</td>
                                                             <td>{{ $data->actual_date ? date('d/m/Y', strtotime($data->actual_date)) : '' }}</td>

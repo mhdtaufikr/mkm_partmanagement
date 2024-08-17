@@ -231,7 +231,7 @@ public function storehp(Request $request)
             ->update(['pm_status' => 'Close']);
     }
 
-    return redirect()->route('machine')->with('status', 'Historical problem recorded successfully');
+    return redirect()->route('history')->with('status', 'Historical problem recorded successfully');
 }
 
 

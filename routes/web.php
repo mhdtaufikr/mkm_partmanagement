@@ -124,7 +124,6 @@ Route::middleware(['auth'])->group(function () {
 
     //checksheet
     //Master Checksheet form/checksheet/scan
-    Route::get('/checksheet/data', [ChecksheetController::class, 'getData'])->name('checksheet.data');
     Route::get('/checksheet', [ChecksheetController::class, 'index'])->middleware(['checkRole:IT,Super Admin,Approval,Checker,User'])->name('machine');
     Route::post('/checksheet/scan', [ChecksheetController::class, 'checksheetScan'])->middleware(['checkRole:IT,Super Admin,User']);
     Route::post('/checksheet/store', [ChecksheetController::class, 'storeHeadForm'])->name('checksheet.store');

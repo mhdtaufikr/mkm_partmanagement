@@ -41,7 +41,84 @@
                                             </button>
                                         </div>
                                     </div>
+<!-- Modal for Adding Daily Report -->
+<div class="modal fade" id="modal-add" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-add-label">Add Daily Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="historical-problem-form" action="{{ url('/history/store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div>
+                                <label for="line" class="form-label">Line</label>
+                                <select class="form-control" id="line" name="line" required>
+                                    <option value="">-- Select Line --</option>
+                                    @foreach($lines as $line)
+                                        <option value="{{ $line->line }}">{{ $line->line }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
+                            <div>
+                                <label for="shift" class="form-label">Shift</label>
+                                <select class="form-control" id="shift" name="shift" required>
+                                    <option value="Day">Day</option>
+                                    <option value="Night">Night</option>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <div>
+                                <label for="no_machine" class="form-label">Machine No (Op No)</label>
+                                <select class="form-control" id="no_machine" name="no_machine" required>
+                                    <option value="">-- Select Machine --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="date" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="date" name="date" value="{{ date('Y-m-d') }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3" form="historical-problem-form">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('line').addEventListener('change', function() {
+        const line = this.value;
+        fetch(`/get-op-nos/${line}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const noMachineSelect = document.getElementById('no_machine');
+                noMachineSelect.innerHTML = '<option value="">-- Select Machine --</option>';
+                data.forEach(machine => {
+                    const option = document.createElement('option');
+                    option.value = machine.id;
+                    option.textContent = machine.op_no;
+                    noMachineSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching machine data:', error);
+                alert('Error fetching machine data: ' + error.message);
+            });
+    });
+</script>
                                     <!-- DataTable -->
                                     <div class="table-responsive">
                                         <table id="tablehistory" class="table table-bordered table-striped">
