@@ -17,16 +17,36 @@ use App\Exports\PartTemplateExport;
 use App\Imports\PartsImport;
 use App\Models\PreventiveMaintenanceView;
 use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\DataTables;
 
 class MstMachinePartController extends Controller
 {
-    public function index(){
-        $items = Machine::get()->sortBy([
-            ['line', 'asc'],
-            ['op_no', 'asc']
-        ]);
+    public function index(Request $request)
+    {
+        if ($request->ajax()) {
+            $items = Machine::select(['id', 'line', 'op_no', 'process', 'maker', 'mfg_date']);
 
-       return view('master.machine',compact('items'));
+            return DataTables::of($items)
+                ->addIndexColumn()
+                ->addColumn('mfg_date', function ($row) {
+                    return $row->mfg_date ? $row->mfg_date->format('Y-m-d') : 'N/A';
+                })
+                ->addColumn('action', function($row){
+                    $btn = '<div class="btn-group">
+                                <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Actions
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="'.url('/mst/machine/detail/'.encrypt($row->id)).'"><i class="fas fa-info"></i> Detail</a></li>
+                                </ul>
+                            </div>';
+                    return $btn;
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+
+        return view('master.machine');
     }
 
     public function detail($id) {
@@ -44,6 +64,7 @@ class MstMachinePartController extends Controller
         // Fetch preventive maintenance records for the specified machine ID
         $query = PreventiveMaintenanceView::select(
             'preventive_maintenance_view.id',
+            'preventive_maintenance_view.id_ch',
             'preventive_maintenance_view.machine_no',
             'preventive_maintenance_view.op_name',
             'preventive_maintenance_view.machine_name',

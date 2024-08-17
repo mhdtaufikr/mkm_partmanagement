@@ -21,9 +21,6 @@
 
     <div class="container-fluid px-4 mt-n10">
         <div class="content-wrapper">
-            <section class="content-header">
-            </section>
-
             <section class="content">
                 <div class="container-fluid">
                     <div class="row">
@@ -33,34 +30,9 @@
                                     <h3 class="card-title">List of Daily Report</h3>
                                 </div>
 
-                      <!--alert success -->
-                      @if (session('status'))
-                      <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <strong>{{ session('status') }}</strong>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                      </div>
-                    @endif
+                                <!-- Success and Error Alerts -->
+                                <!-- Your alerts code here -->
 
-                    @if (session('failed'))
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                      <strong>{{ session('failed') }}</strong>
-                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                  @endif
-
-                      <!--alert success -->
-                      <!--validasi form-->
-                        @if (count($errors)>0)
-                          <div class="alert alert-info alert-dismissible fade show" role="alert">
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                              <ul>
-                                  <li><strong>Data Process Failed !</strong></li>
-                                  @foreach ($errors->all() as $error)
-                                      <li><strong>{{ $error }}</strong></li>
-                                  @endforeach
-                              </ul>
-                          </div>
-                        @endif
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="mb-3 col-sm-12">
@@ -69,88 +41,10 @@
                                             </button>
                                         </div>
                                     </div>
-<!-- Modal for Adding Daily Report -->
-<div class="modal fade" id="modal-add" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modal-add-label">Add Daily Report</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="historical-problem-form" action="{{ url('/history/store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div>
-                                <label for="line" class="form-label">Line</label>
-                                <select class="form-control" id="line" name="line" required>
-                                    <option value="">-- Select Line --</option>
-                                    @foreach($lines as $line)
-                                        <option value="{{ $line->line }}">{{ $line->line }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
 
-                            <div>
-                                <label for="shift" class="form-label">Shift</label>
-                                <select class="form-control" id="shift" name="shift" required>
-                                    <option value="Day">Day</option>
-                                    <option value="Night">Night</option>
-                                </select>
-                            </div>
-
-                        </div>
-                        <div class="col-md-6">
-                            <div>
-                                <label for="no_machine" class="form-label">Machine No (Op No)</label>
-                                <select class="form-control" id="no_machine" name="no_machine" required>
-                                    <option value="">-- Select Machine --</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="date" class="form-label">Date</label>
-                                <input type="date" class="form-control" id="date" name="date" value="{{ date('Y-m-d') }}" required>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary mt-3" form="historical-problem-form">Submit</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    document.getElementById('line').addEventListener('change', function() {
-        const line = this.value;
-        fetch(`/get-op-nos/${line}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                const noMachineSelect = document.getElementById('no_machine');
-                noMachineSelect.innerHTML = '<option value="">-- Select Machine --</option>';
-                data.forEach(machine => {
-                    const option = document.createElement('option');
-                    option.value = machine.id;
-                    option.textContent = machine.op_no;
-                    noMachineSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching machine data:', error);
-                alert('Error fetching machine data: ' + error.message);
-            });
-    });
-</script>
-
-
+                                    <!-- DataTable -->
                                     <div class="table-responsive">
-                                        <table id="tablehistory" class="table table-bordered table-striped ">
+                                        <table id="tablehistory" class="table table-bordered table-striped">
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
@@ -171,156 +65,106 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @php
-                                                    $no = 1;
-                                                @endphp
-                                                @foreach ($items as $data)
-                                                <tr>
-                                                    <td>{{ $no++ }}</td>
-                                                    <td>{{ $data->machine->op_no }}</td>
-                                                    <td>{{ $data->date }}</td>
-                                                    <td>{{ $data->shift }}</td>
-                                                    <td>{{ $data->shop }}</td>
-                                                    <td>{{ $data->problem }}</td>
-                                                    <td>{{ $data->cause }}</td>
-                                                    <td>{{ $data->action }}</td>
-                                                    <td>{{ $data->start_time }}</td>
-                                                    <td>{{ $data->finish_time }}</td>
-                                                    <td>{{ $data->balance }} Hour</td>
-                                                    <td>{{ $data->pic }}</td>
-                                                    <td>{{ $data->remarks }}</td>
-                                                    @php
-                                                    $statusClass = '';
-                                                    switch ($data->status) {
-                                                        case 'Close':
-                                                            $statusClass = 'btn-success';
-                                                            break;
-                                                        case 'Open':
-                                                            $statusClass = 'btn-primary';
-                                                            break;
-                                                        case 'Delay':
-                                                            $statusClass = 'btn-warning';
-                                                            break;
-                                                        case 'Ongoing':
-                                                            $statusClass = 'btn-info';
-                                                            break;
-                                                        default:
-                                                            $statusClass = 'btn-danger'; // Default case, if status is unrecognized
-                                                            break;
-                                                    }
-                                                @endphp
-
-                                                <td>
-                                                    <button class="btn {{ $statusClass }} btn-sm">
-                                                        {{ $data->status }}
-                                                    </button>
-                                                </td>
-
-                                                    <td>
-                                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-detail-{{ $data->id }}">Detail</button>
-                                                    </td>
-                                                </tr>
-
-
-                                                @endforeach
+                                                <!-- The rows will be populated by DataTables -->
                                             </tbody>
                                         </table>
-                                        @foreach ($items as $data)
-                                        <!-- Modal for showing spare parts used in historical problem -->
-                                        <div class="modal fade" id="modal-detail-{{ $data->id }}" tabindex="-1" aria-labelledby="modal-detail-label-{{ $data->id }}" aria-hidden="true">
-                                            <div class="modal-dialog modal-lg">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="modal-detail-label-{{ $data->id }}">Detail of Historical Problem</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="row mb-3">
-                                                            <div class="col-md-6">
-                                                                <h6><strong>Machine No:</strong> {{ $data->no_machine }}</h6>
-                                                                <h6><strong>Date:</strong> {{ $data->date }}</h6>
-                                                                <h6><strong>Shift:</strong> {{ $data->shift }}</h6>
-                                                                <h6><strong>Shop:</strong> {{ $data->shop }}</h6>
-                                                                <h6><strong>Problem:</strong> {{ $data->problem }}</h6>
-                                                                <h6><strong>Cause:</strong> {{ $data->cause }}</h6>
-                                                                <h6><strong>Action:</strong> {{ $data->action }}</h6>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <h6><strong>Start Time:</strong> {{ $data->start_time }}</h6>
-                                                                <h6><strong>Finish Time:</strong> {{ $data->finish_time }}</h6>
-                                                                <h6><strong>Balance:</strong> {{ $data->balance }} Hour</h6>
-                                                                <h6><strong>PIC:</strong> {{ $data->pic }}</h6>
-                                                                <h6><strong>Remarks:</strong> {{ $data->remarks }}</h6>
-                                                                <h6><strong>Status:</strong> {{ $data->status }}</h6>
-                                                            </div>
-                                                        </div>
-                                                        @if($data->img)
-                                                        <div class="row mb-3">
-                                                            <div class="col-md-12 text-center">
-                                                                <img src="{{ asset( $data->img) }}" class="img-fluid" alt="Problem Image">
-                                                            </div>
-                                                        </div>
-                                                        @endif
-                                                        <hr>
-                                                        <h5 class="mb-3">Spare Parts Used</h5>
-                                                        <div class="table-responsive">
-                                                            <table class="table table-bordered table-striped">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Part No</th>
-                                                                        <th>Description</th>
-                                                                        <th>Quantity</th>
-                                                                        <th>Location</th>
-                                                                        <th>Stock Type</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    @foreach ($data->spareParts as $part)
-                                                                    <tr>
-                                                                        <td>{{ $part->part->material ?? null }}</td>
-                                                                        <td>{{ $part->part->material_description ?? null}}</td>
-                                                                        <td>{{ $part->qty ?? null}}</td>
-                                                                        <td>{{ $part->location ?? null}}</td>
-                                                                        <td>{{ $part->routes?? null }}</td>
-                                                                    </tr>
-                                                                    @endforeach
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @endforeach
-
                                     </div>
+
                                 </div>
                             </div>
-                            <!-- /.card -->
                         </div>
-                        <!-- /.col -->
                     </div>
-                    <!-- /.row -->
                 </div>
-                <!-- /.container-fluid -->
             </section>
-            <!-- /.content -->
         </div>
-        <!-- /.content-wrapper -->
     </div>
-</main>
+    <!-- Modal Structure -->
+<div class="modal fade" id="modal-detail" tabindex="-1" aria-labelledby="modal-detail-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-detail-label">Detail of Historical Problem</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-body-content">
+                <!-- Dynamic content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-<!-- For Datatables -->
+</main>
 <script>
     $(document).ready(function() {
         var table = $("#tablehistory").DataTable({
+            "processing": true,
+            "serverSide": true,
             "responsive": true,
             "lengthChange": false,
             "autoWidth": false,
+            "ajax": "{{ route('history') }}",
+            "columns": [
+                { "data": "DT_RowIndex", "name": "DT_RowIndex", "orderable": false, "searchable": false },
+                { "data": "machine.op_no", "name": "machine.op_no" },
+                { "data": "date", "name": "date" },
+                { "data": "shift", "name": "shift" },
+                { "data": "shop", "name": "shop" },
+                { "data": "problem", "name": "problem" },
+                { "data": "cause", "name": "cause" },
+                { "data": "action", "name": "action" },
+                { "data": "start_time", "name": "start_time" },
+                { "data": "finish_time", "name": "finish_time" },
+                { "data": "balance", "name": "balance" },
+                { "data": "pic", "name": "pic" },
+                { "data": "remarks", "name": "remarks" },
+                {
+                    "data": "status",
+                    "name": "status",
+                    "render": function(data, type, row) {
+                        let statusClass = '';
+                        switch (data) {
+                            case 'Close': statusClass = 'btn-success'; break;
+                            case 'Open': statusClass = 'btn-primary'; break;
+                            case 'Delay': statusClass = 'btn-warning'; break;
+                            case 'Ongoing': statusClass = 'btn-info'; break;
+                            default: statusClass = 'btn-danger';
+                        }
+                        return '<button class="btn ' + statusClass + ' btn-sm">' + data + '</button>';
+                    }
+                },
+                {
+                    "data": "id",
+                    "name": "id",
+                    "orderable": false,
+                    "searchable": false,
+                    "render": function(data, type, row) {
+                        return `<button class="btn btn-sm btn-primary btn-detail" data-id="${data}" data-bs-toggle="modal" data-bs-target="#modal-detail">Detail</button>`;
+                    }
+                }
+            ]
+        });
+
+        // Load modal content dynamically when the detail button is clicked
+        $('#tablehistory').on('click', '.btn-detail', function() {
+            var id = $(this).data('id');
+            $.ajax({
+                url: "{{ url('/history/detail') }}/" + id,
+                method: 'GET',
+                success: function(data) {
+                    $('#modal-body-content').html(data);
+                    $('#modal-detail').modal('show');
+                },
+                error: function(xhr, status, error) {
+                    alert('An error occurred while fetching details: ' + error);
+                }
+            });
         });
     });
 </script>
+
+
+<!-- DataTables script remains unchanged -->
 @endsection

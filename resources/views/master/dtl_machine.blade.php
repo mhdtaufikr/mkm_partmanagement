@@ -587,7 +587,7 @@
                                             <div class="card">
                                                 <div class="card-body">
                                                     <div class="table-responsive">
-                                                        <table id="combinedTable" class="table table-bordered table-striped">
+                                                        <table id="tablehistory" class="table table-bordered table-striped">
                                                             <thead>
                                                                 <tr>
                                                                     <th>No</th>
@@ -665,7 +665,13 @@
                                                                         @endif
                                                                     </td> <!-- Status with conditional badge based on type -->
                                                                     <td>
+                                                                        @if($data->type == 'Daily Report')
                                                                         <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-detail-{{ $data->data->id }}">Detail</button>
+                                                                        @else
+                                                                        <a target="_blank" title="Detail" class=" btn btn-sm btn-primary" href="{{url("checksheet/detail/".encrypt($data->data->id_ch))}} ">
+                                                                            Detail
+                                                                        </a>
+                                                                        @endif
                                                                     </td>
                                                                 </tr>
                                                                 @endforeach

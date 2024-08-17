@@ -121,8 +121,6 @@
                                             </div>
                                         </div>
                                         </div>
-
-
                                 </div>
 
                               </div>
@@ -133,7 +131,7 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">{{ $itemHead->machine_name }}</h3>
+                                    <h3 class="card-title">{{$itemHead->preventiveMaintenance->machine->machine_name}}</h3>
                                 </div>
 
                                 <!-- Legend Section -->

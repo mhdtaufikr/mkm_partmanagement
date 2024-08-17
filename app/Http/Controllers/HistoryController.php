@@ -12,21 +12,40 @@ use App\Models\HistoricalProblemPart;
 use App\Models\ChecksheetStatusLog;
 use App\Models\MachineSparePartsInventory;
 use DB;
-
+use Yajra\DataTables\DataTables;
 
 class HistoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        if ($request->ajax()) {
+            $query = HistoricalProblem::with(['spareParts.part', 'machine'])
+                ->orderBy('date', 'desc')       // Sort by date in descending order
+                ->orderBy('start_time', 'desc'); // Then sort by start time in descending order
+
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->addColumn('action', function($row){
+                    return '<button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-detail-'.$row->id.'">Detail</button>';
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+
         $machines = Machine::all();
         $lines = Machine::select('line')->distinct()->get();
-        $items = HistoricalProblem::with(['spareParts.part', 'machine'])
-            ->orderBy('date', 'desc')       // Sort by date in descending order
-            ->orderBy('start_time', 'desc') // Then sort by start time in descending order
-            ->get();
 
-        return view('history.index', compact('items', 'machines', 'lines'));
+        return view('history.index', compact('machines', 'lines'));
     }
+
+    // HistoryController.php
+        public function showDetail($id)
+        {
+            $data = HistoricalProblem::with(['spareParts.part', 'machine'])->findOrFail($id);
+
+            // Assuming you have a Blade partial for rendering the modal content
+            return view('history.partials', compact('data'));
+        }
 
     public function getOpNos($line)
     {

@@ -434,7 +434,13 @@ public function storeHeadForm(Request $request)
 
     public function checksheetApprove($id){
         $id = decrypt($id);
-        $itemHead = ChecksheetFormHead::where('id', $id)->first();
+        // Retrieve the ChecksheetFormHead along with related PreventiveMaintenance and Machine in one query
+        $itemHead = ChecksheetFormHead::with('preventiveMaintenance.machine')->where('id', $id)->first();
+
+        // Check if itemHead is found
+        if (!$itemHead) {
+            return redirect()->back()->with('error', 'Checksheet not found.');
+        }
         $itemDetail = ChecksheetFormDetail::where('id_header', $id)->get();
 
         // Group item details based on asset categories
@@ -454,7 +460,13 @@ public function storeHeadForm(Request $request)
 
     public function checksheetChecker($id){
         $id = decrypt($id);
-        $itemHead = ChecksheetFormHead::where('id', $id)->first();
+       // Retrieve the ChecksheetFormHead along with related PreventiveMaintenance and Machine in one query
+       $itemHead = ChecksheetFormHead::with('preventiveMaintenance.machine')->where('id', $id)->first();
+
+       // Check if itemHead is found
+       if (!$itemHead) {
+           return redirect()->back()->with('error', 'Checksheet not found.');
+       }
         $itemDetail = ChecksheetFormDetail::where('id_header', $id)->get();
 
         // Group item details based on asset categories
@@ -564,7 +576,13 @@ public function generatePdfmail($id)
 
     public function checksheetUpdate($id){
         $id = decrypt($id);
-        $itemHead = ChecksheetFormHead::where('id', $id)->first();
+       // Retrieve the ChecksheetFormHead along with related PreventiveMaintenance and Machine in one query
+       $itemHead = ChecksheetFormHead::with('preventiveMaintenance.machine')->where('id', $id)->first();
+
+       // Check if itemHead is found
+       if (!$itemHead) {
+           return redirect()->back()->with('error', 'Checksheet not found.');
+       }
         $itemDetail = ChecksheetFormDetail::where('id_header', $id)->get();
 
         // Group item details based on asset categories

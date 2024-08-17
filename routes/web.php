@@ -70,7 +70,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/get-repair-stock/{partId}', [MstMachinePartController::class, 'getRepairStock']);
     Route::get('/mst/repair/part', [MstPartRepairController::class, 'repairPart'])->middleware(['checkRole:IT']);
      // mstMachine Part
-    Route::get('/mst/machine/part', [MstMachinePartController::class, 'index'])->middleware(['checkRole:IT']);
+     Route::get('/mst/machine/part', [MstMachinePartController::class, 'index'])->middleware(['checkRole:IT'])->name('mst.machine.part');
     Route::get('/mst/machine/detail/{id}', [MstMachinePartController::class, 'detail'])->middleware(['checkRole:IT']);
     Route::post('/mst/machine/repair', [MstMachinePartController::class, 'repair'])->middleware(['checkRole:IT']);
     Route::post('/mst/machine/add-part', [MstMachinePartController::class, 'store'])->middleware(['checkRole:IT']);
@@ -84,7 +84,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/history', [HistoryController::class, 'index'])->middleware(['checkRole:IT'])->name('history');
      Route::post('/history/store', [HistoryController::class, 'store']);
-
+     Route::get('/history/detail/{id}', [HistoryController::class, 'showDetail']);
 
     Route::get('/get-parts/{machineId}', [HistoryController::class, 'getParts']);
 
@@ -124,13 +124,14 @@ Route::middleware(['auth'])->group(function () {
 
     //checksheet
     //Master Checksheet form/checksheet/scan
+    Route::get('/checksheet/data', [ChecksheetController::class, 'getData'])->name('checksheet.data');
     Route::get('/checksheet', [ChecksheetController::class, 'index'])->middleware(['checkRole:IT,Super Admin,Approval,Checker,User'])->name('machine');
     Route::post('/checksheet/scan', [ChecksheetController::class, 'checksheetScan'])->middleware(['checkRole:IT,Super Admin,User']);
     Route::post('/checksheet/store', [ChecksheetController::class, 'storeHeadForm'])->name('checksheet.store');
     Route::get('/checksheet/fill/{id}', [ChecksheetController::class, 'checksheetfill'])->middleware(['checkRole:IT,Super Admin,User'])->name('fillForm');
 
     Route::post('/checksheet/store/detail', [ChecksheetController::class, 'storeDetailForm'])->middleware(['checkRole:IT,Super Admin,User']);
-    Route::get('/checksheet/detail/{id}', [ChecksheetController::class, 'checksheetDetail'])->middleware(['checkRole:IT,Approval,Checker,Super Admin,User']);
+    Route::get('/checksheet/detail/{id}', [ChecksheetController::class, 'checksheetDetail'])->middleware(['checkRole:IT,Approval,Checker,Super Admin,User'])->name('checksheet.detail');
     Route::post('/checksheet/signature', [ChecksheetController::class, 'checksheetSignature'])->middleware(['checkRole:IT,Super Admin,User']);
 
     Route::get('/checksheet/approve/{id}', [ChecksheetController::class, 'checksheetApprove'])->middleware(['checkRole:IT,Super Admin,Approval']);
