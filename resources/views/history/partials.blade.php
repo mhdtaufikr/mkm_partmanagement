@@ -20,7 +20,7 @@
 @if($data->img)
     <div class="row mb-3">
         <div class="col-md-12 text-center">
-            <img src="{{ asset($data->img) }}" class="img-fluid" alt="Problem Image">
+            <img src="{{ asset($data->img) }}"  class="img-fluid" alt="Problem Image" style="max-width: 400px; max-height: 300px;">
         </div>
     </div>
 @endif

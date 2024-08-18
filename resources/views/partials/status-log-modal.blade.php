@@ -31,7 +31,7 @@
                     @if($data->logStatus->img)
                         <div class="row mb-3">
                             <div class="col-md-12 text-center">
-                                <img src="{{ asset($data->logStatus->img) }}" class="img-fluid" alt="Problem Image">
+                                <img src="{{ asset($data->logStatus->img) }}" class="img-fluid" alt="Problem Image" style="max-width: 400px; max-height: 300px;">
                             </div>
                         </div>
                     @endif

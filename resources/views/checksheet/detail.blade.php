@@ -196,12 +196,17 @@
                      <div class="col-12 mb-4">
                          <div class="card">
                              <div class="card-header">
-                                 <h3 class="card-title">Status Log Details</h3>
+                                 <h3 class="card-title">Follow Up Problem</h3>
                              </div>
                              <!-- /.card-header -->
                              <div class="card-body">
                                  <div class="row">
-                                     <div class="col-md-6">
+                                    <div class="col-md-4">
+                                        @if($logStatus->img)
+                                        <img src="{{ asset($logStatus->img) }}" class="img-fluid" alt="Problem Image" style="max-width: 400px; max-height: 300px;">
+                                     @endif
+                                    </div>
+                                     <div class="col-md-4">
                                          <h6><strong>Machine No:</strong> {{ $logStatus->machine->no_machine }}</h6>
                                          <h6><strong>Date:</strong> {{ $logStatus->date }}</h6>
                                          <h6><strong>Shift:</strong> {{ $logStatus->shift }}</h6>
@@ -210,7 +215,7 @@
                                          <h6><strong>Cause:</strong> {{ $logStatus->cause }}</h6>
                                          <h6><strong>Action:</strong> {{ $logStatus->action }}</h6>
                                      </div>
-                                     <div class="col-md-6">
+                                     <div class="col-md-4">
                                          <h6><strong>Start Time:</strong> {{ $logStatus->start_time }}</h6>
                                          <h6><strong>Finish Time:</strong> {{ $logStatus->finish_time }}</h6>
                                          <h6><strong>Balance:</strong> {{ $logStatus->balance }} Hour</h6>
@@ -218,15 +223,9 @@
                                          <h6><strong>Remarks:</strong> {{ $logStatus->remarks }}</h6>
                                          <h6><strong>Status:</strong> {{ $logStatus->status }}</h6>
                                      </div>
-                                 </div>
-                                 @if($logStatus->img)
-                                     <div class="row mb-3">
-                                         <div class="col-md-12 text-center">
-                                             <img src="{{ asset($logStatus->img) }}" class="img-fluid" alt="Problem Image" style="max-width: 400px; max-height: 300px;">
 
-                                         </div>
-                                     </div>
-                                 @endif
+                                 </div>
+
                                  <hr>
                                  <h5 class="mb-3">Spare Parts Used</h5>
                                  <div class="table-responsive">
