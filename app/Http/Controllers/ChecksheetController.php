@@ -89,7 +89,7 @@ class ChecksheetController extends Controller
     } else {
         $items = $query->get();
     }
-
+    $logStatus = null; // Initialize the variable before the loop
     // Attach logs and status_logs to each item
     foreach ($items as $item) {
         $item->logs = ChecksheetJourneyLog::where('checksheet_id', $item->checksheet_id)
@@ -404,8 +404,19 @@ public function storeHeadForm(Request $request)
             $groupedResults[$detail->checksheet_category][] = $detail;
         }
 
-        return view('checksheet.detail', compact('itemHead', 'groupedResults', 'id'));
+        // Check if there is a status log for the checksheet
+        $logStatus = ChecksheetStatusLog::where('checksheet_header_id', $id)->first();
+
+        // If there is a status log, fetch the historical problem associated with it
+        if ($logStatus) {
+            $logStatus = HistoricalProblem::with(['spareParts.part', 'machine'])
+                ->where('id', $logStatus->historical_id)
+                ->first();
+        }
+
+        return view('checksheet.detail', compact('itemHead', 'groupedResults', 'logStatus', 'id'));
     }
+
 
 
 

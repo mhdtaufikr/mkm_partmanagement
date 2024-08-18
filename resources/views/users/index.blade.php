@@ -62,26 +62,59 @@
                                 <form action="{{ url('/user/store') }}" method="POST">
                                   @csrf
                                   <div class="modal-body">
-                                    <div class="form-group">
-                                      <input type="text" class="form-control" id="name" name="name" placeholder="Enter User Name" required>
-                                    </div>
-                                    <br>
-                                    <div class="form-group">
-                                      <input type="email" class="form-control" id="email" name="email" placeholder="Enter User Email" required>
-                                    </div>
-                                    <br>
-                                    <div class="form-group">
-                                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter User Password" required>
-                                      </div>
-                                      <br>
-                                    <div class="form-group">
-                                        <select name="role" id="role" class="form-control">
-                                            <option value="">- Please Select Role -</option>
-                                            @foreach ($dropdown as $role)
-                                                <option value="{{ $role->name_value }}">{{ $role->name_value }}</option>
-                                            @endforeach
-                                          </select>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-2">
+                                                <label for="">username</label>
+                                                <input type="text" class="form-control" id="name" name="name" placeholder="Enter User Name" required>
+                                              </div>
+
+                                              <div class="form-group mb-2">
+                                                <label for="">email</label>
+                                                <input type="email" class="form-control" id="email" name="email" placeholder="Enter User Email" required>
+                                              </div>
+
+                                              <div class="form-group mb-2">
+                                                <label for="">Password</label>
+                                                  <input type="password" class="form-control" id="password" name="password" placeholder="Enter User Password" required>
+                                                </div>
                                         </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-2">
+                                                <label for="">Role</label>
+                                                <select name="role" id="role" class="form-control">
+
+                                                    <option value="">- Please Select Role -</option>
+                                                    @foreach ($dropdown as $role)
+                                                        <option value="{{ $role->name_value }}">{{ $role->name_value }}</option>
+                                                    @endforeach
+                                                  </select>
+                                            </div>
+                                                <div class="form-group mb-2">
+                                                    <label for="">Plant</label>
+                                                    <select name="role" id="role" class="form-control">
+
+                                                        <option value="">- Please Select Plant -</option>
+                                                        @foreach ($plants as $plant)
+                                                            <option value="{{ $plant->name_value }}">{{ $plant->name_value }}</option>
+                                                        @endforeach
+                                                      </select>
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <label for="">Type</label>
+                                                        <select name="role" id="role" class="form-control">
+
+                                                            <option value="">- Please Select Type -</option>
+                                                            @foreach ($types as $type)
+                                                                <option value="{{ $type->name_value }}">{{ $type->name_value }}</option>
+                                                            @endforeach
+                                                          </select>
+                                                        </div>
+                                        </div>
+                                    </div>
+
+
+
                                   </div>
                                   <div class="modal-footer">
                                     <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
@@ -93,42 +126,21 @@
                           </div>
 
 
-                    <div class="col-sm-12">
-                      <!--alert success -->
-                      @if (session('status'))
-                      <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <strong>{{ session('status') }}</strong>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                      </div>
-                    @endif
-
-                      <!--alert success -->
-                      <!--validasi form-->
-                        @if (count($errors)>0)
-                          <div class="alert alert-info alert-dismissible fade show" role="alert">
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                              <ul>
-                                  <li><strong>Data Process Failed !</strong></li>
-                                  @foreach ($errors->all() as $error)
-                                      <li><strong>{{ $error }}</strong></li>
-                                  @endforeach
-                              </ul>
-                          </div>
-                        @endif
-                      <!--end validasi form-->
-                    </div>
+                          @include('partials.alert')
                 </div>
                 <div class="table-responsive">
                 <table id="tableUser" class="table table-bordered table-striped">
                   <thead>
-                  <tr>
-                    <th>No</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Last Login</th>
-                    <th>Action</th>
-                  </tr>
+                    <tr>
+                        <th>No</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Plant</th>
+                        <th>Type</th>
+                        <th>Last Login</th>
+                        <th>Action</th>
+                    </tr>
                   </thead>
                   <tbody>
                     @php
@@ -140,7 +152,9 @@
                         <td>{{ $data->name }}</td>
                         <td>{{ $data->email }}</td>
                         <td>{{ $data->role }}</td>
-                        <td> {{ date('d-m-Y H:i:s', strtotime($data->last_login)) }}</td>
+                        <td>{{ $data->plant }}</td>
+                        <td>{{ $data->type }}</td>
+                        <td>{{ date('d-m-Y H:i:s', strtotime($data->last_login)) }}</td>
                         <td>
                             <button title="Edit User" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-update{{ $data->id }}">
                                 <i class="fas fa-user-edit"></i>
@@ -157,8 +171,8 @@
                         </td>
                     </tr>
 
-                     {{-- Modal Update --}}
-                     <div class="modal fade" id="modal-update{{ $data->id }}" tabindex="-1" aria-labelledby="modal-update{{ $data->id }}-label" aria-hidden="true">
+                    {{-- Modal Update --}}
+                    <div class="modal fade" id="modal-update{{ $data->id }}" tabindex="-1" aria-labelledby="modal-update{{ $data->id }}-label" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -169,18 +183,57 @@
                                     @csrf
                                     @method('patch')
                                     <div class="modal-body">
-                                        <div class="mb-3 form-group">
-                                            <label for="email">{{ $data->email }}</label>
-                                        </div>
-                                        <div class="form-group">
-                                            <select name="role" id="role" class="form-control">
-                                                <option value="">- Please Select Role -</option>
-                                                @foreach ($dropdown as $role)
-                                                    <option value="{{ $role->name_value }}" {{ $data->role == $role->name_value ? 'selected' : '' }}>{{ $role->name_value }}</option>
-                                                @endforeach
-                                            </select>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-2">
+                                                    <label for="name">Username</label>
+                                                    <input type="text" class="form-control" id="name" name="name" value="{{ $data->name }}" readonly>
+                                                </div>
+
+                                                <div class="form-group mb-2">
+                                                    <label for="email">Email</label>
+                                                    <input type="email" class="form-control" id="email" name="email" value="{{ $data->email }}" readonly>
+                                                </div>
+
+                                                <div class="form-group mb-2">
+                                                    <label for="password">New Password</label>
+                                                    <input type="password" class="form-control" id="password" name="password" placeholder="Leave blank to keep current password">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-2">
+                                                    <label for="role">Role</label>
+                                                    <select name="role" id="role" class="form-control">
+                                                        <option value="">- Please Select Role -</option>
+                                                        @foreach ($dropdown as $role)
+                                                            <option value="{{ $role->name_value }}" {{ $data->role == $role->name_value ? 'selected' : '' }}>{{ $role->name_value }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                <div class="form-group mb-2">
+                                                    <label for="plant">Plant</label>
+                                                    <select name="plant" id="plant" class="form-control">
+                                                        <option value="">- Please Select Plant -</option>
+                                                        @foreach ($plants as $plant)
+                                                            <option value="{{ $plant->name_value }}" {{ $data->plant == $plant->name_value ? 'selected' : '' }}>{{ $plant->name_value }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                <div class="form-group mb-2">
+                                                    <label for="type">Type</label>
+                                                    <select name="type" id="type" class="form-control">
+                                                        <option value="">- Please Select Type -</option>
+                                                        @foreach ($types as $type)
+                                                            <option value="{{ $type->name_value }}" {{ $data->type == $type->name_value ? 'selected' : '' }}>{{ $type->name_value }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+
                                     <div class="modal-footer justify-content-between">
                                         <button type="button" class="btn btn-dark btn-default" data-bs-dismiss="modal">Close</button>
                                         <input type="submit" class="btn btn-primary" value="Update">
@@ -189,7 +242,8 @@
                             </div>
                         </div>
                     </div>
-                      {{-- Modal Update --}}
+                    {{-- Modal Update --}}
+
 
                       {{-- Modal Access --}}
                       <div class="modal fade" id="modal-access{{ $data->id }}">
@@ -202,7 +256,7 @@
                                 <form action="{{ url('/user/access/'.$data->id) }}" enctype="multipart/form-data" method="GET">
                                     @csrf
                                     <div class="modal-body">
-                                        <div class="form-group">
+                                        <div class="form-group mb-2">
                                             Give Access to <label for="email">{{ $data->email }}</label>?
                                         </div>
                                     </div>
@@ -228,7 +282,7 @@
                                 <form action="{{ url('/user/revoke/'.$data->id) }}" enctype="multipart/form-data" method="GET">
                                     @csrf
                                     <div class="modal-body">
-                                        <div class="form-group">
+                                        <div class="form-group mb-2">
                                             Are you sure you want to revoke <label for="email">{{ $data->email }}</label>?
                                         </div>
                                     </div>
@@ -257,7 +311,7 @@
                             @csrf
                             @method('delete')
                             <div class="modal-body">
-                                <div class="form-group">
+                                <div class="form-group mb-2">
                                 Are you sure you want to delete <label for="Dropdown">{{ $data->name_value }}</label>?
                                 </div>
                             </div>

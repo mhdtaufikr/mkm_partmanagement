@@ -565,6 +565,7 @@
                                                             <thead>
                                                                 <tr>
                                                                     <th>No</th>
+                                                                    <th>Type</th> <!-- New Type column -->
                                                                     <th>Date</th>
                                                                     <th>Shift</th>
                                                                     <th>Shop</th>
@@ -585,6 +586,7 @@
                                                                 @foreach ($combinedData as $data)
                                                                 <tr>
                                                                     <td>{{ $no++ }}</td>
+                                                                    <td>{{ $data->Category }}</td>
                                                                     <td>{{ $data->date }}</td>
                                                                     <td>{{ $data->data->shift ?? '-' }}</td>
                                                                     <td>{{ $data->data->shop }}</td>

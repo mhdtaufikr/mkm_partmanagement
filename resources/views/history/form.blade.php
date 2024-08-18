@@ -25,41 +25,12 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">Inser Daily Report</h3>
+                                    <h3 class="card-title">Insert Daily Report</h3>
                                 </div>
                                 <!-- /.card-header -->
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="mb-3 col-sm-12">
-                                            <!-- Alert success -->
-                                            @if (session('status'))
-                                                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                                    <strong>{{ session('status') }}</strong>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                                </div>
-                                            @endif
-
-                                            @if (session('failed'))
-                                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                                    <strong>{{ session('failed') }}</strong>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                                </div>
-                                            @endif
-
-                                            <!-- Validation errors -->
-                                            @if (count($errors) > 0)
-                                                <div class="alert alert-info alert-dismissible fade show" role="alert">
-                                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                                    <ul>
-                                                        <li><strong>Data Process Failed!</strong></li>
-                                                        @foreach ($errors->all() as $error)
-                                                            <li><strong>{{ $error }}</strong></li>
-                                                        @endforeach
-                                                    </ul>
-                                                </div>
-                                            @endif
-                                            <!-- End validation errors -->
-                                        </div>
+                                        @include('partials.alert')
                                         <div class="col-md-12">
                                             <!-- Create this view for store -->
                                             <form action="{{ route('historical') }}" method="POST" enctype="multipart/form-data">
@@ -67,7 +38,7 @@
                                                 <input type="hidden" name="id_machine" value="{{ $no_machine }}">
                                                 <input type="hidden" name="date" value="{{ $date }}">
                                                 <input type="hidden" name="shift" value="{{ $shift }}">
-
+                                                <input type="hidden" name="report" value="Daily Report">
 
                                                 <div class="row mb-4">
                                                     <div class="col-md-3">
@@ -153,19 +124,30 @@
                                                 <hr>
 
                                                 <div class="row mb-4">
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label for="">Category</label>
+                                                            <select name="category" id="category" class="form-control" required>
+                                                                <option value="">- Please Select Role -</option>
+                                                                @foreach ($dropdown as $Problem)
+                                                                    <option value="{{ $Problem->name_value }}">{{ $Problem->name_value }}</option>
+                                                                @endforeach
+                                                              </select>
+                                                          </div>
+                                                    </div>
+                                                    <div class="col-md-3">
                                                         <div class="form-group">
                                                             <label for="start_time">Start Time</label>
                                                             <input type="time" class="form-control" id="start_time" name="start_time" required>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-3">
                                                         <div class="form-group">
                                                             <label for="finish_time">Finish Time</label>
                                                             <input type="time" class="form-control" id="finish_time" name="finish_time" required>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-3">
                                                         <div class="form-group">
                                                             <label for="balance">Balance</label>
                                                             <input readonly type="number" class="form-control" id="balance" name="balance" required>

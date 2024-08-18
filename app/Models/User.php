@@ -36,5 +36,26 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'last_login' => 'datetime',
     ];
+
+    /**
+     * Additional attributes that should be treated as booleans.
+     *
+     * @var array<string, string>
+     */
+    protected $attributes = [
+        'is_active' => 'active',
+    ];
+
+    /**
+     * Scope a query to only include active users.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', 'active');
+    }
 }

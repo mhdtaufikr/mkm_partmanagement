@@ -93,6 +93,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/form/{no_machine}/{date}/{shift}', [HistoryController::class, 'form'])->name('form');
     Route::get('/get-repair-locations-for-part/{part_id}', [HistoryController::class, 'getRepairLocationsForPart']);
     Route::post('/historical-problems/store', [HistoryController::class, 'storehp'])->name('historical');
+    Route::post('/historical-problems/store/status', [HistoryController::class, 'storehpStatus'])->name('historicalStatus');
     Route::get('/form/{no_machine}/{date}/{shift}/{id_pm}/{id_checksheet_head}', [HistoryController::class, 'formStatus'])->name('formStatus');
 
 

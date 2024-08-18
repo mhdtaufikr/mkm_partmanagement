@@ -136,7 +136,7 @@
                                                             <th>Type</th>
                                                             <th>Planning Date</th>
                                                             <th>Actual Date</th>
-                                                            <th>Created By</th>
+                                                            <th>PIC</th>
                                                             <th>Approval</th>
                                                             <th>Status</th>
                                                             <th>Action</th>
@@ -146,12 +146,24 @@
                                                         @php $no = 1; @endphp
                                                         @foreach ($items as $data)
                                                         <tr>
-                                                            <td>{{ $no++ }}</td>
+                                                            <td>
+                                                                <div class="row align-items-center">
+                                                                    <div class="col-md-2">
+                                                                        {{ $no++ }}
+                                                                    </div>
+                                                                    <div class="col-md-4">
+                                                                        @if($data->status_logs->isNotEmpty())
+                                                                        <span class="badge bg-primary ms-2" style="padding: 0.35rem 0.75rem; margin-left: 10px; font-size: 0.85rem;">Log</span>
+
+                                                                    @endif
+                                                                    </div>
+                                                                </div>
+                                                            </td>
                                                             <td>{{ $data->op_name ?? '' }}({{ $data->machine_name ?? '' }}) </td>
                                                             <td>{{ $data->type ?? 'Unknown' }}</td>
                                                             <td>{{ $data->planning_date ? date('d/m/Y', strtotime($data->planning_date)) : '' }}</td>
                                                             <td>{{ $data->actual_date ? date('d/m/Y', strtotime($data->actual_date)) : '' }}</td>
-                                                            <td>{{ $data->created_by }}</td>
+                                                            <td>{{ $data->pic }}</td>
                                                             <td>
                                                                 @if($data->status == 0)
                                                                     <span class="badge bg-primary">Update</span>
@@ -187,13 +199,14 @@
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
 
                             <!-- Include Modals -->
                             @foreach ($items as $data)
-                                @include('partials.change-status-modal', ['data' => $data])
-                                @include('partials.journey-modal', ['data' => $data])
-                                 @include('partials.status-log-modal', ['data' => $data])
+                                    @include('partials.change-status-modal', ['data' => $data])
+                                    @include('partials.journey-modal', ['data' => $data])
+                                    @include('partials.status-log-modal', ['data' => $data])
                             @endforeach
 
                             <!-- End of List Checksheet Card -->

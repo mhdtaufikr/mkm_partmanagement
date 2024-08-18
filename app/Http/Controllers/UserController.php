@@ -14,38 +14,45 @@ class UserController extends Controller
         $user = User::get();
         $dropdown = Dropdown::where('category','Role')
         ->get();
-        return view('users.index',compact('user','dropdown'));
+        $types = Dropdown::where('category','Category')
+        ->get();
+        $plants = Dropdown::where('category','Plant')
+        ->get();
+        return view('users.index',compact('user','dropdown','types','plants'));
     }
 
 
     public function store(Request $request)
     {
-
         $request->validate([
             'name' => 'required',
-            'email' => 'required',
+            'email' => 'required|email|unique:users,email',
             'role' => 'required',
-            'password' => 'required',
+            'plant' => 'required',
+            'type' => 'required',
+            'password' => 'required|min:6',
         ]);
 
         $password = bcrypt($request->password);
-        //dd($password);
-        $addUser=User::create([
-            'id_partner' => '0',
+
+        $addUser = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => $password,
             'role' => $request->role,
+            'plant' => $request->plant,
+            'type' => $request->type,
             'last_login' => null,
             'is_active' => '1',
-
         ]);
+
         if ($addUser) {
-            return redirect('/user')->with('status','Success Add User');
-        }else{
-            return redirect('/user')->with('status','Failed Add User');
+            return redirect('/user')->with('status', 'Success Add User');
+        } else {
+            return redirect('/user')->with('status', 'Failed Add User');
         }
     }
+
 
     public function storePartner(Request $request)
     {
@@ -97,10 +104,28 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        $role= User::where('id',$id)
-        ->update([
-            'role' => $request->role,
+        $request->validate([
+            'role' => 'required',
+            'plant' => 'required',
+            'type' => 'required',
         ]);
-            return redirect('/user')->with('status','Success Revoke User');
+
+        $user = User::findOrFail($id);
+
+        // Only update password if a new one is provided
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
+        }
+
+        $user->role = $request->role;
+        $user->plant = $request->plant;
+        $user->type = $request->type;
+
+        if ($user->save()) {
+            return redirect('/user')->with('status', 'Success updating User');
+        } else {
+            return redirect('/user')->with('status', 'Failed to update User');
+        }
     }
+
 }

@@ -125,7 +125,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
-                                                    <th>Machine No</th>
+                                                    <th>OP No.</th>
                                                     <th>Date</th>
                                                     <th>Shift</th>
                                                     <th>Shop</th>

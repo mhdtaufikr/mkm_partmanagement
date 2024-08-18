@@ -111,22 +111,23 @@ class MstMachinePartController extends Controller
 
         // Combine the data into a single collection
         $combinedData = collect();
-
-        // Add historical problems to the collection
         foreach ($historicalProblems as $problem) {
             $combinedData->push((object) [
                 'date' => $problem->date,
-                'type' => 'Daily Report',
-                'data' => $problem
+                'type' => "Daily Report",  // Use the report column as the type
+                'data' => $problem,
+                'Category' => $problem->report
             ]);
         }
+
 
         // Add preventive maintenance records to the collection
         foreach ($preventiveMaintenances as $pm) {
             $combinedData->push((object) [
                 'date' => $pm->planning_date,
                 'type' => 'Preventive Maintenance',
-                'data' => $pm
+                'data' => $pm,
+                'Category' => 'Preventive Maintenance'
             ]);
         }
 
