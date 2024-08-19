@@ -57,7 +57,7 @@
     <div class="container-fluid px-4 mt-n10">
         <div class="card mb-4">
             <div class="card-header">
-                <h1>Preventive Maintenance Schedule</h1>
+                <h1 style="color: white">Preventive Maintenance Schedule</h1>
             </div>
             <div class="card-body">
                  <!--alert success -->
@@ -226,7 +226,7 @@
                                 <tr>
                                     @for($month = 1; $month <= 12; $month++)
                                         <th>
-                                            <a target="_blank" href="{{ url('/mst/preventive/schedule/detail/' . $month) }}">
+                                            <a style="color: white" target="_blank" href="{{ url('/mst/preventive/schedule/detail/' . $month) }}">
                                                 {{ DateTime::createFromFormat('!m', $month)->format('M') }}
                                             </a>
                                         </th>

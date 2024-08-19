@@ -20,7 +20,7 @@
     <div class="container-fluid px-4 mt-n10">
         <div class="card mb-4">
             <div class="card-header">
-                <h1>Preventive Maintenance Schedule - {{ DateTime::createFromFormat('!m', $month)->format('F') }}</h1>
+                <h1 style="color: white">Preventive Maintenance Schedule - {{ DateTime::createFromFormat('!m', $month)->format('F') }}</h1>
             </div>
             <div class="card-body">
                 @foreach($items as $type => $lines)
