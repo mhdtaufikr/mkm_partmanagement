@@ -127,7 +127,7 @@
                                                     <th>Process</th>
                                                     <th>Maker</th>
                                                     <th>Mfg. Date</th>
-                                                    <th>Action</th>
+
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -151,13 +151,12 @@
 
 </main>
 
-<!-- For Datatables -->
 <script>
     $(document).ready(function() {
         var table = $('#tableUser').DataTable({
             "processing": true,
             "serverSide": true,
-            "ajax": "{{ route('mst.machine.part') }}",  // Your server-side route here
+            "ajax": "{{ route('mst.machine.part') }}",
             "columns": [
                 { "data": "DT_RowIndex", "name": "DT_RowIndex", "orderable": false, "searchable": false },
                 { "data": "plant", "name": "plant" },
@@ -166,11 +165,16 @@
                 { "data": "machine_name", "name": "machine_name" },
                 { "data": "process", "name": "process" },
                 { "data": "maker", "name": "maker" },
-                { "data": "mfg_date", "name": "mfg_date" },
-                { "data": "action", "name": "action", "orderable": false, "searchable": false }
+                { "data": "mfg_date", "name": "mfg_date" }
             ],
-            "order": [[1, 'asc'], [2, 'asc']]
+            "order": [[1, 'asc'], [2, 'asc']],
+            "createdRow": function(row, data, dataIndex) {
+                $(row).attr('onclick', 'window.location.href="{{ url("/mst/machine/detail/") }}/'+data.encrypted_id +'";');
+                $(row).css('cursor', 'pointer');
+            }
         });
     });
 </script>
+
+
 @endsection

@@ -18,36 +18,33 @@ use App\Imports\PartsImport;
 use App\Models\PreventiveMaintenanceView;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\Crypt;
 
 class MstMachinePartController extends Controller
 {
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $items = Machine::select(['*']);
+            $items = Machine::select(['*'])
+                ->get()
+                ->map(function ($item) {
+                    $item->encrypted_id = encrypt($item->id); // Add encrypted id
+                    return $item;
+                });
 
             return DataTables::of($items)
                 ->addIndexColumn()
                 ->addColumn('mfg_date', function ($row) {
-                    return $row->mfg_date ? $row->mfg_date : 'N/A'; // No date formatting here
+                    return $row->mfg_date ? $row->mfg_date : 'N/A';
                 })
-                ->addColumn('action', function($row){
-                    $btn = '<div class="btn-group">
-                                <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Actions
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="'.url('/mst/machine/detail/'.encrypt($row->id)).'"><i class="fas fa-info"></i> Detail</a></li>
-                                </ul>
-                            </div>';
-                    return $btn;
-                })
-                ->rawColumns(['action'])
                 ->make(true);
         }
 
         return view('master.machine');
     }
+
+
+
 
 
     public function detail($id) {

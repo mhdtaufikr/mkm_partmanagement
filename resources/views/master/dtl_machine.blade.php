@@ -52,7 +52,7 @@
                                         </button>
                                     </div>
 
-                                    <h3 class="text-center">{{ $machine->machine_name }}</h3>
+                                    <h3 class="text-center">{{ $machine->op_no }}</h3>
 
                                     <!-- Button trigger modal -->
                                     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#imageModal">
