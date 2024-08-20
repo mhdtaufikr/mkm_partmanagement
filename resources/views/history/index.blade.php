@@ -131,7 +131,6 @@
                                                     <th>Shop</th>
                                                     <th>Problem</th>
                                                     <th>Cause</th>
-                                                    <th>Action</th>
                                                     <th>Start Time</th>
                                                     <th>Finish Time</th>
                                                     <th>Balance</th>
@@ -191,7 +190,6 @@
                 { "data": "shop", "name": "shop" },
                 { "data": "problem", "name": "problem" },
                 { "data": "cause", "name": "cause" },
-                { "data": "action", "name": "action" },
                 { "data": "start_time", "name": "start_time" },
                 { "data": "finish_time", "name": "finish_time" },
                 { "data": "balance", "name": "balance" },

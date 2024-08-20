@@ -403,6 +403,8 @@
                                                                         <th>Description</th>
                                                                         <th>Estimation Lifetime</th>
                                                                         <th>Last Replace</th>
+                                                                        <th>Periodic Check</th>
+                                                                        <th>Periodic Status</th> <!-- New Periodic Status column -->
                                                                         <th>Type</th>
                                                                         <th>SAP Stock</th>
                                                                         <th>Repair Stock</th>
@@ -414,10 +416,40 @@
                                                                 </thead>
                                                                 <tbody>
                                                                     @php
+
                                                                         $no=1;
                                                                     @endphp
                                                                     @foreach ($machine->spareParts as $part)
+                                                                    @php
+                                                                $currentYear = date('Y');
+                                                                $currentMonth = date('m');
 
+                                                                $status = $machine->inventoryStatus->firstWhere('part_id', $part->part_id);
+
+                                                                // Calculate the periodic check date
+                                                                $periodicCheckDate = date('d M Y', strtotime($part->last_replace . ' + ' . $part->estimation_lifetime . ' years'));
+                                                                $periodicCheckYear = date('Y', strtotime($part->last_replace . ' + ' . $part->estimation_lifetime . ' years'));
+                                                                $periodicCheckMonth = date('m', strtotime($part->last_replace . ' + ' . $part->estimation_lifetime . ' years'));
+
+                                                                // Determine the periodic status based on the current date (year and month) and the periodic check date
+                                                                $yearDifference = $currentYear - $periodicCheckYear;
+                                                                $monthDifference = $currentMonth - $periodicCheckMonth;
+
+                                                                if ($yearDifference > 0 || ($yearDifference == 0 && $monthDifference > 0)) {
+                                                                    $periodicStatus = 'Overdue';
+                                                                    $statusClass = 'btn-danger';
+                                                                } elseif ($yearDifference == 0 && $monthDifference == 0) {
+                                                                    $periodicStatus = 'Check';
+                                                                    $statusClass = 'btn-warning';
+                                                                } else {
+                                                                    $periodicStatus = 'Safe';
+                                                                    $statusClass = 'btn-success';
+                                                                }
+
+                                                                $status = $machine->inventoryStatus->firstWhere('part_id', $part->part_id);
+                                                                        // Calculate the periodic check date
+                                                                        $periodicCheck = date('d M Y', strtotime($part->last_replace . ' + ' . $part->estimation_lifetime . ' years'));
+                                                                    @endphp
                                                                         <tr>
                                                                             @php
                                                                                 $status = $machine->inventoryStatus->firstWhere('part_id', $part->part_id);
@@ -426,6 +458,12 @@
                                                                             <td>{{ $status ? $status->material_description : '-' }}</td>
                                                                             <td>{{ $part->estimation_lifetime }}</td>
                                                                             <td>{{ date('d M Y', strtotime($part->last_replace)) }}</td> {{-- Format the date --}}
+                                                                            <td>{{ $periodicCheck }}</td>
+                                                                            <td>
+                                                                                <button class="btn {{ $statusClass }} btn-sm">
+                                                                                    {{ $periodicStatus }}
+                                                                                </button>
+                                                                            </td> <!-- Display the periodic status with appropriate styling -->
                                                                             <td>{{ $part->type }}</td>
                                                                             <td>{{ $status ? (int) $status->sap_stock : 0 }}</td>
                                                                             <td>{{ $status ? (int) $status->repair_stock : 0 }}</td>
