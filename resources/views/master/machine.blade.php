@@ -111,7 +111,7 @@
                                             <i class="fas fa-plus-square"></i> Add Machine
                                         </button>
 
-                                        <!-- Alert Success and Validation Errors -->
+                                        @include('partials.alert')
 
                                     </div>
 

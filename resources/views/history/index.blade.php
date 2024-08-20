@@ -30,8 +30,7 @@
                                     <h3 class="card-title">List of Daily Report</h3>
                                 </div>
 
-                                <!-- Success and Error Alerts -->
-                                <!-- Your alerts code here -->
+                                @include('partials.alert')
 
                                 <div class="card-body">
                                     <div class="row">

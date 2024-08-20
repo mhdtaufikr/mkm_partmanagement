@@ -29,7 +29,7 @@ class MstMachinePartController extends Controller
             return DataTables::of($items)
                 ->addIndexColumn()
                 ->addColumn('mfg_date', function ($row) {
-                    return $row->mfg_date ? $row->mfg_date->format('Y-m-d') : 'N/A';
+                    return $row->mfg_date ? $row->mfg_date : 'N/A'; // No date formatting here
                 })
                 ->addColumn('action', function($row){
                     $btn = '<div class="btn-group">
@@ -48,6 +48,7 @@ class MstMachinePartController extends Controller
 
         return view('master.machine');
     }
+
 
     public function detail($id) {
         $id = decrypt($id);

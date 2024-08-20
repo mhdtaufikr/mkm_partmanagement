@@ -40,8 +40,8 @@ class MachinesImport implements ToCollection, WithHeadingRow
                     'maker'             => $row['maker'],
                     'model'             => $row['model_type'],
                     'serial_number'     => $row['serial_number'],
-                    'mfg_date'          => $this->transformDate($row['mfg_date']),
-                    'install_date'      => $this->transformDate($row['install_date']),
+                    'mfg_date'          => $row['mfg_date'],
+                    'install_date'      => $row['install_date'],
                     'img'               => null, // Handle file uploads separately if needed
                     'file'              => null, // Handle file uploads separately if needed
                     'electrical_co'     => $row['electrical_control'],
@@ -52,25 +52,8 @@ class MachinesImport implements ToCollection, WithHeadingRow
         });
     }
 
-    /**
-     * Transform Excel date to a Carbon instance or format as needed.
-     *
-     * @param mixed $value
-     * @return string|null
-     */
-    private function transformDate($value)
-    {
-        if (!$value) {
-            return null;
-        }
 
-        // Check if the value is a valid Excel date
-        if (is_numeric($value)) {
-            return Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value))->format('Y-m-d');
-        }
 
-        // If not, assume the date is in d/m/Y format
-        return Carbon::createFromFormat('d/m/Y', $value)->format('Y-m-d');
-    }
+
 }
 
