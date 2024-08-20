@@ -120,8 +120,10 @@
                                             <thead>
                                                 <tr>
                                                     <th>No.</th>
+                                                    <th>Plant</th>
                                                     <th>Line</th>
                                                     <th>OP. No</th>
+                                                    <th>Machine Name</th>
                                                     <th>Process</th>
                                                     <th>Maker</th>
                                                     <th>Mfg. Date</th>
@@ -158,8 +160,10 @@
             "ajax": "{{ route('mst.machine.part') }}",  // Your server-side route here
             "columns": [
                 { "data": "DT_RowIndex", "name": "DT_RowIndex", "orderable": false, "searchable": false },
+                { "data": "plant", "name": "plant" },
                 { "data": "line", "name": "line" },
                 { "data": "op_no", "name": "op_no" },
+                { "data": "machine_name", "name": "machine_name" },
                 { "data": "process", "name": "process" },
                 { "data": "maker", "name": "maker" },
                 { "data": "mfg_date", "name": "mfg_date" },

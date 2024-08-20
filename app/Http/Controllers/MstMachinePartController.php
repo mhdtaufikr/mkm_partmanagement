@@ -24,7 +24,7 @@ class MstMachinePartController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $items = Machine::select(['id', 'line', 'op_no', 'process', 'maker', 'mfg_date']);
+            $items = Machine::select(['*']);
 
             return DataTables::of($items)
                 ->addIndexColumn()
