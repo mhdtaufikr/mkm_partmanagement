@@ -16,6 +16,7 @@ use Exception;
 use App\Exports\PartTemplateExport;
 use App\Imports\PartsImport;
 use App\Models\PreventiveMaintenanceView;
+use App\Models\ChecksheetStatusLog;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Crypt;
@@ -104,7 +105,7 @@ class MstMachinePartController extends Controller
 
         // Attach logs to each preventive maintenance record
         foreach ($preventiveMaintenances as $pm) {
-            $pm->logs = ChecksheetJourneyLog::where('checksheet_id', $pm->checksheet_id)->orderBy('created_at', 'desc')->get();
+            $pm->logs = ChecksheetStatusLog::where('checksheet_header_id', $pm->checksheet_id)->orderBy('created_at', 'desc')->get();
         }
 
         // Combine the data into a single collection
@@ -114,10 +115,10 @@ class MstMachinePartController extends Controller
                 'date' => $problem->date,
                 'type' => "Daily Report",  // Use the report column as the type
                 'data' => $problem,
-                'Category' => $problem->report
+                'Category' => $problem->report,
+                'status_logs' => collect()  // Add an empty collection for historical problems
             ]);
         }
-
 
         // Add preventive maintenance records to the collection
         foreach ($preventiveMaintenances as $pm) {
@@ -125,16 +126,16 @@ class MstMachinePartController extends Controller
                 'date' => $pm->planning_date,
                 'type' => 'Preventive Maintenance',
                 'data' => $pm,
-                'Category' => 'Preventive Maintenance'
+                'Category' => 'Preventive Maintenance',
+                'status_logs' => $pm->logs  // Attach the logs collection to the pm data
             ]);
         }
 
         // Sort the combined data by date
         $combinedData = $combinedData->sortBy('date');
-
-
         return view('master.dtl_machine', compact('machine', 'parts', 'combinedData'));
     }
+
 
 
 

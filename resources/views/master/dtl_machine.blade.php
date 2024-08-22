@@ -636,7 +636,18 @@
                                                                 @endphp
                                                                 @foreach ($combinedData as $data)
                                                                 <tr>
-                                                                    <td>{{ $no++ }}</td>
+                                                                    <td>
+                                                                        <div class="row align-items-center">
+                                                                            <div class="col-md-2">
+                                                                                {{ $no++ }}
+                                                                            </div>
+                                                                            <div class="col-md-4">
+                                                                                @if($data->status_logs->isNotEmpty())
+                                                                                    <span class="badge bg-primary ms-2" style="padding: 0.35rem 0.75rem; margin-left: 10px; font-size: 0.85rem;">Log</span>
+                                                                                @endif
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
                                                                     <td>{{ $data->Category }}</td>
                                                                     <td>{{ $data->date }}</td>
                                                                     <td>{{ $data->data->shift ?? '-' }}</td>
