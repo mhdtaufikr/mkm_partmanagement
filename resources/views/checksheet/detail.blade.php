@@ -245,8 +245,8 @@
                                                      <td>{{ $part->part->material ?? null }}</td>
                                                      <td>{{ $part->part->material_description ?? null }}</td>
                                                      <td>{{ $part->qty ?? 0 }}</td>
-                                                     <td>{{ $part->location ?? 'N/A' }}</td>
-                                                     <td>{{ $part->routes ?? 'N/A' }}</td>
+                                                     <td>{{ $part->location ?? '-' }}</td>
+                                                     <td>{{ $part->routes ?? '-' }}</td>
                                                  </tr>
                                              @endforeach
                                          </tbody>

@@ -315,7 +315,7 @@
                                   if ($checksheet3) {
                                       echo $checksheet3->checksheet_category;
                                   } else {
-                                      echo 'N/A'; // Display 'N/A' if the checksheet does not exist
+                                      echo '-'; // Display '-' if the checksheet does not exist
                                   }
                               @endphp
                           </td>

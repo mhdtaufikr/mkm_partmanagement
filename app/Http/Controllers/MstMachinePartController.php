@@ -36,7 +36,7 @@ class MstMachinePartController extends Controller
             return DataTables::of($items)
                 ->addIndexColumn()
                 ->addColumn('mfg_date', function ($row) {
-                    return $row->mfg_date ? $row->mfg_date : 'N/A';
+                    return $row->mfg_date ? $row->mfg_date : '-';
                 })
                 ->make(true);
         }

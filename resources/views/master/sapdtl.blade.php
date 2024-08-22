@@ -128,7 +128,7 @@
                                         <strong>Type</strong>
                                     </div>
                                     <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                        <p class="m-0">{{ $part->type ?? 'N/A' }}</p>
+                                        <p class="m-0">{{ $part->type ?? '-' }}</p>
                                     </div>
                                 </div>
                                <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
@@ -136,7 +136,7 @@
                                         <strong>Plant</strong>
                                     </div>
                                     <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                        <p class="m-0">{{ $part->plnt ?? 'N/A' }}</p>
+                                        <p class="m-0">{{ $part->plnt ?? '-' }}</p>
                                     </div>
                                 </div>
                                <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
@@ -144,7 +144,7 @@
                                         <strong>Storage Location</strong>
                                     </div>
                                     <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                        <p class="m-0">{{ $part->sloc ?? 'N/A' }}</p>
+                                        <p class="m-0">{{ $part->sloc ?? '-' }}</p>
                                     </div>
                                 </div>
                                <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
@@ -152,7 +152,7 @@
                                         <strong>Vendor</strong>
                                     </div>
                                     <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                        <p class="m-0">{{ $part->vendor ?? 'N/A' }}</p>
+                                        <p class="m-0">{{ $part->vendor ?? '-' }}</p>
                                     </div>
                                 </div>
                                <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
@@ -160,7 +160,7 @@
                                         <strong>Unit</strong>
                                     </div>
                                     <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                        <p class="m-0">{{ $part->bun ?? 'N/A' }}</p>
+                                        <p class="m-0">{{ $part->bun ?? '-' }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -171,7 +171,7 @@
                                         <strong>Beginning Quantity</strong>
                                     </div>
                                     <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                        <p class="m-0">{{ $part->begining_qty !== null ? number_format($part->begining_qty, 0) : 'N/A' }}</p>
+                                        <p class="m-0">{{ $part->begining_qty !== null ? number_format($part->begining_qty, 0) : '-' }}</p>
                                     </div>
                                 </div>
                                <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
@@ -179,7 +179,7 @@
                                         <strong>Beginning Value</strong>
                                     </div>
                                     <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                        <p class="m-0">{{ $part->begining_value !== null ? number_format($part->begining_value, 0) : 'N/A' }}</p>
+                                        <p class="m-0">{{ $part->begining_value !== null ? number_format($part->begining_value, 0) : '-' }}</p>
                                     </div>
                                 </div>
                                <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
@@ -187,7 +187,7 @@
                                         <strong>Total Stock</strong>
                                     </div>
                                     <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                         <p class="m-0">{{ $part->total_stock !== null ? number_format($part->total_stock, 0) : 'N/A' }}</p>
+                                         <p class="m-0">{{ $part->total_stock !== null ? number_format($part->total_stock, 0) : '-' }}</p>
                                     </div>
                                 </div>
                                <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
@@ -195,7 +195,7 @@
                                         <strong>Total Value</strong>
                                     </div>
                                     <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                        <p class="m-0">{{ $part->total_value !== null ? number_format($part->total_value, 0) : 'N/A' }}</p>
+                                        <p class="m-0">{{ $part->total_value !== null ? number_format($part->total_value, 0) : '-' }}</p>
                                     </div>
                                 </div>
                                <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
@@ -203,7 +203,7 @@
                                         <strong>Currency</strong>
                                     </div>
                                     <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                        <p class="m-0">{{ $part->currency ?? 'N/A' }}</p>
+                                        <p class="m-0">{{ $part->currency ?? '-' }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -224,7 +224,7 @@
                             <tbody>
                                 @foreach($repairParts as $repairPart)
                                     <tr>
-                                        <td>{{ $repairPart->repaired_qty !== null ? number_format($repairPart->repaired_qty, 0) : 'N/A' }}</td>
+                                        <td>{{ $repairPart->repaired_qty !== null ? number_format($repairPart->repaired_qty, 0) : '-' }}</td>
                                         <td>{{ date('d M Y', strtotime($repairPart->repair_date)) }}</td>
                                         <td>{{ $repairPart->sloc }}</td>
                                         <td>{{ $repairPart->notes }}</td>
@@ -328,11 +328,11 @@
                                 <td>{{ $machinePart->critical_part }}</td>
                                 <td>{{ $machinePart->type }}</td>
                                 <td>{{ $machinePart->estimation_lifetime }}</td>
-                                <td>{{ $machinePart->cost !== null ? number_format($machinePart->cost, 0) : 'N/A' }}</td>
+                                <td>{{ $machinePart->cost !== null ? number_format($machinePart->cost, 0) : '-' }}</td>
                                 <td>{{ date('d M Y', strtotime($machinePart->last_replace )) }}</td>
                                 <td>{{ $machinePart->safety_stock }}</td>
-                                <td>{{ $machinePart->repair_stock !== null ? number_format($machinePart->repair_stock, 0) : 'N/A' }}</td>
-                                <td>{{  $machinePart->total  !== null ? number_format( $machinePart->total , 0) : 'N/A' }}</td>
+                                <td>{{ $machinePart->repair_stock !== null ? number_format($machinePart->repair_stock, 0) : '-' }}</td>
+                                <td>{{  $machinePart->total  !== null ? number_format( $machinePart->total , 0) : '-' }}</td>
                                 <td>
                                     @if ($machinePart->status)
                                         @php

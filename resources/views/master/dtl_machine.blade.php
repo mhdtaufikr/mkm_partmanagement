@@ -80,7 +80,7 @@
                                             <strong>OP No.</strong>
                                         </div>
                                         <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                            <p class="m-0">{{ $machine->op_no ?? 'N/A' }}</p>
+                                            <p class="m-0">{{ $machine->op_no ?? '-' }}</p>
                                         </div>
                                     </div>
 
@@ -89,7 +89,7 @@
                                             <strong>Plant</strong>
                                         </div>
                                         <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                            <p class="m-0">{{ $machine->plant ?? 'N/A' }}</p>
+                                            <p class="m-0">{{ $machine->plant ?? '-' }}</p>
                                         </div>
                                     </div>
 
@@ -98,7 +98,7 @@
                                             <strong>Line</strong>
                                         </div>
                                         <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                            <p class="m-0">{{ $machine->line ?? 'N/A' }}</p>
+                                            <p class="m-0">{{ $machine->line ?? '-' }}</p>
                                         </div>
                                     </div>
 
@@ -107,7 +107,7 @@
                                             <strong>Location</strong>
                                         </div>
                                         <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                            <p class="m-0">{{ $machine->location ?? 'N/A' }}</p>
+                                            <p class="m-0">{{ $machine->location ?? '-' }}</p>
                                         </div>
                                     </div>
 
@@ -116,7 +116,7 @@
                                             <strong>Asset No.</strong>
                                         </div>
                                         <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                            <p class="m-0">{{ $machine->asset_no ?? 'N/A' }}</p>
+                                            <p class="m-0">{{ $machine->asset_no ?? '-' }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -127,7 +127,7 @@
                                             <strong>Machine Name</strong>
                                         </div>
                                         <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                            <p class="m-0">{{ $machine->machine_name ?? 'N/A' }}</p>
+                                            <p class="m-0">{{ $machine->machine_name ?? '-' }}</p>
                                         </div>
                                     </div>
 
@@ -136,7 +136,7 @@
                                             <strong>Process</strong>
                                         </div>
                                         <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                            <p class="m-0">{{ $machine->process ?? 'N/A' }}</p>
+                                            <p class="m-0">{{ $machine->process ?? '-' }}</p>
                                         </div>
                                     </div>
 
@@ -145,7 +145,7 @@
                                             <strong>Maker</strong>
                                         </div>
                                         <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                            <p class="m-0">{{ $machine->maker ?? 'N/A' }}</p>
+                                            <p class="m-0">{{ $machine->maker ?? '-' }}</p>
                                         </div>
                                     </div>
 
@@ -154,7 +154,7 @@
                                             <strong>Model</strong>
                                         </div>
                                         <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                            <p class="m-0">{{ $machine->model ?? 'N/A' }}</p>
+                                            <p class="m-0">{{ $machine->model ?? '-' }}</p>
                                         </div>
                                     </div>
 
@@ -163,7 +163,7 @@
                                             <strong>Serial Number</strong>
                                         </div>
                                         <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                            <p class="m-0">{{ $machine->serial_number ?? 'N/A' }}</p>
+                                            <p class="m-0">{{ $machine->serial_number ?? '-' }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -174,7 +174,7 @@
                                             <strong>Mfg Date</strong>
                                         </div>
                                         <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                            <p class="m-0">{{ $machine->mfg_date ?? 'N/A' }}</p>
+                                            <p class="m-0">{{ $machine->mfg_date ?? '-' }}</p>
                                         </div>
                                     </div>
 
@@ -183,7 +183,7 @@
                                             <strong>Install Date</strong>
                                         </div>
                                         <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                            <p class="m-0">{{ $machine->install_date ?? 'N/A' }}</p>
+                                            <p class="m-0">{{ $machine->install_date ?? '-' }}</p>
                                         </div>
                                     </div>
 
@@ -192,7 +192,7 @@
                                             <strong>Specification (Electrical Control)</strong>
                                         </div>
                                         <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
-                                            <p class="m-0">{{ $machine->electrical_co ?? 'N/A' }}</p>
+                                            <p class="m-0">{{ $machine->electrical_co ?? '-' }}</p>
                                         </div>
                                     </div>
                                 </div>
