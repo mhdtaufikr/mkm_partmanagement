@@ -50,7 +50,13 @@ class MstPartSAPController extends Controller
 
         // Fetch machine details using the part
         $machineParts = MachineSparePartsInventory::where('part_id', $id)->with('machine')->get();
-        $machines = Machine::all();
+        // Get the machine IDs that are already associated with the given part_id
+        $associatedMachineIds = MachineSparePartsInventory::where('part_id', $id)
+        ->pluck('machine_id')
+        ->toArray();
+
+        // Retrieve all machines that are not in the associatedMachineIds array
+        $machines = Machine::whereNotIn('id', $associatedMachineIds)->get();
 
         return view('master.sapdtl', compact('part', 'repairParts', 'machineParts','machines','repairPartsTotalQty'));
     }
