@@ -46,7 +46,7 @@
                                                 @endforeach
                                             @else
                                                 <div class="carousel-item active">
-                                                    <div class="d-flex align-items-center justify-content-center" style="height: 300px; background-color: #f0f0f0; border: 1px solid #ccc;">
+                                                    <div class="d-flex align-items-center justify-content-center" style="border: 4px solid rgba(0, 103, 127, 1); height: 300px; background-color: #f0f0f0; ">
                                                         <span class="text-muted">No Images Available</span>
                                                     </div>
                                                 </div>
