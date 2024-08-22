@@ -22,7 +22,6 @@
                 <h1 style="color: white">{{ $part->material }} - {{ $part->material_description }}</h1>
             </div>
             <div class="card-body">
-                @include('partials.alert')
                 <div class="row mb-4">
                     <div  class="col-md-3 text-center">
                         <h5>Image</h5>
@@ -43,8 +42,8 @@
 
                                 @else
                                     <div class="carousel-item active">
-                                        <div class="d-flex align-items-center justify-content-center" style="height: 300px; background-color: #f0f0f0; border: 1px solid #ccc;">
-                                            <span class="text-muted">No Images Available</span>
+                                        <div class="d-flex align-items-center justify-content-center" style="border: 4px solid rgba(0, 103, 127, 1); height: 300px; background-color: #f0f0f0; ">
+                                            <span class="text-muted">No Images</span>
                                         </div>
                                     </div>
                                 @endif
@@ -278,7 +277,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="cost" class="form-label">Cost</label>
-                                <input readonly value="{{ $part->total_value !== null ? number_format($part->total_value, 0) : 'N/A' }}" type="number" step="0.01" class="form-control" id="cost" name="cost" required>
+                                <input readonly value="{{$part->total_value}}" type="number" step="0.01" class="form-control" id="cost" name="cost" required>
                             </div>
                             <div class="mb-3">
                                 <label for="last_replace" class="form-label">Last Replace Date</label>
