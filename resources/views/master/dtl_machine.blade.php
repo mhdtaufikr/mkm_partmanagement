@@ -36,12 +36,22 @@
                                             $imagePaths = $machine->img ? json_decode($machine->img) : [];
                                             @endphp
 
-                                            @foreach($imagePaths as $key => $imagePath)
-                                            <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
-                                                <img src="{{ asset($imagePath) }}" class="d-block w-100 carousel-image" alt="Image {{ $key + 1 }}">
-                                            </div>
-                                            @endforeach
+                                            @if(count($imagePaths) > 0)
+                                                @foreach($imagePaths as $key => $imagePath)
+                                                <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
+                                                    <img src="{{ asset($imagePath) }}" class="d-block w-100 carousel-image" alt="Image {{ $key + 1 }}">
+                                                </div>
+                                                @endforeach
+                                            @else
+                                                <div class="carousel-item active">
+                                                    <div class="d-flex align-items-center justify-content-center" style="height: 300px; background-color: #f0f0f0; border: 1px solid #ccc;">
+                                                        <span class="text-muted">No Images Available</span>
+                                                    </div>
+                                                </div>
+                                            @endif
                                         </div>
+
+                                        @if(count($imagePaths) > 1)
                                         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
                                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                             <span class="visually-hidden">Previous</span>
@@ -50,6 +60,7 @@
                                             <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                             <span class="visually-hidden">Next</span>
                                         </button>
+                                        @endif
                                     </div>
 
                                     <h3 class="text-center">{{ $machine->op_no }}</h3>
@@ -59,6 +70,7 @@
                                         Manage Images
                                     </button>
                                 </div>
+
 
                                 <div class="col-md-3">
                                     <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
