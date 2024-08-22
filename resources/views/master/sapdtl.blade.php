@@ -23,76 +23,191 @@
             </div>
             <div class="card-body">
                 <div class="row mb-4">
-                    <div class="col-md-6">
-                        <h5>Part Information</h5>
+                    <div  class="col-md-3 text-center">
+                        <h5>Image</h5>
+                        <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                @php
+                                $imagePaths = $part->img ? json_decode($part->img) : [];
+                                @endphp
+
+                                @if(count($imagePaths) > 0)
+                                    @foreach($imagePaths as $key => $imagePath)
+                                    <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
+                                        <img src="{{ asset($imagePath) }}" class="d-block w-100 carousel-image" alt="Image {{ $key + 1 }}">
+                                    </div>
+                                    @endforeach
+                                @else
+                                    <div class="carousel-item active">
+                                        <div class="d-flex align-items-center justify-content-center" style="height: 300px; background-color: #f0f0f0; border: 1px solid #ccc;">
+                                            <span class="text-muted">No Images Available</span>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+
+                            @if(count($imagePaths) > 1)
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                            @endif
+                        </div>
+
+                        <h3 class="text-center">{{ $part->material }}</h3>
+
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#imageModal">
+                            Manage Images
+                        </button>
+                    </div>
+
+                      {{-- Modal Image CRUD --}}
+                            <!-- Modal -->
+                            <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="imageModalLabel">Manage Images</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <!-- Add a container for the "Add New" row -->
+                                            <div class="mb-3">
+                                                <form id="searchForm" action="{{ url('/mst/part/add/image') }}" method="POST" enctype="multipart/form-data">
+                                                    @csrf
+                                                    <h5>Add New Images</h5>
+                                                    <input name="id" type="text" value="{{ $part->id }}" hidden>
+                                                    <div class="input-group">
+                                                        <input type="file" class="form-control" name="new_images[]" multiple>
+                                                        <button class="btn btn-primary" type="submit">Upload</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="row">
+                                                <!-- Loop through the images and display them in a grid -->
+                                                @foreach($imagePaths as $key => $imagePath)
+                                                <div class="col-md-4 mb-3">
+                                                    <div class="card">
+                                                        <img src="{{ asset($imagePath) }}" class="card-img-top" alt="Image {{ $key + 1 }}" style="height: 200px; width: auto;">
+                                                        <div class="card-body">
+                                                            <!-- Use a form to delete the image -->
+                                                            <form action="{{ route('machine.delete.image') }}" method="POST">
+                                                                @csrf
+                                                                <input type="hidden" name="img_path" value="{{ $imagePath }}">
+                                                                <input type="hidden" name="id" value="{{ $part->id }}">
+                                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <!-- Add buttons for saving changes or performing other actions -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                    <div class="col-md-5">
+                        <h5 class="mb-4">Part Information</h5>
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="card mb-2 border border-dark rounded">
-                                    <div class="card-body p-2">
-                                        <strong>Type:</strong>
-                                        <p>{{ $part->type }}</p>
+                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
+                                        <strong>Type</strong>
+                                    </div>
+                                    <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
+                                        <p class="m-0">{{ $part->type ?? 'N/A' }}</p>
                                     </div>
                                 </div>
-                                <div class="card mb-2 border border-dark rounded">
-                                    <div class="card-body p-2">
-                                        <strong>Plant:</strong>
-                                        <p>{{ $part->plnt }}</p>
+                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
+                                        <strong>Plant</strong>
+                                    </div>
+                                    <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
+                                        <p class="m-0">{{ $part->plnt ?? 'N/A' }}</p>
                                     </div>
                                 </div>
-                                <div class="card mb-2 border border-dark rounded">
-                                    <div class="card-body p-2">
-                                        <strong>Storage Location:</strong>
-                                        <p>{{ $part->sloc }}</p>
+                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
+                                        <strong>Storage Location</strong>
+                                    </div>
+                                    <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
+                                        <p class="m-0">{{ $part->sloc ?? 'N/A' }}</p>
                                     </div>
                                 </div>
-                                <div class="card mb-2 border border-dark rounded">
-                                    <div class="card-body p-2">
-                                        <strong>Vendor:</strong>
-                                        <p>{{ $part->vendor }}</p>
+                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
+                                        <strong>Vendor</strong>
+                                    </div>
+                                    <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
+                                        <p class="m-0">{{ $part->vendor ?? 'N/A' }}</p>
                                     </div>
                                 </div>
-                                <div class="card mb-2 border border-dark rounded">
-                                    <div class="card-body p-2">
-                                        <strong>Unit:</strong>
-                                        <p>{{ $part->bun }}</p>
+                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
+                                        <strong>Unit</strong>
+                                    </div>
+                                    <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
+                                        <p class="m-0">{{ $part->bun ?? 'N/A' }}</p>
                                     </div>
                                 </div>
                             </div>
+
                             <div class="col-md-6">
-                                <div class="card mb-2 border border-dark rounded">
-                                    <div class="card-body p-2">
-                                        <strong>Beginning Quantity:</strong>
-                                        <p>{{ $part->begining_qty }}</p>
+                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
+                                        <strong>Beginning Quantity</strong>
+                                    </div>
+                                    <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
+                                        <p class="m-0">{{ $part->begining_qty !== null ? number_format($part->begining_qty, 0) : 'N/A' }}</p>
                                     </div>
                                 </div>
-                                <div class="card mb-2 border border-dark rounded">
-                                    <div class="card-body p-2">
-                                        <strong>Beginning Value:</strong>
-                                        <p>{{ $part->begining_value }}</p>
+                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
+                                        <strong>Beginning Value</strong>
+                                    </div>
+                                    <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
+                                        <p class="m-0">{{ $part->begining_value !== null ? number_format($part->begining_value, 0) : 'N/A' }}</p>
                                     </div>
                                 </div>
-                                <div class="card mb-2 border border-dark rounded">
-                                    <div class="card-body p-2">
-                                        <strong>Total Stock:</strong>
-                                        <p>{{ $part->total_stock }}</p>
+                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
+                                        <strong>Total Stock</strong>
+                                    </div>
+                                    <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
+                                         <p class="m-0">{{ $part->total_stock !== null ? number_format($part->total_stock, 0) : 'N/A' }}</p>
                                     </div>
                                 </div>
-                                <div class="card mb-2 border border-dark rounded">
-                                    <div class="card-body p-2">
-                                        <strong>Total Value:</strong>
-                                        <p>{{ $part->total_value }}</p>
+                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
+                                        <strong>Total Value</strong>
+                                    </div>
+                                    <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
+                                        <p class="m-0">{{ $part->total_value !== null ? number_format($part->total_value, 0) : 'N/A' }}</p>
                                     </div>
                                 </div>
-                                <div class="card mb-2 border border-dark rounded">
-                                    <div class="card-body p-2">
-                                        <strong>Currency:</strong>
-                                        <p>{{ $part->currency }}</p>
+                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
+                                        <strong>Currency</strong>
+                                    </div>
+                                    <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
+                                        <p class="m-0">{{ $part->currency ?? 'N/A' }}</p>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <h5>Repair Part Information</h5>
                         <table id="RepairList" class="table table-bordered table-striped">
                             <thead>
@@ -106,8 +221,8 @@
                             <tbody>
                                 @foreach($repairParts as $repairPart)
                                     <tr>
-                                        <td>{{ $repairPart->repaired_qty }}</td>
-                                        <td>{{ $repairPart->repair_date }}</td>
+                                        <td>{{ $repairPart->repaired_qty !== null ? number_format($repairPart->repaired_qty, 0) : 'N/A' }}</td>
+                                        <td>{{ date('d M Y', strtotime($repairPart->repair_date)) }}</td>
                                         <td>{{ $repairPart->sloc }}</td>
                                         <td>{{ $repairPart->notes }}</td>
                                     </tr>
@@ -117,7 +232,7 @@
                     </div>
                 </div>
 
-                <h5>Machines Using This Part</h5>
+                <h5 class="mt-4" >Machines Using This Part</h5>
                 <table id="MachineList" class="table table-bordered table-striped">
                     <thead>
                         <tr>
@@ -142,11 +257,11 @@
                                 <td>{{ $machinePart->critical_part }}</td>
                                 <td>{{ $machinePart->type }}</td>
                                 <td>{{ $machinePart->estimation_lifetime }}</td>
-                                <td>{{ $machinePart->cost }}</td>
-                                <td>{{ $machinePart->last_replace }}</td>
+                                <td>{{ $machinePart->cost !== null ? number_format($machinePart->cost, 0) : 'N/A' }}</td>
+                                <td>{{ date('d M Y', strtotime($machinePart->last_replace )) }}</td>
                                 <td>{{ $machinePart->safety_stock }}</td>
-                                <td>{{ $machinePart->repair_stock }}</td>
-                                <td>{{ $machinePart->total }}</td>
+                                <td>{{ $machinePart->repair_stock !== null ? number_format($machinePart->repair_stock, 0) : 'N/A' }}</td>
+                                <td>{{  $machinePart->total  !== null ? number_format( $machinePart->total , 0) : 'N/A' }}</td>
                                 <td>
                                     @if ($machinePart->status)
                                         @php

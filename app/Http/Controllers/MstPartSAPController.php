@@ -51,5 +51,42 @@ class MstPartSAPController extends Controller
         return view('master.sapdtl', compact('part', 'repairParts', 'machineParts'));
     }
 
+    public function addImage(Request $request)
+    {
+
+        // Validate the incoming request
+        $request->validate([
+            'id' => 'required', // Ensure the machine ID exists
+            'new_images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048', // Validate the image files
+        ]);
+
+        // Retrieve the machine
+        $machine = Part::findOrFail($request->id);
+
+        $imagePaths = $machine->img ? json_decode($machine->img, true) : [];
+
+        // Check if the request has any new images
+        if ($request->hasFile('new_images')) {
+            foreach ($request->file('new_images') as $file) {
+                // Generate a unique file name for each image
+                $fileName = uniqid() . '_' . $file->getClientOriginalName();
+
+                // Move the uploaded image to the storage directory
+                $destinationPath = public_path('assets/img/parts');
+                $file->move($destinationPath, $fileName);
+
+                // Store the image path in the array
+                $imagePaths[] = 'assets/img/parts/' . $fileName;
+            }
+
+            // Save the updated machine with the new image paths
+            $machine->img = json_encode($imagePaths); // Convert back to JSON before saving
+            $machine->save();
+        }
+
+        // Redirect back with a success message
+        return redirect()->back()->with('success', 'Images uploaded successfully.');
+    }
+
 
 }
