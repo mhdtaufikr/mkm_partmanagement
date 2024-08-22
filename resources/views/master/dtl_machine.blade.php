@@ -39,7 +39,9 @@
                                             @if(count($imagePaths) > 0)
                                                 @foreach($imagePaths as $key => $imagePath)
                                                 <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
-                                                    <img src="{{ asset($imagePath) }}" class="d-block w-100 carousel-image" alt="Image {{ $key + 1 }}">
+                                                    <div class="image-box" style="border: 4px solid rgba(0, 103, 127, 1); padding: 5px; background-color: #f8f9fa; border-radius: 10px;">
+                                                        <img src="{{ asset($imagePath) }}" class="d-block w-100 carousel-image" alt="Image {{ $key + 1 }}">
+                                                    </div>
                                                 </div>
                                                 @endforeach
                                             @else
@@ -73,123 +75,123 @@
 
 
                                 <div class="col-md-3">
-                                    <div class="card mb-4 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                         <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                             <strong>OP No.</strong>
                                         </div>
-                                        <div class="card-body bg-secondary d-flex align-items-center justify-content-center p-1 text-center">
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
                                             <p class="m-0">{{ $machine->op_no ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-4 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                         <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                             <strong>Plant</strong>
                                         </div>
-                                        <div class="card-body bg-secondary d-flex align-items-center justify-content-center p-1 text-center">
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
                                             <p class="m-0">{{ $machine->plant ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-4 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                         <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                             <strong>Line</strong>
                                         </div>
-                                        <div class="card-body bg-secondary d-flex align-items-center justify-content-center p-1 text-center">
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
                                             <p class="m-0">{{ $machine->line ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-4 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                         <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                             <strong>Location</strong>
                                         </div>
-                                        <div class="card-body bg-secondary d-flex align-items-center justify-content-center p-1 text-center">
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
                                             <p class="m-0">{{ $machine->location ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-4 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                         <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                             <strong>Asset No.</strong>
                                         </div>
-                                        <div class="card-body bg-secondary d-flex align-items-center justify-content-center p-1 text-center">
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
                                             <p class="m-0">{{ $machine->asset_no ?? 'N/A' }}</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="col-md-3">
-                                    <div class="card mb-4 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                         <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                             <strong>Machine Name</strong>
                                         </div>
-                                        <div class="card-body bg-secondary d-flex align-items-center justify-content-center p-1 text-center">
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
                                             <p class="m-0">{{ $machine->machine_name ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-4 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                         <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                             <strong>Process</strong>
                                         </div>
-                                        <div class="card-body bg-secondary d-flex align-items-center justify-content-center p-1 text-center">
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
                                             <p class="m-0">{{ $machine->process ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-4 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                         <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                             <strong>Maker</strong>
                                         </div>
-                                        <div class="card-body bg-secondary d-flex align-items-center justify-content-center p-1 text-center">
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
                                             <p class="m-0">{{ $machine->maker ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-4 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                         <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                             <strong>Model</strong>
                                         </div>
-                                        <div class="card-body bg-secondary d-flex align-items-center justify-content-center p-1 text-center">
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
                                             <p class="m-0">{{ $machine->model ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-4 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                         <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                             <strong>Serial Number</strong>
                                         </div>
-                                        <div class="card-body bg-secondary d-flex align-items-center justify-content-center p-1 text-center">
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
                                             <p class="m-0">{{ $machine->serial_number ?? 'N/A' }}</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="col-md-3">
-                                    <div class="card mb-4 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                         <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                             <strong>Mfg Date</strong>
                                         </div>
-                                        <div class="card-body bg-secondary d-flex align-items-center justify-content-center p-1 text-center">
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
                                             <p class="m-0">{{ $machine->mfg_date ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-4 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                         <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                             <strong>Install Date</strong>
                                         </div>
-                                        <div class="card-body bg-secondary d-flex align-items-center justify-content-center p-1 text-center">
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
                                             <p class="m-0">{{ $machine->install_date ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="card mb-4 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                    <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                         <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                             <strong>Specification (Electrical Control)</strong>
                                         </div>
-                                        <div class="card-body bg-secondary d-flex align-items-center justify-content-center p-1 text-center">
+                                        <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
                                             <p class="m-0">{{ $machine->electrical_co ?? 'N/A' }}</p>
                                         </div>
                                     </div>
@@ -690,7 +692,7 @@
                                                                             @elseif($data->data->status == 'Close')
                                                                                 <span class="badge bg-success">Close</span>
                                                                             @else
-                                                                                <span class="badge bg-secondary">Unknown Status</span>
+                                                                                <span class="badge">Unknown Status</span>
                                                                             @endif
                                                                         @else
                                                                             @if($data->data->pm_status == 'Open')
@@ -698,7 +700,7 @@
                                                                             @elseif($data->data->pm_status == 'Close')
                                                                                 <span class="badge bg-success">Close</span>
                                                                             @else
-                                                                                <span class="badge bg-secondary">Unknown Status</span>
+                                                                                <span class="badge">Unknown Status</span>
                                                                             @endif
                                                                         @endif
                                                                     </td> <!-- Status with conditional badge based on type -->
