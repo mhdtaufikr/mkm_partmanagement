@@ -61,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
      Route::get('/mst/part/sap/template', [MstPartSAPController::class, 'sapTemplate'])->middleware(['checkRole:IT']);
      Route::post('/mst/part/sap/upload', [MstPartSAPController::class, 'sapUpload'])->middleware(['checkRole:IT']);
      Route::post('/mst/part/add/image', [MstPartSAPController::class, 'addImage'])->middleware(['checkRole:IT']);
+     Route::post('/mst/sap/part/store/', [MstPartSAPController::class, 'sapPartDetailStore'])->middleware(['checkRole:IT']);
 
 
     // Repair Parts

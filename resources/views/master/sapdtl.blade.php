@@ -22,6 +22,7 @@
                 <h1 style="color: white">{{ $part->material }} - {{ $part->material_description }}</h1>
             </div>
             <div class="card-body">
+                @include('partials.alert')
                 <div class="row mb-4">
                     <div  class="col-md-3 text-center">
                         <h5>Image</h5>
@@ -32,11 +33,14 @@
                                 @endphp
 
                                 @if(count($imagePaths) > 0)
-                                    @foreach($imagePaths as $key => $imagePath)
-                                    <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
+                                @foreach($imagePaths as $key => $imagePath)
+                                <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
+                                    <div class="image-box" style="border: 4px solid rgba(0, 103, 127, 1); padding: 5px; background-color: #f8f9fa; border-radius: 10px;">
                                         <img src="{{ asset($imagePath) }}" class="d-block w-100 carousel-image" alt="Image {{ $key + 1 }}">
                                     </div>
-                                    @endforeach
+                                </div>
+                            @endforeach
+
                                 @else
                                     <div class="carousel-item active">
                                         <div class="d-flex align-items-center justify-content-center" style="height: 300px; background-color: #f0f0f0; border: 1px solid #ccc;">
@@ -120,7 +124,7 @@
                         <h5 class="mb-4">Part Information</h5>
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                                <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                     <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                         <strong>Type</strong>
                                     </div>
@@ -128,7 +132,7 @@
                                         <p class="m-0">{{ $part->type ?? 'N/A' }}</p>
                                     </div>
                                 </div>
-                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                               <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                     <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                         <strong>Plant</strong>
                                     </div>
@@ -136,7 +140,7 @@
                                         <p class="m-0">{{ $part->plnt ?? 'N/A' }}</p>
                                     </div>
                                 </div>
-                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                               <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                     <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                         <strong>Storage Location</strong>
                                     </div>
@@ -144,7 +148,7 @@
                                         <p class="m-0">{{ $part->sloc ?? 'N/A' }}</p>
                                     </div>
                                 </div>
-                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                               <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                     <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                         <strong>Vendor</strong>
                                     </div>
@@ -152,7 +156,7 @@
                                         <p class="m-0">{{ $part->vendor ?? 'N/A' }}</p>
                                     </div>
                                 </div>
-                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                               <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                     <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                         <strong>Unit</strong>
                                     </div>
@@ -163,7 +167,7 @@
                             </div>
 
                             <div class="col-md-6">
-                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                               <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                     <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                         <strong>Beginning Quantity</strong>
                                     </div>
@@ -171,7 +175,7 @@
                                         <p class="m-0">{{ $part->begining_qty !== null ? number_format($part->begining_qty, 0) : 'N/A' }}</p>
                                     </div>
                                 </div>
-                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                               <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                     <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                         <strong>Beginning Value</strong>
                                     </div>
@@ -179,7 +183,7 @@
                                         <p class="m-0">{{ $part->begining_value !== null ? number_format($part->begining_value, 0) : 'N/A' }}</p>
                                     </div>
                                 </div>
-                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                               <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                     <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                         <strong>Total Stock</strong>
                                     </div>
@@ -187,7 +191,7 @@
                                          <p class="m-0">{{ $part->total_stock !== null ? number_format($part->total_stock, 0) : 'N/A' }}</p>
                                     </div>
                                 </div>
-                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                               <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                     <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                         <strong>Total Value</strong>
                                     </div>
@@ -195,7 +199,7 @@
                                         <p class="m-0">{{ $part->total_value !== null ? number_format($part->total_value, 0) : 'N/A' }}</p>
                                     </div>
                                 </div>
-                                <div class="card mb-2 border border-dark rounded" style="position: relative; padding-top: 10px; height: 80px;">
+                               <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                     <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
                                         <strong>Currency</strong>
                                     </div>
@@ -233,6 +237,74 @@
                 </div>
 
                 <h5 class="mt-4" >Machines Using This Part</h5>
+                <button type="button" class="btn btn-dark btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#modal-add">
+                    <i class="fas fa-plus-square"></i> Add Machine
+                </button>
+                <!-- Add Machine Modal -->
+<div class="modal fade" id="modal-add" tabindex="-1" aria-labelledby="modalAddLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAddLabel">Add Machine</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{url('/mst/sap/part/store/')}}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="machine_id" class="form-label">Machine</label>
+                                <select class="form-select" id="machine_id" name="machine_id" required>
+                                    <option value="" disabled selected>Select Machine</option>
+                                    @foreach($machines as $machine)
+                                        <option value="{{ $machine->id }}">{{ $machine->op_no }} - {{ $machine->machine_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="critical_part" class="form-label">Critical Part</label>
+                                <input readonly value="{{$part->material_description}}" type="text" class="form-control" id="critical_part" name="critical_part" required>
+                            </div>
+                            <div hidden class="mb-3">
+                                <label for="type" class="form-label">Type</label>
+                                <input readonly value="{{$part->type}}" type="text" class="form-control" id="type" name="type" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="estimation_lifetime" class="form-label">Estimation Lifetime (in years)</label>
+                                <input type="number" class="form-control" id="estimation_lifetime" name="estimation_lifetime" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="cost" class="form-label">Cost</label>
+                                <input readonly value="{{ $part->total_value !== null ? number_format($part->total_value, 0) : 'N/A' }}" type="number" step="0.01" class="form-control" id="cost" name="cost" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="last_replace" class="form-label">Last Replace Date</label>
+                                <input type="date" class="form-control" id="last_replace" name="last_replace" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="safety_stock" class="form-label">Safety Stock</label>
+                                <input type="number" class="form-control" id="safety_stock" name="safety_stock" required>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="part_id" value="{{ $part->id }}">
+                    <input type="hidden" name="sap_stock" value="{{ $part->total_stock }}">
+                    <input type="hidden" name="repair_stock" value="{{ $repairPartsTotalQty }}">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Machine</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
                 <table id="MachineList" class="table table-bordered table-striped">
                     <thead>
                         <tr>
@@ -299,7 +371,7 @@
 <script>
     $(document).ready(function() {
         $('#RepairList').DataTable({
-            "pageLength": 5, // Limit the number of rows to 2 per page
+            "pageLength": 6, // Limit the number of rows to 2 per page
             "responsive": true,
             "lengthChange": false,
             "autoWidth": false

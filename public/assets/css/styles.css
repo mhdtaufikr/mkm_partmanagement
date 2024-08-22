@@ -9098,6 +9098,10 @@ textarea.form-control-lg {
   border-color: #212832 !important;
 }
 
+.border-mkm {
+    border-color: rgba(0, 103, 127, 1) !important;
+  }
+
 .border-black {
   border-color: #000 !important;
 }

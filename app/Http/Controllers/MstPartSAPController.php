@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Part;
 use App\Models\RepairPart;
+use App\Models\Machine;
 use App\Models\MachineSparePartsInventory;
 use App\Exports\PartsSAPTemplateExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -44,11 +45,14 @@ class MstPartSAPController extends Controller
 
         // Fetch repair part details
         $repairParts = RepairPart::where('part_id', $id)->get();
+        $repairPartsTotalQty = RepairPart::where('part_id', $id)->sum('repaired_qty');
+
 
         // Fetch machine details using the part
         $machineParts = MachineSparePartsInventory::where('part_id', $id)->with('machine')->get();
+        $machines = Machine::all();
 
-        return view('master.sapdtl', compact('part', 'repairParts', 'machineParts'));
+        return view('master.sapdtl', compact('part', 'repairParts', 'machineParts','machines','repairPartsTotalQty'));
     }
 
     public function addImage(Request $request)
@@ -86,6 +90,42 @@ class MstPartSAPController extends Controller
 
         // Redirect back with a success message
         return redirect()->back()->with('success', 'Images uploaded successfully.');
+    }
+
+    public function sapPartDetailStore(Request $request)
+    {
+
+        // Validate the request data if needed
+        $request->validate([
+            'machine_id' => 'required|integer',
+            'part_id' => 'required|integer',
+            'critical_part' => 'required|string|max:255',
+            'type' => 'required|string|max:255',
+            'estimation_lifetime' => 'required|integer',
+            'cost' => 'required|numeric',
+            'last_replace' => 'required|date',
+            'safety_stock' => 'required|integer',
+            'sap_stock' => 'required|numeric',
+            'repair_stock' => 'required|numeric',
+        ]);
+
+
+        // Store the data in the database
+        $machinePart = MachineSparePartsInventory::create([
+            'machine_id' => $request->machine_id,
+            'part_id' => $request->part_id,
+            'critical_part' => $request->critical_part,
+            'type' => $request->type,
+            'estimation_lifetime' => $request->estimation_lifetime,
+            'cost' => $request->cost,
+            'last_replace' => $request->last_replace,
+            'safety_stock' => $request->safety_stock,
+            'sap_stock' => $request->sap_stock,
+            'repair_stock' => $request->repair_stock,
+        ]);
+
+        // Redirect back with a success message or return a response
+        return redirect()->back()->with('status', 'Machine part added successfully.');
     }
 
 
