@@ -11,14 +11,51 @@ use App\Exports\PartsSAPTemplateExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\PartsSAPImport;
 use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\Facades\DataTables;
 
 
 class MstPartSAPController extends Controller
 {
-    public function sapPart(){
-        $item = Part::get();
-        return view('master.sap',compact('item'));
+    public function sapPart(Request $request, $plnt = null)
+{
+    if ($request->ajax()) {
+        $query = Part::select(['*']);
+
+        if ($plnt) {
+            $query->where('plnt', $plnt);
+        }
+
+        $items = $query->get()->map(function ($item) {
+            $item->encrypted_id = encrypt($item->id); // Add encrypted id
+            return $item;
+        });
+
+        return DataTables::of($items)
+            ->addIndexColumn()
+            ->addColumn('action', function($row){
+                $btn = '<div class="dropdown">
+                            <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li>
+                                    <a title="Detail Part" class="dropdown-item" href="'.url('/mst/sap/part/info/' . encrypt($row->id)).'">
+                                        <i class="fas fa-info me-2"></i>Detail Part
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>';
+                return $btn;
+            })
+            ->rawColumns(['action'])
+            ->make(true);
     }
+
+    return view('master.sap');
+}
+
+
+
 
     public function sapTemplate()
     {

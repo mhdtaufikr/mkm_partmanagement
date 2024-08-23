@@ -23,26 +23,32 @@ use Illuminate\Support\Facades\Crypt;
 
 class MstMachinePartController extends Controller
 {
-    public function index(Request $request)
-    {
-        if ($request->ajax()) {
-            $items = Machine::select(['*'])
-                ->get()
-                ->map(function ($item) {
-                    $item->encrypted_id = encrypt($item->id); // Add encrypted id
-                    return $item;
-                });
+    public function index(Request $request, $location = null)
+{
 
-            return DataTables::of($items)
-                ->addIndexColumn()
-                ->addColumn('mfg_date', function ($row) {
-                    return $row->mfg_date ? $row->mfg_date : '-';
-                })
-                ->make(true);
+    if ($request->ajax()) {
+        $query = Machine::select(['*']);
+
+        if ($location) {
+            $query->where('plant', $location);
         }
 
-        return view('master.machine');
+        $items = $query->get()->map(function ($item) {
+            $item->encrypted_id = encrypt($item->id); // Add encrypted id
+            return $item;
+        });
+
+        return DataTables::of($items)
+            ->addIndexColumn()
+            ->addColumn('mfg_date', function ($row) {
+                return $row->mfg_date ? $row->mfg_date : '-';
+            })
+            ->make(true);
     }
+
+    return view('master.machine');
+}
+
 
 
 

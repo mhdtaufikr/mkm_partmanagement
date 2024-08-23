@@ -153,27 +153,34 @@
 
 <script>
     $(document).ready(function() {
-        var table = $('#tableUser').DataTable({
-            "processing": true,
-            "serverSide": true,
-            "ajax": "{{ route('mst.machine.part') }}",
-            "columns": [
-                { "data": "DT_RowIndex", "name": "DT_RowIndex", "orderable": false, "searchable": false },
-                { "data": "plant", "name": "plant" },
-                { "data": "line", "name": "line" },
-                { "data": "op_no", "name": "op_no" },
-                { "data": "machine_name", "name": "machine_name" },
-                { "data": "process", "name": "process" },
-                { "data": "maker", "name": "maker" },
-                { "data": "mfg_date", "name": "mfg_date" }
-            ],
-            "order": [[1, 'asc'], [2, 'asc']],
-            "createdRow": function(row, data, dataIndex) {
-                $(row).attr('onclick', 'window.location.href="{{ url("/mst/machine/detail/") }}/'+data.encrypted_id +'";');
-                $(row).css('cursor', 'pointer');
-            }
-        });
+    // Fetch the current location from the URL or set to null
+    var location = '{{ request()->segment(4) ?? '' }}'; // Assuming location is the 4th segment in your URL
+
+    var table = $('#tableUser').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            "url": location ? "{{ url('/mst/machine/part') }}/" + location : "{{ route('mst.machine.part') }}",
+            "type": "GET"
+        },
+        "columns": [
+            { "data": "DT_RowIndex", "name": "DT_RowIndex", "orderable": false, "searchable": false },
+            { "data": "plant", "name": "plant" },
+            { "data": "line", "name": "line" },
+            { "data": "op_no", "name": "op_no" },
+            { "data": "machine_name", "name": "machine_name" },
+            { "data": "process", "name": "process" },
+            { "data": "maker", "name": "maker" },
+            { "data": "mfg_date", "name": "mfg_date" }
+        ],
+        "order": [[1, 'asc'], [2, 'asc']],
+        "createdRow": function(row, data, dataIndex) {
+            $(row).attr('onclick', 'window.location.href="{{ url("/mst/machine/detail/") }}/'+data.encrypted_id +'";');
+            $(row).css('cursor', 'pointer');
+        }
     });
+});
+
 </script>
 
 

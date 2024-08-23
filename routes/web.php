@@ -56,7 +56,7 @@ Route::middleware(['auth'])->group(function () {
      Route::get('/user/access/{user}', [UserController::class, 'access'])->middleware(['checkRole:IT']);
 
      //mstSAP Part
-     Route::get('/mst/sap/part', [MstPartSAPController::class, 'sapPart'])->middleware(['checkRole:IT']);
+     Route::get('/mst/sap/part/{plnt?}', [MstPartSAPController::class, 'sapPart'])->middleware(['checkRole:IT'])->name('mst.sap.part');
      Route::get('/mst/sap/part/info/{id}', [MstPartSAPController::class, 'sapPartDetail'])->middleware(['checkRole:IT']);
      Route::get('/mst/part/sap/template', [MstPartSAPController::class, 'sapTemplate'])->middleware(['checkRole:IT']);
      Route::post('/mst/part/sap/upload', [MstPartSAPController::class, 'sapUpload'])->middleware(['checkRole:IT']);
@@ -72,7 +72,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/get-repair-stock/{partId}', [MstMachinePartController::class, 'getRepairStock']);
     Route::get('/mst/repair/part', [MstPartRepairController::class, 'repairPart'])->middleware(['checkRole:IT']);
      // mstMachine Part
-     Route::get('/mst/machine/part', [MstMachinePartController::class, 'index'])->middleware(['checkRole:IT'])->name('mst.machine.part');
+     Route::get('/mst/machine/part/{location?}', [MstMachinePartController::class, 'index'])->middleware(['checkRole:IT'])->name('mst.machine.part');
     Route::get('/mst/machine/detail/{id}', [MstMachinePartController::class, 'detail'])->middleware(['checkRole:IT']);
     Route::post('/mst/machine/repair', [MstMachinePartController::class, 'repair'])->middleware(['checkRole:IT']);
     Route::post('/mst/machine/add-part', [MstMachinePartController::class, 'store'])->middleware(['checkRole:IT']);
