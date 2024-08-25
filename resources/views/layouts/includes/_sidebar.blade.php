@@ -68,7 +68,7 @@
                 <!-- Sidenav Accordion (Master Data) -->
                 <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapsemaster" aria-expanded="false" aria-controls="collapsemaster">
                     <div class="nav-link-icon"><i class="fas fa-database"></i></div>
-                    Master Preventive Maintenance
+                    Master PM
                     <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
 
@@ -77,7 +77,7 @@
                     <nav class="sidenav-menu-nested nav">
 
                         <a class="nav-link" href="{{ url('/mst/preventive') }}">PM Form</a>
-                        <a class="nav-link" href="{{ url('/mst/preventive/schedule') }}">PM Schedule Master</a>
+                        <a class="nav-link" href="{{ url('/mst/preventive/schedule') }}">PM Schedule</a>
                     </nav>
                 </div>
 

@@ -17,13 +17,20 @@
                         <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#uploadMasterPart">
                             <i class="fas fa-file-excel"></i> Master Part Machine
                         </button>
+                        <button type="button" class="btn btn-dark btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#modal-add">
+                            <i class="fas fa-plus-square"></i> Add SAP Part
+                        </button>
+                        <!-- Delete SAP Part Button -->
+                        <button type="button" class="btn btn-danger btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#modal-delete-part">
+                            <i class="fas fa-trash-alt"></i> Delete SAP Part
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </header>
-       <!-- Modal -->
-       <div class="modal fade" id="uploadMasterPart" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">
+    <!-- Modal for Upload -->
+    <div class="modal fade" id="uploadMasterPart" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -55,6 +62,35 @@
         </div>
     </div>
 
+    <!-- Modal for Deleting Parts -->
+    <div class="modal fade" id="modal-delete-part" tabindex="-1" aria-labelledby="modal-delete-part-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-delete-part-label">Delete Parts</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="delete-part-form" action="{{ url('/mst/sap/part/delete') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="parts" class="form-label">Select Parts to Delete</label>
+                            <select class="form-control chosen-select" id="parts" name="parts[]" multiple="multiple" required>
+                                @foreach($parts as $part)
+                                    <option value="{{ $part->id }}">{{ $part->material }} - {{ $part->material_description }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger">Delete Selected Parts</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Main page content-->
     <div class="container-fluid px-4 mt-n10">
         <div class="content-wrapper">
@@ -69,10 +105,6 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="mb-3 col-sm-12">
-                                        <button type="button" class="btn btn-dark btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#modal-add">
-                                            <i class="fas fa-plus-square"></i> Add SAP Part
-                                        </button>
-
                                         @include('partials.alert')
                                     </div>
 
@@ -92,7 +124,6 @@
                                                     <th>Consumed Value</th>
                                                     <th>Total Stock</th>
                                                     <th>Total Value</th>
-                                                    <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody></tbody>
@@ -107,6 +138,10 @@
         </div>
     </div>
 </main>
+
+<!-- Include Chosen jQuery plugin -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
 
 <script>
     $(document).ready(function() {
@@ -133,12 +168,39 @@
                 { "data": "consumed_value", "name": "consumed_value", "render": $.fn.dataTable.render.number(',', '.', 0) },
                 { "data": "total_stock", "name": "total_stock", "render": $.fn.dataTable.render.number(',', '.', 0) },
                 { "data": "total_value", "name": "total_value", "render": $.fn.dataTable.render.number(',', '.', 0) },
-                { "data": "action", "name": "action", "orderable": false, "searchable": false },
+                { "data": "encrypted_id", "name": "encrypted_id", "visible": false }, // Add hidden encrypted ID for row click
             ],
-            "order": [[1, 'asc']]
+            "order": [[1, 'asc']],
+            "dom": 'Blfrtip', // Enable buttons and length menu
+            "buttons": [
+                {
+                    title: 'SAP Part Data Export',
+                    text: '<i class="fas fa-file-excel"></i> Export to Excel',
+                    extend: 'excel',
+                    className: 'btn btn-success btn-sm mb-2',
+                    exportOptions: {
+                        columns: ':visible', // Export only visible columns
+                        modifier: {
+                            search: 'applied', // Export only filtered data
+                            order: 'applied', // Export data in current order
+                            page: 'all' // Export all pages of data
+                        }
+                    }
+                }
+            ],
+            "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            "pageLength": 10, // Set the default number of rows to display
+            "createdRow": function(row, data, dataIndex) {
+                $(row).attr('onclick', 'window.location.href="{{ url("/mst/sap/part/info/") }}/'+data.encrypted_id+'"');
+                $(row).css('cursor', 'pointer');
+            }
+        });
+
+        // Initialize Chosen plugin for multi-select
+        $('.chosen-select').chosen({
+            width: '100%',
+            no_results_text: 'No results matched'
         });
     });
 </script>
-
-
 @endsection

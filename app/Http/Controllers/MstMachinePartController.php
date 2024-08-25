@@ -20,34 +20,37 @@ use App\Models\ChecksheetStatusLog;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Crypt;
+use DB;
 
 class MstMachinePartController extends Controller
 {
     public function index(Request $request, $location = null)
-{
+    {
+        if ($request->ajax()) {
+            $query = Machine::query();
 
-    if ($request->ajax()) {
-        $query = Machine::select(['*']);
+            if ($location) {
+                $query->where('plant', $location);
+            }
 
-        if ($location) {
-            $query->where('plant', $location);
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->addColumn('mfg_date', function ($row) {
+                    return $row->mfg_date ? $row->mfg_date : '-';
+                })
+                ->addColumn('encrypted_id', function ($row) {
+                    return encrypt($row->id);
+                })
+                ->make(true);
         }
 
-        $items = $query->get()->map(function ($item) {
-            $item->encrypted_id = encrypt($item->id); // Add encrypted id
-            return $item;
-        });
+        // Fetch all machines to populate the dropdown in the delete modal
+        $machines = Machine::all();
 
-        return DataTables::of($items)
-            ->addIndexColumn()
-            ->addColumn('mfg_date', function ($row) {
-                return $row->mfg_date ? $row->mfg_date : '-';
-            })
-            ->make(true);
+        return view('master.machine', compact('machines'));
     }
 
-    return view('master.machine');
-}
+
 
 
 
@@ -352,6 +355,80 @@ public function deleteImage(Request $request)
     // Redirect back with a success message
     return redirect()->back()->with('success', 'Image deleted successfully.');
 }
+
+public function deleteMachine(Request $request)
+{
+    // Validate request input
+    $request->validate([
+        'machines' => 'required|array', // Ensure 'machines' is an array
+        'machines.*' => 'exists:machines,id' // Each machine ID must exist in the machines table
+    ]);
+
+    // Get the array of machine IDs to delete
+    $machineIds = $request->input('machines');
+
+    try {
+        // Start a database transaction
+        DB::beginTransaction();
+
+        // Step 1: Delete related entries from dependent tables
+
+        // Delete related records in historical_problems first
+        DB::table('historical_problems')->whereIn('id_machine', $machineIds)->delete();
+
+        // Delete from checksheet_status_logs where checksheet_header_id is related to the machines
+        $checksheetHeaderIds = DB::table('preventive_maintenances')
+            ->whereIn('machine_id', $machineIds)
+            ->join('checksheet_form_heads', 'preventive_maintenances.id', '=', 'checksheet_form_heads.preventive_maintenances_id')
+            ->pluck('checksheet_form_heads.id');
+
+        DB::table('checksheet_status_logs')->whereIn('checksheet_header_id', $checksheetHeaderIds)->delete();
+
+        // Delete from checksheet_journey_logs where checksheet_id is related to the machines
+        DB::table('checksheet_journey_logs')->whereIn('checksheet_id', $checksheetHeaderIds)->delete();
+
+        // Delete from checksheet_form_details where id_header is related to the machines
+        DB::table('checksheet_form_details')->whereIn('id_header', $checksheetHeaderIds)->delete();
+
+        // Delete from checksheet_form_heads
+        DB::table('checksheet_form_heads')->whereIn('id', $checksheetHeaderIds)->delete();
+
+        // Delete from pm_schedule_details
+        $pmScheduleMasterIds = DB::table('preventive_maintenances')
+            ->whereIn('machine_id', $machineIds)
+            ->join('pm_schedule_masters', 'preventive_maintenances.id', '=', 'pm_schedule_masters.pm_id')
+            ->pluck('pm_schedule_masters.id');
+
+        DB::table('pm_schedule_details')->whereIn('pm_schedule_master_id', $pmScheduleMasterIds)->delete();
+
+        // Delete from pm_schedule_masters
+        DB::table('pm_schedule_masters')->whereIn('id', $pmScheduleMasterIds)->delete();
+
+        // Delete from preventive_maintenances
+        DB::table('preventive_maintenances')->whereIn('machine_id', $machineIds)->delete();
+
+        // Delete from machine_spare_parts_inventories
+        DB::table('machine_spare_parts_inventories')->whereIn('machine_id', $machineIds)->delete();
+
+        // Step 2: Delete the machines
+        DB::table('machines')->whereIn('id', $machineIds)->delete();
+
+        // Commit the transaction
+        DB::commit();
+
+        // Return a success response
+        return redirect()->back()->with('status', 'Selected machines and their dependencies have been deleted successfully.');
+
+    } catch (\Exception $e) {
+        // Rollback the transaction in case of any error
+        DB::rollback();
+
+        // Return an error response
+        return redirect()->back()->with('failed', 'An error occurred while deleting machines. Please try again.'. $e->getMessage());
+    }
+}
+
+
 
 
 }

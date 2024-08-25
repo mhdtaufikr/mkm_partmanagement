@@ -62,6 +62,8 @@ Route::middleware(['auth'])->group(function () {
      Route::post('/mst/part/sap/upload', [MstPartSAPController::class, 'sapUpload'])->middleware(['checkRole:IT']);
      Route::post('/mst/part/add/image', [MstPartSAPController::class, 'addImage'])->middleware(['checkRole:IT']);
      Route::post('/mst/sap/part/store/', [MstPartSAPController::class, 'sapPartDetailStore'])->middleware(['checkRole:IT']);
+     Route::post('/mst/sap/part/delete', [MstPartSAPController::class, 'sapPartDelete'])->middleware(['checkRole:IT']);
+
 
 
     // Repair Parts
@@ -83,6 +85,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/mst/part/upload', [MstMachinePartController::class, 'partUpload'])->middleware(['checkRole:IT']);
     Route::post('/mst/machine/add/image', [MstMachinePartController::class, 'addImage'])->middleware(['checkRole:IT']);
     Route::post('mst/machine/delete/image', [MstMachinePartController::class, 'deleteImage'])->name('machine.delete.image');
+    Route::post('/mst/machine/delete', [MstMachinePartController::class, 'deleteMachine']);
 
     Route::get('/history', [HistoryController::class, 'index'])->middleware(['checkRole:IT'])->name('history');
      Route::post('/history/store', [HistoryController::class, 'store']);

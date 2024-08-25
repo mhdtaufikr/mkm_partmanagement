@@ -17,42 +17,31 @@ use Yajra\DataTables\Facades\DataTables;
 class MstPartSAPController extends Controller
 {
     public function sapPart(Request $request, $plnt = null)
-{
-    if ($request->ajax()) {
-        $query = Part::select(['*']);
+    {
+        if ($request->ajax()) {
+            $query = Part::select(['*']);
 
-        if ($plnt) {
-            $query->where('plnt', $plnt);
+            if ($plnt) {
+                $query->where('plnt', $plnt);
+            }
+
+            $items = $query->get()->map(function ($item) {
+                $item->encrypted_id = encrypt($item->id); // Add encrypted id for row URL
+                return $item;
+            });
+
+            return DataTables::of($items)
+                ->addIndexColumn()
+                ->make(true);
         }
 
-        $items = $query->get()->map(function ($item) {
-            $item->encrypted_id = encrypt($item->id); // Add encrypted id
-            return $item;
-        });
+        // Fetch all parts to pass to the view for the delete modal
+        $parts = Part::all();
 
-        return DataTables::of($items)
-            ->addIndexColumn()
-            ->addColumn('action', function($row){
-                $btn = '<div class="dropdown">
-                            <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                Actions
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li>
-                                    <a title="Detail Part" class="dropdown-item" href="'.url('/mst/sap/part/info/' . encrypt($row->id)).'">
-                                        <i class="fas fa-info me-2"></i>Detail Part
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>';
-                return $btn;
-            })
-            ->rawColumns(['action'])
-            ->make(true);
+        return view('master.sap', compact('parts')); // Pass the parts variable to the view
     }
 
-    return view('master.sap');
-}
+
 
 
 
@@ -135,41 +124,73 @@ class MstPartSAPController extends Controller
         return redirect()->back()->with('success', 'Images uploaded successfully.');
     }
 
-    public function sapPartDetailStore(Request $request)
+    public function store(Request $request)
     {
+        $machineIds = $request->input('machine_id');
+        $criticalParts = $request->input('critical_part');
+        $types = $request->input('type');
+        $estimationLifetimes = $request->input('estimation_lifetime');
+        $costs = $request->input('cost');
+        $lastReplaces = $request->input('last_replace');
+        $safetyStocks = $request->input('safety_stock');
 
-        // Validate the request data if needed
-        $request->validate([
-            'machine_id' => 'required|integer',
-            'part_id' => 'required|integer',
-            'critical_part' => 'required|string|max:255',
-            'type' => 'required|string|max:255',
-            'estimation_lifetime' => 'required|integer',
-            'cost' => 'required|numeric',
-            'last_replace' => 'required|date',
-            'safety_stock' => 'required|integer',
-            'sap_stock' => 'required|numeric',
-            'repair_stock' => 'required|numeric',
-        ]);
+        for ($i = 0; $i < count($machineIds); $i++) {
+            // Save each set of machine data
+            MachinePart::create([
+                'machine_id' => $machineIds[$i],
+                'critical_part' => $criticalParts[$i],
+                'type' => $types[$i],
+                'estimation_lifetime' => $estimationLifetimes[$i],
+                'cost' => $costs[$i],
+                'last_replace' => $lastReplaces[$i],
+                'safety_stock' => $safetyStocks[$i],
+                'part_id' => $request->input('part_id'),
+                'sap_stock' => $request->input('sap_stock'),
+                'repair_stock' => $request->input('repair_stock')
+            ]);
+        }
 
-
-        // Store the data in the database
-        $machinePart = MachineSparePartsInventory::create([
-            'machine_id' => $request->machine_id,
-            'part_id' => $request->part_id,
-            'critical_part' => $request->critical_part,
-            'type' => $request->type,
-            'estimation_lifetime' => $request->estimation_lifetime,
-            'cost' => $request->cost,
-            'last_replace' => $request->last_replace,
-            'safety_stock' => $request->safety_stock,
-            'sap_stock' => $request->sap_stock,
-            'repair_stock' => $request->repair_stock,
-        ]);
-
-        // Redirect back with a success message or return a response
-        return redirect()->back()->with('status', 'Machine part added successfully.');
+        return redirect()->back()->with('success', 'Machine parts added successfully.');
     }
+
+    public function sapPartDelete(Request $request)
+    {
+        // Validate request input
+        $request->validate([
+            'parts' => 'required|array', // Ensure 'parts' is an array
+            'parts.*' => 'exists:parts,id' // Each part ID must exist in the parts table
+        ]);
+
+        // Get the array of part IDs to delete
+        $partIds = $request->input('parts');
+
+        try {
+            // Start a database transaction
+            DB::beginTransaction();
+
+            // Step 1: Delete related entries from dependent tables
+            // Example: If parts are related to another table
+            // DB::table('related_table')->whereIn('part_id', $partIds)->delete();
+
+            // Step 2: Delete the parts
+            DB::table('parts')->whereIn('id', $partIds)->delete();
+
+            // Commit the transaction
+            DB::commit();
+
+            // Return a success response
+            return redirect()->back()->with('status', 'Selected parts and their dependencies have been deleted successfully.');
+
+        } catch (\Exception $e) {
+            // Rollback the transaction in case of any error
+            DB::rollback();
+
+            // Return an error response
+            return redirect()->back()->with('failed', 'An error occurred while deleting parts. Please try again.'. $e->getMessage());
+        }
+    }
+
+
 
 
 }

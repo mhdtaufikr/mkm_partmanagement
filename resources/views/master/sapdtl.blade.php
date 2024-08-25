@@ -250,50 +250,54 @@
             <form action="{{url('/mst/sap/part/store/')}}" method="POST">
                 @csrf
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="machine_id" class="form-label">Machine</label>
-                                <select class="form-select" id="machine_id" name="machine_id" required>
-                                    <option value="" disabled selected>Select Machine</option>
-                                    @foreach($machines as $machine)
-                                        <option value="{{ $machine->id }}">{{ $machine->op_no }} - {{ $machine->machine_name }}</option>
-                                    @endforeach
-                                </select>
+                    <div id="machine-forms-container">
+                        <div class="row machine-form">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="machine_id" class="form-label">Machine</label>
+                                    <select class="form-select" id="machine_id" name="machine_id[]" required>
+                                        <option value="" disabled selected>Select Machine</option>
+                                        @foreach($machines as $machine)
+                                            <option value="{{ $machine->id }}">{{ $machine->op_no }} - {{ $machine->machine_name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="critical_part" class="form-label">Critical Part</label>
+                                    <input readonly value="{{$part->material_description}}" type="text" class="form-control" id="critical_part" name="critical_part[]" required>
+                                </div>
+                                <div hidden class="mb-3">
+                                    <label for="type" class="form-label">Type</label>
+                                    <input readonly value="{{$part->type}}" type="text" class="form-control" id="type" name="type[]" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="estimation_lifetime" class="form-label">Estimation Lifetime (in years)</label>
+                                    <input type="number" class="form-control" id="estimation_lifetime" name="estimation_lifetime[]" required>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="critical_part" class="form-label">Critical Part</label>
-                                <input readonly value="{{$part->material_description}}" type="text" class="form-control" id="critical_part" name="critical_part" required>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="cost" class="form-label">Cost</label>
+                                    <input readonly value="{{$part->total_value}}" type="number" step="0.01" class="form-control" id="cost" name="cost[]" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="last_replace" class="form-label">Last Replace Date</label>
+                                    <input type="date" class="form-control" id="last_replace" name="last_replace[]" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="safety_stock" class="form-label">Safety Stock</label>
+                                    <input type="number" class="form-control" id="safety_stock" name="safety_stock[]" required>
+                                </div>
                             </div>
-                            <div hidden class="mb-3">
-                                <label for="type" class="form-label">Type</label>
-                                <input readonly value="{{$part->type}}" type="text" class="form-control" id="type" name="type" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="estimation_lifetime" class="form-label">Estimation Lifetime (in years)</label>
-                                <input type="number" class="form-control" id="estimation_lifetime" name="estimation_lifetime" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="cost" class="form-label">Cost</label>
-                                <input readonly value="{{$part->total_value}}" type="number" step="0.01" class="form-control" id="cost" name="cost" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="last_replace" class="form-label">Last Replace Date</label>
-                                <input type="date" class="form-control" id="last_replace" name="last_replace" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="safety_stock" class="form-label">Safety Stock</label>
-                                <input type="number" class="form-control" id="safety_stock" name="safety_stock" required>
-                            </div>
+                            <hr>
                         </div>
                     </div>
+                    <button type="button" id="add-machine-form" class="btn btn-secondary btn-sm">+ Add Another Machine</button>
                     <input type="hidden" name="part_id" value="{{ $part->id }}">
                     <input type="hidden" name="sap_stock" value="{{ $part->total_stock }}">
                     <input type="hidden" name="repair_stock" value="{{ $repairPartsTotalQty }}">
-
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Add Machine</button>
@@ -302,6 +306,22 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('add-machine-form').addEventListener('click', function () {
+            // Clone the first machine form
+            var firstForm = document.querySelector('.machine-form');
+            var clonedForm = firstForm.cloneNode(true);
+
+            // Clear the input values in the cloned form
+            clonedForm.querySelectorAll('input').forEach(input => input.value = '');
+            clonedForm.querySelectorAll('select').forEach(select => select.value = '');
+
+            // Append the cloned form to the container
+            document.getElementById('machine-forms-container').appendChild(clonedForm);
+        });
+    });
+</script>
 
 
                 <table id="MachineList" class="table table-bordered table-striped">
