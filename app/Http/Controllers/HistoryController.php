@@ -7,6 +7,7 @@ use App\Models\HistoricalProblem;
 use App\Models\Machine;
 use App\Models\Dropdown;
 use App\Models\RepairPart;
+use App\Models\Part;
 use App\Models\PreventiveMaintenance;
 use App\Models\ChecksheetFormHead;
 use App\Models\HistoricalProblemPart;
@@ -110,17 +111,16 @@ public function store(Request $request)
 }
 
 public function form($no_machine, $date, $shift)
-    {
-        $no_machine = decrypt($no_machine);
+{
+    $no_machine = decrypt($no_machine);
 
-        $dropdown = Dropdown::where('category','Problem')->get();
-        // Fetch spare parts related to the machine with part details
-        $spareParts = MachineSparePartsInventory::where('machine_id', $no_machine)
-                        ->with('part')
-                        ->get();
+    $dropdown = Dropdown::where('category','Problem')->get();
 
-        return view('history.form', compact('no_machine', 'date', 'shift', 'spareParts','dropdown'));
-    }
+    // Fetch all parts instead of just those related to MachineSparePartsInventory
+    $spareParts = Part::all(); // Fetch all parts directly from the 'parts' table
+
+    return view('history.form', compact('no_machine', 'date', 'shift', 'spareParts','dropdown'));
+}
 
     public function getRepairLocationsForPart($part_id)
 {
@@ -135,7 +135,6 @@ public function form($no_machine, $date, $shift)
 
 public function storehp(Request $request)
 {
-
     // Validate the request data
     $validatedData = $request->validate([
         'id_machine' => 'required|integer',
@@ -194,8 +193,31 @@ public function storehp(Request $request)
     foreach ($validatedData['spare_part'] as $index => $sparePartId) {
         $stockType = $validatedData['stock_type'][$index];
         $usedQty = $validatedData['used_qty'][$index];
-
         $location = null;
+
+        // Check if part exists for the specific machine in machine_spare_parts_inventories
+        $machinePart = MachineSparePartsInventory::where('part_id', $sparePartId)
+            ->where('machine_id', $validatedData['id_machine'])
+            ->first();
+
+        if (!$machinePart) {
+            // Part does not exist for this machine, create it with default values
+            $repairStock = RepairPart::where('part_id', $sparePartId)->sum('repaired_qty');
+            $sapStock = Part::where('id', $sparePartId)->value('begining_qty');
+
+            $machinePart = MachineSparePartsInventory::create([
+                'part_id' => $sparePartId,
+                'machine_id' => $validatedData['id_machine'],
+                'critical_part' => 'Default', // Adjust as necessary
+                'type' => 'Default', // Adjust as necessary
+                'estimation_lifetime' => 5,
+                'cost' => 0.00, // Adjust as necessary
+                'last_replace' => $validatedData['date'],
+                'safety_stock' => 10,
+                'sap_stock' => $sapStock,
+                'repair_stock' => $repairStock,
+            ]);
+        }
 
         if ($stockType === 'repair') {
             if (!isset($validatedData['repair_location'][$index])) {
@@ -238,6 +260,7 @@ public function storehp(Request $request)
 
     return redirect()->route('history')->with('status', 'Historical problem recorded successfully');
 }
+
 
 
         public function storehpStatus(Request $request)

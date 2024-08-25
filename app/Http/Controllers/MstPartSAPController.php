@@ -169,8 +169,15 @@ class MstPartSAPController extends Controller
             DB::beginTransaction();
 
             // Step 1: Delete related entries from dependent tables
-            // Example: If parts are related to another table
-            // DB::table('related_table')->whereIn('part_id', $partIds)->delete();
+
+            // Delete related records in machine_spare_parts_inventories
+            DB::table('machine_spare_parts_inventories')->whereIn('part_id', $partIds)->delete();
+
+            // Delete related records in historical_problem_parts
+            DB::table('historical_problem_parts')->whereIn('part_id', $partIds)->delete();
+
+            // Since the `historical_problems` table does not directly reference `parts`, no action is needed here
+            // unless you want to handle other business logic tied to the parts
 
             // Step 2: Delete the parts
             DB::table('parts')->whereIn('id', $partIds)->delete();
@@ -186,11 +193,8 @@ class MstPartSAPController extends Controller
             DB::rollback();
 
             // Return an error response
-            return redirect()->back()->with('failed', 'An error occurred while deleting parts. Please try again.'. $e->getMessage());
+            return redirect()->back()->with('failed', 'An error occurred while deleting parts. Please try again. ' . $e->getMessage());
         }
     }
-
-
-
 
 }

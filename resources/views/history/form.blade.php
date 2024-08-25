@@ -75,18 +75,19 @@
                                                         <div class="col-md-3">
                                                             <div class="form-group">
                                                                 <label for="spare_part">Spare Part</label>
-                                                                <select class="form-control spare_part" name="spare_part[]" >
+                                                                <select class="form-control spare_part chosen-select" name="spare_part[]" >
                                                                     <option value="">Select Spare Part</option>
                                                                     @foreach($spareParts as $part)
-                                                                        <option value="{{ $part->part_id }}" data-sap="{{ $part->sap_stock }}" data-repair="{{ $part->repair_stock }}">{{ $part->part->material }}</option>
+                                                                        <option value="{{ $part->id }}" data-sap="{{ $part->begining_qty }}" data-repair="{{ $part->total_stock }}">{{ $part->material }} - {{$part->material_description}}</option>
                                                                     @endforeach
                                                                 </select>
+
                                                             </div>
                                                         </div>
                                                         <div class="col-md-3">
                                                             <div class="form-group">
                                                                 <label for="stock_type">Stock Type</label>
-                                                                <select class="form-control stock_type" name="stock_type[]" >
+                                                                <select class="form-control stock_type" name="stock_type[]">
                                                                     <option value="sap">New (SAP)</option>
                                                                     <option value="repair">Repair (Extend)</option>
                                                                 </select>
@@ -126,14 +127,14 @@
                                                 <div class="row mb-4">
                                                     <div class="col-md-3">
                                                         <div class="form-group">
-                                                            <label for="">Category</label>
+                                                            <label for="category">Category</label>
                                                             <select name="category" id="category" class="form-control" required>
                                                                 <option value="">- Please Select Role -</option>
                                                                 @foreach ($dropdown as $Problem)
                                                                     <option value="{{ $Problem->name_value }}">{{ $Problem->name_value }}</option>
                                                                 @endforeach
-                                                              </select>
-                                                          </div>
+                                                            </select>
+                                                        </div>
                                                     </div>
                                                     <div class="col-md-3">
                                                         <div class="form-group">
@@ -211,8 +212,16 @@
         <!-- /.content-wrapper -->
     </div>
 </main>
+
 <script>
     $(document).ready(function() {
+        // Initialize Chosen for dynamically searchable dropdown
+        $('.chosen-select').chosen({
+            width: '100%',
+            no_results_text: 'No results matched', // Customize the text displayed when no results are found
+            allow_single_deselect: true
+        });
+
         function handleStockTypeChange(row) {
             var stockType = row.find('.stock_type').val();
             if (stockType === 'sap') {
@@ -230,6 +239,7 @@
         function addPartRow() {
             var newRow = $('.part-row:first').clone();
             newRow.find('input, select').val('');
+            newRow.find('.chosen-select').chosen('destroy').chosen(); // Reinitialize Chosen for new row
             newRow.find('.sap_quantity_container').show();
             newRow.find('.repair_location_container').hide();
             newRow.find('.repair_quantity_container').hide();
@@ -307,4 +317,5 @@
         });
     });
 </script>
+
 @endsection

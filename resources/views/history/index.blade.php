@@ -178,7 +178,6 @@
             "processing": true,
             "serverSide": true,
             "responsive": true,
-            "lengthChange": false,
             "autoWidth": false,
             "ajax": "{{ route('history') }}",
             "columns": [
@@ -218,7 +217,26 @@
                         return `<button class="btn btn-sm btn-primary btn-detail" data-id="${data}" data-bs-toggle="modal" data-bs-target="#modal-detail">Detail</button>`;
                     }
                 }
-            ]
+            ],
+            "dom": 'Blfrtip', // Enable buttons and length menu
+            "buttons": [
+                {
+                    title: 'History Data Export',
+                    text: '<i class="fas fa-file-excel"></i> Export to Excel',
+                    extend: 'excel',
+                    className: 'btn btn-success btn-sm mb-2',
+                    exportOptions: {
+                        columns: ':visible', // Export only visible columns
+                        modifier: {
+                            search: 'applied', // Export only filtered data
+                            order: 'applied', // Export data in current order
+                            page: 'all' // Export all pages of data
+                        }
+                    }
+                }
+            ],
+            "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            "pageLength": 10, // Set the default number of rows to display
         });
 
         // Load modal content dynamically when the detail button is clicked
@@ -238,6 +256,7 @@
         });
     });
 </script>
+
 
 
 <!-- DataTables script remains unchanged -->

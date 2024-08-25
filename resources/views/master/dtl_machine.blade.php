@@ -505,20 +505,20 @@
                                                                                     </button>
                                                                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                                                         <li>
+                                                                                            <a target="_blank" title="Master Part" class="dropdown-item" href="{{ url('/mst/sap/part/info/' . encrypt($part->part_id)) }}">
+                                                                                                <i class="fas fa-info me-2"></i>Detail Part
+                                                                                            </a>
+                                                                                        </li>
+                                                                                        <li><hr class="dropdown-divider"></li>
+                                                                                        <li>
                                                                                             <button title="Repair Part" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-repair{{ $part->id }}">
-                                                                                                <i class="fas fa-tools me-2"></i>Add Repair Part
+                                                                                                <i class="fas fa-tools me-2"></i>Add Expand
                                                                                             </button>
                                                                                         </li>
                                                                                         <li>
                                                                                             <button title="Detail Part" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-detail{{ $part->id }}">
-                                                                                                <i class="fas fa-info me-2"></i>Detail Part
+                                                                                                <i class="fas fa-info me-2"></i>Detail Expand
                                                                                             </button>
-                                                                                        </li>
-                                                                                        <li><hr class="dropdown-divider"></li>
-                                                                                        <li>
-                                                                                            <a target="_blank" title="Master Part" class="dropdown-item" href="{{ url('/mst/sap/part/info/' . encrypt($part->part_id)) }}">
-                                                                                                <i class="fas fa-info me-2"></i>Master Part
-                                                                                            </a>
                                                                                         </li>
                                                                                     </ul>
                                                                                 </div>

@@ -50,13 +50,6 @@ class MstMachinePartController extends Controller
         return view('master.machine', compact('machines'));
     }
 
-
-
-
-
-
-
-
     public function detail($id) {
         $id = decrypt($id);
         $machine = Machine::with(['inventoryStatus', 'spareParts', 'spareParts.repairs'])->where('id', $id)->first();
