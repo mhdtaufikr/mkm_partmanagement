@@ -25,4 +25,8 @@ class MachineSparePartsInventory extends Model
     {
         return $this->hasMany(RepairPart::class, 'part_id', 'part_id');
     }
+    public function logs()
+    {
+        return $this->hasMany(MachineSparePartsInventoryLog::class, 'inventory_id');
+    }
 }

@@ -520,9 +520,51 @@
                                                                                                 <i class="fas fa-info me-2"></i>Detail Expand
                                                                                             </button>
                                                                                         </li>
+                                                                                        <li>
+                                                                                            <button title="View Logs" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-log{{ $part->id }}">
+                                                                                                <i class="fas fa-history me-2"></i>View Logs
+                                                                                            </button>
+                                                                                        </li>
                                                                                     </ul>
                                                                                 </div>
-
+ <!-- Log Modal -->
+ <div class="modal fade" id="modal-log{{ $part->id }}" tabindex="-1" aria-labelledby="modal-log-label{{ $part->id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-log-label{{ $part->id }}">Log History for Part: {{ $part->critical_part }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Old Last Replace</th>
+                            <th>Quantity Changed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($part->logs as $log)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ date('d M Y', strtotime($log->old_last_replace)) }}</td>
+                                <td>{{ $log->qty }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="9" class="text-center">No logs available for this part.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
                                                                                 {{-- Modal Update --}}
                                                                                 <div class="modal fade" id="modal-repair{{ $part->id }}" tabindex="-1" aria-labelledby="modal-repair{{ $part->id }}-label" aria-hidden="true">

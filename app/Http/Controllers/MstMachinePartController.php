@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Crypt;
 use DB;
+use App\Models\MachineSparePartsInventoryLog;
 
 class MstMachinePartController extends Controller
 {
@@ -52,7 +53,7 @@ class MstMachinePartController extends Controller
 
     public function detail($id) {
         $id = decrypt($id);
-        $machine = Machine::with(['inventoryStatus', 'spareParts', 'spareParts.repairs'])->where('id', $id)->first();
+        $machine = Machine::with(['inventoryStatus', 'spareParts', 'spareParts.repairs','spareParts.logs' ])->where('id', $id)->first();
 
         // Get all parts with their total repair quantities
         $parts = Part::withSum('repairs as total_repaired_qty', 'repaired_qty')->get();
@@ -87,7 +88,7 @@ class MstMachinePartController extends Controller
             'checksheet_form_heads.planning_date',
             'checksheet_form_heads.actual_date',
             'checksheet_form_heads.pic',
-            'checksheet_form_heads.pm_status', // Added this line to include pm_status
+            'checksheet_form_heads.pm_status',
             'checksheet_form_heads.status',
             'checksheet_form_heads.created_by',
             'checksheet_form_heads.remark',
@@ -110,15 +111,20 @@ class MstMachinePartController extends Controller
             $pm->logs = ChecksheetStatusLog::where('checksheet_header_id', $pm->checksheet_id)->orderBy('created_at', 'desc')->get();
         }
 
+        // Fetch the logs for each part
+        foreach ($parts as $part) {
+            $part->logs = MachineSparePartsInventoryLog::where('inventory_id', $part->id)->orderBy('created_at', 'desc')->get();
+        }
+
         // Combine the data into a single collection
         $combinedData = collect();
         foreach ($historicalProblems as $problem) {
             $combinedData->push((object) [
                 'date' => $problem->date,
-                'type' => "Daily Report",  // Use the report column as the type
+                'type' => "Daily Report",
                 'data' => $problem,
                 'Category' => $problem->report,
-                'status_logs' => collect()  // Add an empty collection for historical problems
+                'status_logs' => collect()
             ]);
         }
 
@@ -129,10 +135,9 @@ class MstMachinePartController extends Controller
                 'type' => 'Preventive Maintenance',
                 'data' => $pm,
                 'Category' => 'Preventive Maintenance',
-                'status_logs' => $pm->logs  // Attach the logs collection to the pm data
+                'status_logs' => $pm->logs
             ]);
         }
-
         // Sort the combined data by date
         $combinedData = $combinedData->sortBy('date');
         return view('master.dtl_machine', compact('machine', 'parts', 'combinedData'));
