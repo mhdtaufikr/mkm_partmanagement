@@ -31,7 +31,6 @@ class PartsImport implements ToCollection, WithHeadingRow
 
                 // Check if the part exists in the parts table
                 $part = Part::where('material', $row['material_no'])
-                    ->where('material_description', $row['description'])
                     ->first();
 
                 if (!$part) {
