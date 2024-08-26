@@ -49,6 +49,7 @@
                                                             <select class="form-control" id="shop" name="shop" required>
                                                                 <option value="Electric">Electric</option>
                                                                 <option value="Mechanic">Mechanic</option>
+                                                                <option value="Power House">Power House</option>
                                                             </select>
                                                         </div>
                                                     </div>
