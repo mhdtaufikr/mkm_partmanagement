@@ -15,6 +15,11 @@ class MachinesImport implements ToCollection, WithHeadingRow
     {
         DB::transaction(function() use ($rows) {
             foreach ($rows as $row) {
+                // Ensure 'shop' value is provided
+                if (empty($row['shop'])) {
+                    throw new \Exception('Shop value is required for all rows.');
+                }
+
                 // Check if the combination of op_no, line, location, and plant already exists
                 $existingMachine = Machine::where('op_no', $row['op_no_machine_no'])
                     ->where('line', $row['line'])
@@ -23,7 +28,7 @@ class MachinesImport implements ToCollection, WithHeadingRow
                     ->first();
 
                 if ($existingMachine) {
-                    // Check if the existing machine's data matches the new data
+                    // Prepare the updated data
                     $updatedData = [
                         'machine_no'        => $row['qr_no'],
                         'asset_no'          => $row['asset_no'],
@@ -35,18 +40,16 @@ class MachinesImport implements ToCollection, WithHeadingRow
                         'mfg_date'          => $row['mfg_date'],
                         'install_date'      => $row['install_date'],
                         'electrical_co'     => $row['electrical_control'],
+                        'shop'              => $row['shop'], // Store the shop value directly, e.g., 'ME,PH'
                         'updated_at'        => now(),
                     ];
 
                     // Compare the existing data with the new data
                     $existingData = $existingMachine->only(array_keys($updatedData));
-                    if ($existingData == $updatedData) {
-                        // Skip the update if no data has changed
-                        continue;
+                    if ($existingData != $updatedData) {
+                        // Update the existing machine if data has changed
+                        $existingMachine->update($updatedData);
                     }
-
-                    // Update the existing machine if data has changed
-                    $existingMachine->update($updatedData);
                 } else {
                     // Insert the new machine data
                     Machine::create([
@@ -58,6 +61,7 @@ class MachinesImport implements ToCollection, WithHeadingRow
                         'asset_no'          => $row['asset_no'],
                         'machine_name'      => $row['machine_name'],
                         'process'           => $row['process'],
+                        'shop'              => $row['shop'], // Store the shop value directly
                         'maker'             => $row['maker'],
                         'model'             => $row['model_type'],
                         'serial_number'     => $row['serial_number'],
@@ -73,6 +77,4 @@ class MachinesImport implements ToCollection, WithHeadingRow
             }
         });
     }
-
 }
-

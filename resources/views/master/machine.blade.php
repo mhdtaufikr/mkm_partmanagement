@@ -230,15 +230,23 @@
                                                 <tr>
                                                     <th>No.</th>
                                                     <th>Plant</th>
+                                                    <th>Location</th> <!-- Removed hidden -->
                                                     <th>Line</th>
                                                     <th>OP. No</th>
+                                                    <th>Barcode No.</th> <!-- Removed hidden -->
+                                                    <th>Asset No.</th> <!-- Removed hidden -->
+                                                    <th>Shop</th> <!-- Removed hidden -->
+                                                    <th>Model</th> <!-- Removed hidden -->
+                                                    <th>Serial Number</th> <!-- Removed hidden -->
                                                     <th>Machine Name</th>
                                                     <th>Process</th>
                                                     <th>Maker</th>
                                                     <th>Mfg. Date</th>
-
+                                                    <th>Install Date</th> <!-- Removed hidden -->
+                                                    <th>Electrical CO</th> <!-- Removed hidden -->
                                                 </tr>
                                             </thead>
+
                                             <tbody>
                                             </tbody>
                                         </table>
@@ -269,7 +277,7 @@
             placeholder_text_multiple: "Select Machine(s)" // Placeholder text
         });
 
-        // Additional setup for DataTables, if required
+        // Additional setup for DataTables
         var location = '{{ request()->segment(4) ?? '' }}'; // Assuming location is the 4th segment in your URL
 
         var table = $('#tableUser').DataTable({
@@ -282,12 +290,20 @@
             "columns": [
                 { "data": "DT_RowIndex", "name": "DT_RowIndex", "orderable": false, "searchable": false },
                 { "data": "plant", "name": "plant" },
+                { "data": "location", "name": "location", "visible": false }, // Hide column in UI but keep for export
                 { "data": "line", "name": "line" },
                 { "data": "op_no", "name": "op_no" },
+                { "data": "machine_no", "name": "machine_no", "visible": false }, // Hide column in UI but keep for export
+                { "data": "asset_no", "name": "asset_no", "visible": false }, // Hide column in UI but keep for export
+                { "data": "shop", "name": "shop", "visible": false }, // Hide column in UI but keep for export
+                { "data": "model", "name": "model", "visible": false }, // Hide column in UI but keep for export
+                { "data": "serial_number", "name": "serial_number", "visible": false }, // Hide column in UI but keep for export
                 { "data": "machine_name", "name": "machine_name" },
                 { "data": "process", "name": "process" },
                 { "data": "maker", "name": "maker" },
-                { "data": "mfg_date", "name": "mfg_date" }
+                { "data": "mfg_date", "name": "mfg_date" },
+                { "data": "install_date", "name": "install_date", "visible": false }, // Hide column in UI but keep for export
+                { "data": "electrical_co", "name": "electrical_co", "visible": false } // Hide column in UI but keep for export
             ],
             "order": [[1, 'asc'], [2, 'asc']],
             "dom": 'Blfrtip', // This enables the export button and length menu
@@ -298,12 +314,7 @@
                     extend: 'excel',
                     className: 'btn btn-success btn-sm mb-2',
                     exportOptions: {
-                        columns: ':visible', // Export only visible columns
-                        modifier: {
-                            search: 'applied', // Export only filtered data
-                            order: 'applied', // Export data in current order
-                            page: 'all' // Export all pages of data
-                        }
+                        columns: ':hidden, :visible' // Export both hidden and visible columns
                     }
                 }
             ],
@@ -316,6 +327,8 @@
         });
     });
 </script>
+
+
 
 
 @endsection
