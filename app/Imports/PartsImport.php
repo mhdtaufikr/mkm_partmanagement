@@ -6,6 +6,7 @@ use App\Models\Machine;
 use App\Models\Part;
 use App\Models\RepairPart;
 use App\Models\MachineSparePartsInventory;
+use App\Models\MachineSparePartsInventoryLog; // Include this model for logging
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Support\Collection;
@@ -17,78 +18,126 @@ class PartsImport implements ToCollection, WithHeadingRow
     public function collection(Collection $rows)
     {
         set_time_limit(300);
-        $errors = []; // Array untuk menyimpan pesan kesalahan
+        $errors = []; // Array to store error messages
 
-        // Memulai transaksi database
+        // Start database transaction
         DB::beginTransaction();
 
         try {
             foreach ($rows as $row) {
-                // Periksa apakah kombinasi op_no, plant, dan line ada di tabel mesin
+                // Check if the combination of op_no, plant, and line exists in the machine table
                 $machine = Machine::where('op_no', $row['op_no_machine_no'])
                     ->where('plant', $row['plant'])
                     ->where('line', $row['line'])
                     ->first();
 
                 if (!$machine) {
-                    // Tambahkan pesan kesalahan ke array errors
                     $errors[] = 'Operation number ' . $row['op_no_machine_no'] . ' does not exist in the given plant and line.';
-                    continue; // Lanjutkan ke baris berikutnya
+                    continue; // Continue to the next row
                 }
 
-                // Periksa apakah bagian ada di tabel parts
-                $part = Part::where('material', $row['material_no'])
-                    ->first();
+                // Check if the part exists in the parts table
+                $part = Part::where('material', $row['material_no'])->first();
 
                 if (!$part) {
-                    // Tambahkan pesan kesalahan ke array errors
                     $errors[] = 'Part ' . $row['material_no'] . ' does not exist in the master parts table.';
-                    continue; // Lanjutkan ke baris berikutnya
+                    continue; // Continue to the next row
                 }
 
-                // Query tabel repair_parts untuk menjumlahkan repaired_qty
+                // Query the repair_parts table to sum the repaired_qty
                 $repair_qty = RepairPart::where('part_id', $part->id)->sum('repaired_qty');
 
-                // Tentukan safety stock dan estimasi lifetime dengan nilai default jika kosong
+                // Determine safety stock and estimation lifetime with default values if empty
                 $safety_stock = $row['safety_stock'] ?? 0;
                 $estimation_lifetime = $row['estimation_lifetime'] ?? 0;
 
-                // Masukkan data inventory spare part mesin baru
-                MachineSparePartsInventory::create([
-                    'part_id'              => $part->id,
-                    'machine_id'           => $machine->id,
-                    'critical_part'        => $part->material_description,
-                    'type'                 => $part->type,
-                    'estimation_lifetime'  => $estimation_lifetime,
-                    'cost'                 => $part->total_value,
-                    'last_replace'         => $this->transformDate($row['date']),
-                    'safety_stock'         => $safety_stock,
-                    'sap_stock'            => $part->total_stock,
-                    'repair_stock'         => $repair_qty,
-                    'created_at'           => now(),
-                    'updated_at'           => now(),
-                ]);
+                // Transform the date from the Excel file
+                $newLastReplaceDate = $this->transformDate($row['date']);
+
+                // Check for an existing entry in MachineSparePartsInventory with the same part_id and machine_id
+                $existingEntry = MachineSparePartsInventory::where('part_id', $part->id)
+                    ->where('machine_id', $machine->id)
+                    ->first();
+
+                if ($existingEntry) {
+                    // Compare dates
+                    $oldLastReplaceDate = $existingEntry->last_replace;
+
+                    if (Carbon::parse($newLastReplaceDate)->lt(Carbon::parse($oldLastReplaceDate))) {
+                        // If the new date is older, log the existing record and update the inventory
+                        MachineSparePartsInventoryLog::create([
+                            'inventory_id' => $existingEntry->id,
+                            'old_last_replace' => $oldLastReplaceDate,
+                            'new_last_replace' => $newLastReplaceDate,
+                            'old_sap_stock' => $existingEntry->sap_stock,
+                            'new_sap_stock' => $part->total_stock,
+                            'old_repair_stock' => $existingEntry->repair_stock,
+                            'new_repair_stock' => $repair_qty,
+                            'qty' => 0, // Assuming no qty change is logged
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+
+                        // Update the inventory with the new date
+                        $existingEntry->update([
+                            'last_replace' => $newLastReplaceDate,
+                            'sap_stock' => $part->total_stock,
+                            'repair_stock' => $repair_qty,
+                            'updated_at' => now(),
+                        ]);
+                    } else {
+                        // If the old date is older, log the new record instead
+                        MachineSparePartsInventoryLog::create([
+                            'inventory_id' => $existingEntry->id,
+                            'old_last_replace' => $newLastReplaceDate,
+                            'new_last_replace' => $oldLastReplaceDate,
+                            'old_sap_stock' => $existingEntry->sap_stock,
+                            'new_sap_stock' => $part->total_stock,
+                            'old_repair_stock' => $existingEntry->repair_stock,
+                            'new_repair_stock' => $repair_qty,
+                            'qty' => 0, // Assuming no qty change is logged
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+                } else {
+                    // No existing entry, insert the new record into inventory
+                    MachineSparePartsInventory::create([
+                        'part_id'              => $part->id,
+                        'machine_id'           => $machine->id,
+                        'critical_part'        => $part->material_description,
+                        'type'                 => $part->type,
+                        'estimation_lifetime'  => $estimation_lifetime,
+                        'cost'                 => $part->total_value,
+                        'last_replace'         => $newLastReplaceDate,
+                        'safety_stock'         => $safety_stock,
+                        'sap_stock'            => $part->total_stock,
+                        'repair_stock'         => $repair_qty,
+                        'created_at'           => now(),
+                        'updated_at'           => now(),
+                    ]);
+                }
             }
 
-            // Jika ada error, throw exception untuk rollback
+            // If there are errors, throw an exception to rollback
             if (!empty($errors)) {
                 throw new \Exception('Errors encountered during import: ' . implode(', ', $errors));
             }
 
-            // Commit transaksi jika tidak ada error
+            // Commit transaction if there are no errors
             DB::commit();
 
         } catch (\Exception $e) {
-            // Rollback transaksi jika ada exception
+            // Rollback transaction if there is an exception
             DB::rollBack();
 
-            // Throw exception dengan pesan error gabungan
+            // Throw exception with combined error message
             throw new \Exception('Import failed with errors: ' . implode(', ', $errors));
         }
     }
 
     /**
-     * Transformasi tanggal Excel ke instance Carbon atau format sesuai kebutuhan.
+     * Transform Excel date to Carbon instance or formatted string as needed.
      *
      * @param mixed $value
      * @return string|null
@@ -99,12 +148,12 @@ class PartsImport implements ToCollection, WithHeadingRow
             return null;
         }
 
-        // Periksa apakah nilai adalah tanggal Excel yang valid
+        // Check if the value is a valid Excel date
         if (is_numeric($value)) {
             return Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value))->format('Y-m-d');
         }
 
-        // Jika tidak, asumsikan tanggal dalam format d/m/Y
+        // Otherwise, assume the date is in the format d/m/Y
         return Carbon::createFromFormat('d/m/Y', $value)->format('Y-m-d');
     }
 }
