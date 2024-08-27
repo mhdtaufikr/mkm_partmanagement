@@ -4,12 +4,15 @@ namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromArray;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterSheet;
 
-class MachineTemplateExport implements WithHeadings, FromArray
+class MachineTemplateExport implements WithHeadings, FromArray, WithEvents
 {
     public function headings(): array
     {
         return [
+            'shop',
             'plant',
             'location',
             'line',
@@ -35,5 +38,17 @@ class MachineTemplateExport implements WithHeadings, FromArray
             // Or return an empty array to have only the headers
         ];
     }
-}
 
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function (AfterSheet $event) {
+                // Initialize a comment for cell A1
+                $comment = $event->sheet->getDelegate()->getComment('A1');
+
+                // Set the text of the comment
+                $comment->getText()->createTextRun('ME/PH');
+            },
+        ];
+    }
+}

@@ -12,7 +12,6 @@ class PartTemplateExport implements WithHeadings, FromArray, WithEvents
     public function headings(): array
     {
         return [
-            'shop',
             'date',
             'material no',
             'description',
@@ -37,7 +36,7 @@ class PartTemplateExport implements WithHeadings, FromArray, WithEvents
                 // Add a note to cell A1
                 $event->sheet->getDelegate()->getComment('A1')->getText()->createTextRun('ME/PH');
                 // Add a note to cell B1
-                $event->sheet->getDelegate()->getComment('B1')->getText()->createTextRun('Short Date Format');
+                $event->sheet->getDelegate()->getComment('A1')->getText()->createTextRun('Short Date Format');
             },
         ];
     }
