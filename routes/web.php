@@ -86,6 +86,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/mst/machine/add/image', [MstMachinePartController::class, 'addImage'])->middleware(['checkRole:IT']);
     Route::post('mst/machine/delete/image', [MstMachinePartController::class, 'deleteImage'])->name('machine.delete.image');
     Route::post('/mst/machine/delete', [MstMachinePartController::class, 'deleteMachine']);
+    Route::put('/spare-parts/{machineId}/update', [MstMachinePartController::class, 'update'])->name('spare-parts.update');
+
 
     Route::get('/history', [HistoryController::class, 'index'])->middleware(['checkRole:IT'])->name('history');
      Route::post('/history/store', [HistoryController::class, 'store']);

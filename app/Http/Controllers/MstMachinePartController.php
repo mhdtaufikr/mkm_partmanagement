@@ -427,6 +427,31 @@ public function deleteMachine(Request $request)
 }
 
 
+public function update(Request $request, $machineId)
+{
+    // Loop through each part ID provided in the request
+    foreach ($request->input('parts') as $partId => $partData) {
+        // Fetch the inventory record by the current part ID
+        $inventory = MachineSparePartsInventory::findOrFail($partId);
+
+        // Retrieve the part_id from the fetched record
+        $part_id = $inventory->part_id;
+
+        // Update safety_stock for all entries with the same part_id
+        MachineSparePartsInventory::where('part_id', $part_id)->update([
+            'safety_stock' => $partData['safety_stock']
+        ]);
+
+        // Update estimation_lifetime for the specific entry by its ID
+        $inventory->update([
+            'estimation_lifetime' => $partData['estimation_lifetime']
+        ]);
+    }
+
+    // Redirect back with a success message
+    return redirect()->back()->with('success', 'All parts updated successfully.');
+}
+
 
 
 }

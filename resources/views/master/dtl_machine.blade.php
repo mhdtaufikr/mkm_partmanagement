@@ -322,6 +322,60 @@
                                                             <button type="button" class="btn btn-dark btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#modal-add">
                                                                 <i class="fas fa-plus-square"></i> Add Part
                                                             </button>
+                                                            <!-- Edit Parts Button -->
+                                                            <button type="button" class="btn btn-primary btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#modal-edit">
+                                                                <i class="fas fa-edit"></i> Edit Parts
+                                                            </button>
+                                                            <!-- Edit Parts Modal -->
+                                                            <div class="modal fade" id="modal-edit" tabindex="-1" aria-labelledby="modalEditLabel" aria-hidden="true">
+                                                                <div class="modal-dialog modal-lg">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title" id="modalEditLabel">Edit Spare Parts for Machine: {{ $machine->op_no }}</h5>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                        </div>
+                                                                        <form action="{{ route('spare-parts.update', $machine->id) }}" method="POST">
+                                                                            @csrf
+                                                                            @method('PUT')
+                                                                            <div class="modal-body">
+                                                                                <table id="table-edit" class="table table-bordered">
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th>Material</th>
+                                                                                            <th>Description</th>
+                                                                                            <th>Safety Stock</th>
+                                                                                            <th>Estimation Lifetime</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        @foreach ($machine->spareParts as $part)
+                                                                                            <tr>
+                                                                                                @php
+                                                                                                    $status = $machine->inventoryStatus->firstWhere('part_id', $part->part_id);
+                                                                                                @endphp
+                                                                                                <td>{{ $status ? $status->material : '-' }}</td>
+                                                                                                <td>{{ $status ? $status->material_description : '-' }}</td>
+                                                                                                <td>
+                                                                                                    <input type="number" name="parts[{{ $part->id }}][safety_stock]" class="form-control" value="{{ $part->safety_stock }}" required>
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    <input type="number" name="parts[{{ $part->id }}][estimation_lifetime]" class="form-control" value="{{ $part->estimation_lifetime }}" required>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        @endforeach
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                            <div class="modal-footer">
+                                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                                <button type="submit" class="btn btn-primary">Save changes</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+
                                                             <!-- Modal for Adding New Part -->
                                                             <div class="modal fade" id="modal-add" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">
                                                                 <div class="modal-dialog modal-lg">
@@ -527,44 +581,44 @@
                                                                                         </li>
                                                                                     </ul>
                                                                                 </div>
- <!-- Log Modal -->
- <div class="modal fade" id="modal-log{{ $part->id }}" tabindex="-1" aria-labelledby="modal-log-label{{ $part->id }}" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modal-log-label{{ $part->id }}">Log History for Part: {{ $part->critical_part }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>No.</th>
-                            <th>Old Last Replace</th>
-                            <th>Quantity Changed</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($part->logs as $log)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ date('d M Y', strtotime($log->old_last_replace)) }}</td>
-                                <td>{{ $log->qty }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="9" class="text-center">No logs available for this part.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+                                                                                <!-- Log Modal -->
+                                                                                <div class="modal fade" id="modal-log{{ $part->id }}" tabindex="-1" aria-labelledby="modal-log-label{{ $part->id }}" aria-hidden="true">
+                                                                                    <div class="modal-dialog modal-lg">
+                                                                                        <div class="modal-content">
+                                                                                            <div class="modal-header">
+                                                                                                <h5 class="modal-title" id="modal-log-label{{ $part->id }}">Log History for Part: {{ $part->critical_part }}</h5>
+                                                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                                            </div>
+                                                                                            <div class="modal-body">
+                                                                                                <table class="table table-bordered">
+                                                                                                    <thead>
+                                                                                                        <tr>
+                                                                                                            <th>No.</th>
+                                                                                                            <th>Old Last Replace</th>
+                                                                                                            <th>Quantity Changed</th>
+                                                                                                        </tr>
+                                                                                                    </thead>
+                                                                                                    <tbody>
+                                                                                                        @forelse($part->logs as $log)
+                                                                                                            <tr>
+                                                                                                                <td>{{ $loop->iteration }}</td>
+                                                                                                                <td>{{ date('d M Y', strtotime($log->old_last_replace)) }}</td>
+                                                                                                                <td>{{ $log->qty }}</td>
+                                                                                                            </tr>
+                                                                                                        @empty
+                                                                                                            <tr>
+                                                                                                                <td colspan="9" class="text-center">No logs available for this part.</td>
+                                                                                                            </tr>
+                                                                                                        @endforelse
+                                                                                                    </tbody>
+                                                                                                </table>
+                                                                                            </div>
+                                                                                            <div class="modal-footer">
+                                                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
 
                                                                                 {{-- Modal Update --}}
                                                                                 <div class="modal fade" id="modal-repair{{ $part->id }}" tabindex="-1" aria-labelledby="modal-repair{{ $part->id }}-label" aria-hidden="true">
@@ -795,6 +849,16 @@
 <script>
     $(document).ready(function() {
         var table = $("#tableUser").DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "autoWidth": false,
+        });
+    });
+</script>
+<!-- For Datatables -->
+<script>
+    $(document).ready(function() {
+        var table = $("#table-edit").DataTable({
             "responsive": true,
             "lengthChange": false,
             "autoWidth": false,
