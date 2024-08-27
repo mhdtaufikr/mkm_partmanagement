@@ -541,7 +541,19 @@
                                                                             <td>
                                                                                 @if ($status)
                                                                                     @php
-                                                                                        $statusClass = $status->status == 'Safe' ? 'btn-success' : ($status->status == 'Need to Order' ? 'btn-warning' : 'btn-danger');
+                                                                                        switch ($status->status) {
+                                                                                            case 'Safe':
+                                                                                                $statusClass = 'btn-success';
+                                                                                                break;
+                                                                                            case 'Need to Order':
+                                                                                                $statusClass = 'btn-warning';
+                                                                                                break;
+                                                                                            case 'Out of Stock':
+                                                                                                $statusClass = 'btn-danger';
+                                                                                                break;
+                                                                                            default:
+                                                                                                $statusClass = 'btn-secondary'; // Fallback for any other status
+                                                                                        }
                                                                                     @endphp
                                                                                     <button class="btn {{ $statusClass }} btn-sm">
                                                                                         {{ $status->status }}
@@ -552,6 +564,7 @@
                                                                                     </button>
                                                                                 @endif
                                                                             </td>
+
                                                                             <td>
                                                                                 <div class="dropdown">
                                                                                     <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
