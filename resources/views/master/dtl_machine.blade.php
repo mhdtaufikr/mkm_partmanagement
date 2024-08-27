@@ -324,7 +324,7 @@
                                                             </button>
                                                             <!-- Edit Parts Button -->
                                                             <button type="button" class="btn btn-primary btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#modal-edit">
-                                                                <i class="fas fa-edit"></i> Edit Parts
+                                                                <i class="fas fa-edit"></i> Edit Stock
                                                             </button>
                                                             <!-- Edit Parts Modal -->
                                                             <div class="modal fade" id="modal-edit" tabindex="-1" aria-labelledby="modalEditLabel" aria-hidden="true">
