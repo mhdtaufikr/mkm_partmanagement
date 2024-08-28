@@ -9,7 +9,7 @@
     <meta name="author" content="" />
     <title>DigiMAMS | Digital Maintenance & Asset Management System</title>
     <link href="{{asset('assets/css/styles.css')}}" rel="stylesheet" />
-    <link rel="icon" href="{{ asset('assets/img/work.gif') }}">
+    <link rel="icon" href="{{ asset('assets/img/maintenance.png') }}">
     <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js" crossorigin="anonymous"></script>
 
@@ -71,7 +71,7 @@
                                     @endif
 
                                     <!--alert success -->
-                                    <div class="text-center">
+                                    <div class="text-center mb-4">
                                         <img class="img-fluid mb-4" src="{{ asset('assets/img/Logo Option 3 (1).png') }}" alt="" style="width: 150px; height: auto;">
                                         <h1 class="text-center font-weight-bold" > <strong>DigiMAMS</strong></h1>
                                         <small  class="text-center mb-4">Digital Maintenance & Asset Management System</small>
@@ -83,7 +83,7 @@
                                     <form action="{{ url('auth/login') }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         <!-- Form Group (email address)-->
-                                        <div class="mb-3">
+                                        <div class="mb-3 mt-2">
                                             <label class="small mb-1" for="inputEmailAddress">Username</label>
                                             <input class="form-control" id="inputEmailAddress" type="text" placeholder="Enter email address" name="email" />
                                         </div>
