@@ -41,10 +41,9 @@
         /* Custom styles for the card */
         .custom-card {
             height: 550px;
-            width: 80%; /* Adjust the width as needed */
+            width: 100%; /* Full width inside the column */
             max-width: 400px; /* Maximum width for responsiveness */
             margin: auto; /* Center the card horizontally */
-
         }
     </style>
 </head>
@@ -54,11 +53,11 @@
         <div id="layoutAuthentication_content">
             <main style="margin-top: 50px">
                 <div class="container-xl px-4">
-                    <div class="row justify-content-center">
+                    <div class="row justify-content-end">
                         <!-- Adjust column size and offset -->
-                        <div class="col-lg-6 offset-lg-6">
+                        <div class="col-lg-4 offset-lg-6 col-md-6 offset-md-3 d-flex justify-content-center">
                             <!-- Basic login form-->
-                            <div style="margin-left: 200px" class="card shadow-lg border-0 rounded-lg mt-5 card-animation custom-card">
+                            <div class="card shadow-lg border-0 rounded-lg mt-5 card-animation custom-card">
                                 <div class="card-body">
                                     <!--alert success -->
                                     @if (session('statusLogin'))
@@ -72,7 +71,7 @@
                                     @endif
 
                                     <!--alert success -->
-                                    <h1 style="margin-top: 80px" class="text-center font-weight-bold mb-4">MKM Part Management</h1>
+                                    <h1 class="text-center font-weight-bold mb-4" style="margin-top: 80px">MKM Part Management</h1>
 
                                     <!-- Login form-->
                                     <form action="{{ url('auth/login') }}" method="POST" enctype="multipart/form-data">
