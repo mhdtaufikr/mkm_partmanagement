@@ -40,7 +40,7 @@
 
         /* Custom styles for the card */
         .custom-card {
-            height: 550px;
+            height: 600px;
             width: 100%; /* Full width inside the column */
             max-width: 400px; /* Maximum width for responsiveness */
             margin: auto; /* Center the card horizontally */
@@ -51,7 +51,7 @@
 <body class="bg-dark">
     <div id="layoutAuthentication">
         <div id="layoutAuthentication_content">
-            <main style="margin-top: 50px">
+            <main >
                 <div class="container-xl px-4">
                     <div class="row justify-content-end">
                         <!-- Adjust column size and offset -->
@@ -71,7 +71,13 @@
                                     @endif
 
                                     <!--alert success -->
-                                    <h1 class="text-center font-weight-bold mb-4" style="margin-top: 80px">MKM Part Management</h1>
+                                    <div class="text-center">
+                                        <img class="img-fluid mb-4" src="{{ asset('assets/img/Logo Option 3 (1).png') }}" alt="" style="width: 150px; height: auto;">
+                                        <h1 class="text-center font-weight-bold" > <strong>DigiMAMS</strong></h1>
+                                        <small  class="text-center mb-4">Digital Maintenance & Asset Management System</small>
+                                    </div>
+
+
 
                                     <!-- Login form-->
                                     <form action="{{ url('auth/login') }}" method="POST" enctype="multipart/form-data">
@@ -91,6 +97,10 @@
                                             <button type="submit" class="btn btn-dark">Login</button>
                                         </div>
                                     </form>
+                                    <hr>
+                                    <div class="text-center mb-3">
+                                        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#requestAccessModal">Request Access</button>
+                                    </div>
                                 </div>
                                 <div class="card-footer text-center justify-content-center">
                                     <div style="color: white" class="col-12 small">Copyright PT Mitsubishi Krama Yudha Motors and Manufacturing&copy; 2023</div>
@@ -100,6 +110,38 @@
                     </div>
                 </div>
             </main>
+            <!-- Modal -->
+    <div class="modal fade" id="requestAccessModal" tabindex="-1" aria-labelledby="requestAccessModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="requestAccessModalLabel">Request Access</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="requestAccessForm" action="{{ url('request/access') }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="inputName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="inputName" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="inputEmail" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputPurpose" class="form-label">Purpose</label>
+                            <textarea class="form-control" id="inputPurpose" name="purpose" rows="3" required></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Submit Request</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>

@@ -63,4 +63,23 @@ class AuthController extends Controller
         Auth::logout();
         return redirect('/')->with('statusLogout','Success Logout');
     }
+
+    public function requestAccess(Request $request)
+    {
+        // Validate the incoming request data
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255',
+            'role' => 'required|string|max:255',
+            'purpose' => 'required|string|max:255',
+        ]);
+
+        // Send the email
+        Mail::to(['aditia@ptmkm.co.id','muhammad.taufik@ptmkm.co.id','bayu@ptmkm.co.id'])
+            /* ->cc('bayu@ptmkm.co.id') */
+            ->send(new AccessRequestMail($request->all()));
+
+        // Optionally, you can flash a success message or redirect to a specific page
+        return back()->with('statusLogin', 'Your request has been submitted.');
+    }
 }

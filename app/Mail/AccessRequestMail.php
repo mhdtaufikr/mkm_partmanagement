@@ -31,7 +31,7 @@ class AccessRequestMail extends Mailable
     public function build()
     {
         return $this->from(config('mail.from.address'), config('mail.from.name'))
-                    ->subject('New Access Request MKM Preventive Maintenance Stamping')
+                    ->subject('New Access Request DigiMAMS (Digital Maintenance & Asset Management System)')
                     ->view('emails.access_request')
                     ->with('request', $this->request);
     }
