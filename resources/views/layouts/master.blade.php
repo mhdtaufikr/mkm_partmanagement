@@ -8,7 +8,7 @@
         <meta name="author" content="" />
         <title>DigiMAMS | Digital Maintenance & Asset Management System</title>
         <link href="{{asset('assets/css/styles.css')}}" rel="stylesheet" />
-        <link rel="icon" href="{{ asset('assets/img/DigiMAMS.png') }}">
+        <link rel="icon" href="{{ asset('assets/img/work.gif') }}">
         <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.ckeditor.com/4.6.2/standard/ckeditor.js"></script>
