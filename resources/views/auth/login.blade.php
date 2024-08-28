@@ -15,7 +15,7 @@
 
     <style>
         body {
-            background-image: url("{{ asset('assets/img/Backround login.png') }}");
+            background-image: url("{{ asset('assets/img/digiMams.jpg') }}");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -40,9 +40,11 @@
 
         /* Custom styles for the card */
         .custom-card {
+            height: 550px;
             width: 80%; /* Adjust the width as needed */
             max-width: 400px; /* Maximum width for responsiveness */
             margin: auto; /* Center the card horizontally */
+
         }
     </style>
 </head>
@@ -50,12 +52,13 @@
 <body class="bg-dark">
     <div id="layoutAuthentication">
         <div id="layoutAuthentication_content">
-            <main style="margin-top: 150px">
+            <main style="margin-top: 50px">
                 <div class="container-xl px-4">
                     <div class="row justify-content-center">
-                        <div class="col-lg-5">
+                        <!-- Adjust column size and offset -->
+                        <div class="col-lg-6 offset-lg-6">
                             <!-- Basic login form-->
-                            <div class="card shadow-lg border-0 rounded-lg mt-5 card-animation custom-card">
+                            <div style="margin-left: 200px" class="card shadow-lg border-0 rounded-lg mt-5 card-animation custom-card">
                                 <div class="card-body">
                                     <!--alert success -->
                                     @if (session('statusLogin'))
@@ -69,7 +72,7 @@
                                     @endif
 
                                     <!--alert success -->
-                                    <h1 class="text-center font-weight-bold mb-4">MKM Part Management</h1>
+                                    <h1 style="margin-top: 80px" class="text-center font-weight-bold mb-4">MKM Part Management</h1>
 
                                     <!-- Login form-->
                                     <form action="{{ url('auth/login') }}" method="POST" enctype="multipart/form-data">
