@@ -72,7 +72,7 @@
 
                                     <!--alert success -->
                                     <div class="text-center mb-4">
-                                        <img class="img-fluid mb-4" src="{{ asset('assets/img/Logo Option 3 (1).png') }}" alt="" style="width: 150px; height: auto;">
+                                        <img class="img-fluid mb-4" src="{{ asset('assets/img/mms.png') }}" alt="" style="width: 50px; height: auto;">
                                         <h1 class="text-center font-weight-bold" > <strong>DigiMAMS</strong></h1>
                                         <small  class="text-center mb-4">Digital Maintenance & Asset Management System</small>
                                     </div>
