@@ -92,7 +92,7 @@
                                             </div>
                                                 <div class="form-group mb-2">
                                                     <label for="">Plant</label>
-                                                    <select name="role" id="role" class="form-control">
+                                                    <select name="plant" id="plant" class="form-control">
 
                                                         <option value="">- Please Select Plant -</option>
                                                         @foreach ($plants as $plant)
@@ -102,7 +102,7 @@
                                                     </div>
                                                     <div class="form-group mb-2">
                                                         <label for="">Type</label>
-                                                        <select name="role" id="role" class="form-control">
+                                                        <select name="type" id="type" class="form-control">
 
                                                             <option value="">- Please Select Type -</option>
                                                             @foreach ($types as $type)

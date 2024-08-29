@@ -24,64 +24,68 @@
                     Preventive Maintenance
                 </a>
 
-
                 <!-- Sidenav Menu Heading (Master) -->
                 <div class="sidenav-menu-heading">Master</div>
 
-                 <!-- Sidenav Accordion (Master Data) -->
-                 <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapsemachine" aria-expanded="false" aria-controls="collapsemaster">
-                     <div class="nav-link-icon"><i class="fas fa-database"></i></div>
-                     Master Machine
-                     <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                 </a>
+                <!-- Sidenav Accordion (Master Machine) -->
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapsemachine" aria-expanded="false" aria-controls="collapsemachine">
+                    <div class="nav-link-icon"><i class="fas fa-database"></i></div>
+                    Master Machine
+                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
 
-                 <!-- Nested Navigation for Master Data -->
-                 <div class="collapse" id="collapsemachine" data-bs-parent="#accordionSidenav">
-                     <nav class="sidenav-menu-nested nav">
+                <!-- Nested Navigation for Master Machine -->
+                <div class="collapse" id="collapsemachine" data-bs-parent="#accordionSidenav">
+                    <nav class="sidenav-menu-nested nav">
+                        @if(auth()->user()->plant == 'All' || auth()->user()->plant == 'Engine')
+                            <a class="nav-link" href="{{ url('/mst/machine/part/engine') }}">Machine Engine</a>
+                        @endif
+                        @if(auth()->user()->plant == 'All' || auth()->user()->plant == 'Stamping')
+                            <a class="nav-link" href="{{ url('/mst/machine/part/stamping') }}">Machine Stamping</a>
+                        @endif
+                        @if(auth()->user()->plant == 'All')
+                            <a class="nav-link" href="{{ url('/mst/machine/part') }}">Machine All</a>
+                        @endif
+                    </nav>
+                </div>
 
-                        <a class="nav-link" href="{{ url('/mst/machine/part') }}">Machine All</a>
-                        <a class="nav-link" href="{{ url('/mst/machine/part/engine') }}">Machine Engine</a>
-                        <a class="nav-link" href="{{ url('/mst/machine/part/stamping') }}">Machine Stamping</a>
-                     </nav>
-                 </div>
+                <!-- Sidenav Accordion (Master Part) -->
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapsepart" aria-expanded="false" aria-controls="collapsepart">
+                    <div class="nav-link-icon"><i class="fas fa-database"></i></div>
+                    Master Part
+                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
 
+                <!-- Nested Navigation for Master Part -->
+                <div class="collapse" id="collapsepart" data-bs-parent="#accordionSidenav">
+                    <nav class="sidenav-menu-nested nav">
+                        @if(auth()->user()->plant == 'All' || auth()->user()->plant == 'Engine')
+                            <a class="nav-link" href="{{ url('/mst/sap/part/P400') }}">Part Engine</a>
+                        @endif
+                        @if(auth()->user()->plant == 'All' || auth()->user()->plant == 'Stamping')
+                            <a class="nav-link" href="{{ url('/mst/sap/part/P300') }}">Part Stamping</a>
+                        @endif
+                        @if(auth()->user()->plant == 'All')
+                            <a class="nav-link" href="{{ url('/mst/sap/part') }}">Part All</a>
+                            <a class="nav-link" href="{{ url('/mst/repair/part') }}">Part Repair</a>
+                        @endif
+                    </nav>
+                </div>
 
-
-                  <!-- Sidenav Accordion (Master Data) -->
-                  <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapsepart" aria-expanded="false" aria-controls="collapsemaster">
-                      <div class="nav-link-icon"><i class="fas fa-database"></i></div>
-                      Master Part
-                      <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                  </a>
-
-                  <!-- Nested Navigation for Master Data -->
-                  <div class="collapse" id="collapsepart" data-bs-parent="#accordionSidenav">
-                      <nav class="sidenav-menu-nested nav">
-                         <a class="nav-link" href="{{ url('/mst/sap/part') }}">Part All</a>
-                         <a class="nav-link" href="{{ url('/mst/sap/part/P400') }}">Part Engine</a>
-                         <a class="nav-link" href="{{ url('/mst/sap/part/P300') }}">Part Stamping</a>
-                         <a class="nav-link" href="{{ url('/mst/repair/part') }}">Part Repair</a>
-                      </nav>
-                  </div>
-
-
-                <!-- Sidenav Accordion (Master Data) -->
+                <!-- Sidenav Accordion (Master PM) -->
                 <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapsemaster" aria-expanded="false" aria-controls="collapsemaster">
                     <div class="nav-link-icon"><i class="fas fa-database"></i></div>
                     Master PM
                     <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
 
-                <!-- Nested Navigation for Master Data -->
+                <!-- Nested Navigation for Master PM -->
                 <div class="collapse" id="collapsemaster" data-bs-parent="#accordionSidenav">
                     <nav class="sidenav-menu-nested nav">
-
                         <a class="nav-link" href="{{ url('/mst/preventive') }}">PM Form</a>
                         <a class="nav-link" href="{{ url('/mst/preventive/schedule') }}">PM Schedule</a>
                     </nav>
                 </div>
-
-
 
                 @if(\Auth::user()->role === 'IT')
                 <!-- Sidenav Menu Heading (Configuration) -->
