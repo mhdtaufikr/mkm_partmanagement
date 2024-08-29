@@ -6,7 +6,7 @@
     <!-- * * * * * * When using an image, we recommend the SVG format.-->
     <!-- * * * * * * Dimensions: Maximum height: 32px, maximum width: 240px-->
     <div class="ms-2 preloader flex-column justify-content-center align-items-center">
-        <a id="navbarDropdownUserImage" href="{{url('/home')}}"><img class="animation__shake" src="{{ asset('assets/img/Logo Option 3 (1).png') }}" alt="MKM Logo" height="40%" width="40%"> </a>
+        <a id="navbarDropdownUserImage" href="{{url('/home')}}"><img class="animation__shake" src="{{ asset('assets/img/topbar.png') }}" alt="MKM Logo" height="40%" width="40%"> </a>
     </div>
     <h1 style="margin-left: -160px">Maintenance Management System</h1>
 
