@@ -40,7 +40,7 @@
 
         /* Custom styles for the card */
         .custom-card {
-            height: 615px;
+            height: 650px;
             width: 100%; /* Full width inside the column */
             max-width: 400px; /* Maximum width for responsiveness */
             margin: auto; /* Center the card horizontally */
