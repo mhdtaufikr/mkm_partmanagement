@@ -21,26 +21,26 @@ class HistoryController extends Controller
 {
     public function index(Request $request)
 {
-    // Get the logged-in user's plant and type
+    // Dapatkan plant dan type dari pengguna yang sedang login
     $userPlant = auth()->user()->plant;
     $userType = auth()->user()->type;
 
     if ($request->ajax()) {
         $query = HistoricalProblem::with(['spareParts.part', 'machine'])
-            ->orderBy('date', 'desc')       // Sort by date in descending order
-            ->orderBy('start_time', 'desc'); // Then sort by start time in descending order
+            ->orderBy('date', 'desc')       // Urutkan berdasarkan tanggal secara menurun
+            ->orderBy('start_time', 'desc'); // Lalu urutkan berdasarkan waktu mulai secara menurun
 
-        // Apply filters based on user's plant and type
-        if ($userPlant === 'Engine' && ($userType === 'Mechanic' || $userType === 'Electric')) {
-            $query->whereHas('machine', function($q) {
-                $q->where('plant', 'Engine')->where('shop', 'ME');
+        // Terapkan filter berdasarkan plant dan type pengguna
+        if (($userPlant === 'Engine' || $userPlant === 'Stamping') && ($userType === 'Mechanic' || $userType === 'Electric')) {
+            $query->whereHas('machine', function($q) use ($userPlant) {
+                $q->where('plant', $userPlant)->where('shop', 'ME');
             });
-        } elseif ($userPlant === 'Power House' && ($userType === 'Mechanic' || $userType === 'Electric')) {
-            $query->whereHas('machine', function($q) {
-                $q->where('plant', 'Power House')->where('shop', 'PH');
+        } elseif (($userPlant === 'Engine' || $userPlant === 'Stamping') && $userType === 'Power House') {
+            $query->whereHas('machine', function($q) use ($userPlant) {
+                $q->where('plant', $userPlant)->where('shop', 'PH');
             });
         }
-        // If the user's plant is 'All' or if the type does not match the specific cases, no additional filtering is applied
+        // Jika plant pengguna adalah 'All' atau tipe tidak sesuai dengan kasus khusus, tidak ada filter tambahan yang diterapkan
 
         return DataTables::of($query)
             ->addIndexColumn()
@@ -57,18 +57,18 @@ class HistoryController extends Controller
             ->make(true);
     }
 
-    // Apply filters to the machines and lines queries based on user's plant and type
+    // Terapkan filter untuk kueri machines dan lines berdasarkan plant dan type pengguna
     $machinesQuery = Machine::query();
     $linesQuery = Machine::select('line')->distinct();
 
-    if ($userPlant === 'Engine' && ($userType === 'Mechanic' || $userType === 'Electric')) {
-        $machinesQuery->where('plant', 'Engine')->where('shop', 'ME');
-        $linesQuery->where('plant', 'Engine')->where('shop', 'ME');
-    } elseif ($userPlant === 'Power House' && ($userType === 'Mechanic' || $userType === 'Electric')) {
-        $machinesQuery->where('plant', 'Power House')->where('shop', 'PH');
-        $linesQuery->where('plant', 'Power House')->where('shop', 'PH');
+    if (($userPlant === 'Engine' || $userPlant === 'Stamping') && ($userType === 'Mechanic' || $userType === 'Electric')) {
+        $machinesQuery->where('plant', $userPlant)->where('shop', 'ME');
+        $linesQuery->where('plant', $userPlant)->where('shop', 'ME');
+    } elseif (($userPlant === 'Engine' || $userPlant === 'Stamping') && $userType === 'Power House') {
+        $machinesQuery->where('plant', $userPlant)->where('shop', 'PH');
+        $linesQuery->where('plant', $userPlant)->where('shop', 'PH');
     }
-    // If the user's plant is 'All', no filters are applied
+    // Jika plant pengguna adalah 'All', tidak ada filter yang diterapkan
 
     $machines = $machinesQuery->get();
     $lines = $linesQuery->get();
