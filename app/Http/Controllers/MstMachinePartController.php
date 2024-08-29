@@ -26,30 +26,41 @@ use App\Models\MachineSparePartsInventoryLog;
 class MstMachinePartController extends Controller
 {
     public function index(Request $request, $location = null)
-    {
-        if ($request->ajax()) {
-            $query = Machine::query();
+{
+    if ($request->ajax()) {
+        $query = Machine::query();
 
-            if ($location) {
-                $query->where('plant', $location);
-            }
-
-            return DataTables::of($query)
-                ->addIndexColumn()
-                ->addColumn('mfg_date', function ($row) {
-                    return $row->mfg_date ? $row->mfg_date : '-';
-                })
-                ->addColumn('encrypted_id', function ($row) {
-                    return encrypt($row->id);
-                })
-                ->make(true);
+        // Apply location filter if provided
+        if ($location) {
+            $query->where('plant', $location);
         }
 
-        // Fetch all machines to populate the dropdown in the delete modal
-        $machines = Machine::all();
+        // Apply shop filter based on user type
+        $userType = auth()->user()->type; // Get the user's type
 
-        return view('master.machine', compact('machines'));
+        if ($userType === 'Mechanic' || $userType === 'Electric') {
+            $query->where('shop', 'ME');
+        } elseif ($userType === 'Power House') {
+            $query->where('shop', 'PH');
+        }
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->addColumn('mfg_date', function ($row) {
+                return $row->mfg_date ? $row->mfg_date : '-';
+            })
+            ->addColumn('encrypted_id', function ($row) {
+                return encrypt($row->id);
+            })
+            ->make(true);
     }
+
+    // Fetch all machines to populate the dropdown in the delete modal
+    $machines = Machine::all();
+
+    return view('master.machine', compact('machines'));
+}
+
 
     public function detail($id) {
         $id = decrypt($id);

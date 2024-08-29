@@ -37,33 +37,33 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     //Dropdown Controller
-     Route::get('/dropdown', [DropdownController::class, 'index'])->middleware(['checkRole:IT']);
-     Route::post('/dropdown/store', [DropdownController::class, 'store'])->middleware(['checkRole:IT']);
-     Route::patch('/dropdown/update/{id}', [DropdownController::class, 'update'])->middleware(['checkRole:IT']);
-     Route::delete('/dropdown/delete/{id}', [DropdownController::class, 'delete'])->middleware(['checkRole:IT']);
+     Route::get('/dropdown', [DropdownController::class, 'index']);
+     Route::post('/dropdown/store', [DropdownController::class, 'store']);
+     Route::patch('/dropdown/update/{id}', [DropdownController::class, 'update']);
+     Route::delete('/dropdown/delete/{id}', [DropdownController::class, 'delete']);
 
      //Rules Controller
-     Route::get('/rule', [RulesController::class, 'index'])->middleware(['checkRole:IT']);
-     Route::post('/rule/store', [RulesController::class, 'store'])->middleware(['checkRole:IT']);
-     Route::patch('/rule/update/{id}', [RulesController::class, 'update'])->middleware(['checkRole:IT']);
-     Route::delete('/rule/delete/{id}', [RulesController::class, 'delete'])->middleware(['checkRole:IT']);
+     Route::get('/rule', [RulesController::class, 'index']);
+     Route::post('/rule/store', [RulesController::class, 'store']);
+     Route::patch('/rule/update/{id}', [RulesController::class, 'update']);
+     Route::delete('/rule/delete/{id}', [RulesController::class, 'delete']);
 
      //User Controller
-     Route::get('/user', [UserController::class, 'index'])->middleware(['checkRole:IT']);
-     Route::post('/user/store', [UserController::class, 'store'])->middleware(['checkRole:IT']);
-     Route::post('/user/store-partner', [UserController::class, 'storePartner'])->middleware(['checkRole:IT']);
-     Route::patch('/user/update/{user}', [UserController::class, 'update'])->middleware(['checkRole:IT']);
-     Route::get('/user/revoke/{user}', [UserController::class, 'revoke'])->middleware(['checkRole:IT']);
-     Route::get('/user/access/{user}', [UserController::class, 'access'])->middleware(['checkRole:IT']);
+     Route::get('/user', [UserController::class, 'index']);
+     Route::post('/user/store', [UserController::class, 'store']);
+     Route::post('/user/store-partner', [UserController::class, 'storePartner']);
+     Route::patch('/user/update/{user}', [UserController::class, 'update']);
+     Route::get('/user/revoke/{user}', [UserController::class, 'revoke']);
+     Route::get('/user/access/{user}', [UserController::class, 'access']);
 
      //mstSAP Part
-     Route::get('/mst/sap/part/{plnt?}', [MstPartSAPController::class, 'sapPart'])->middleware(['checkRole:IT'])->name('mst.sap.part');
-     Route::get('/mst/sap/part/info/{id}', [MstPartSAPController::class, 'sapPartDetail'])->middleware(['checkRole:IT']);
-     Route::get('/mst/part/sap/template', [MstPartSAPController::class, 'sapTemplate'])->middleware(['checkRole:IT']);
-     Route::post('/mst/part/sap/upload', [MstPartSAPController::class, 'sapUpload'])->middleware(['checkRole:IT']);
-     Route::post('/mst/part/add/image', [MstPartSAPController::class, 'addImage'])->middleware(['checkRole:IT']);
-     Route::post('/mst/sap/part/store/', [MstPartSAPController::class, 'sapPartDetailStore'])->middleware(['checkRole:IT']);
-     Route::post('/mst/sap/part/delete', [MstPartSAPController::class, 'sapPartDelete'])->middleware(['checkRole:IT']);
+     Route::get('/mst/sap/part/{plnt?}', [MstPartSAPController::class, 'sapPart'])->name('mst.sap.part');
+     Route::get('/mst/sap/part/info/{id}', [MstPartSAPController::class, 'sapPartDetail']);
+     Route::get('/mst/part/sap/template', [MstPartSAPController::class, 'sapTemplate']);
+     Route::post('/mst/part/sap/upload', [MstPartSAPController::class, 'sapUpload']);
+     Route::post('/mst/part/add/image', [MstPartSAPController::class, 'addImage']);
+     Route::post('/mst/sap/part/store/', [MstPartSAPController::class, 'sapPartDetailStore']);
+     Route::post('/mst/sap/part/delete', [MstPartSAPController::class, 'sapPartDelete']);
 
 
 
@@ -73,24 +73,24 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/repair-parts/update/{id}', [MstPartRepairController::class, 'update']);
     Route::delete('/repair-parts/delete/{id}', [MstPartRepairController::class, 'destroy']);
     Route::get('/get-repair-stock/{partId}', [MstMachinePartController::class, 'getRepairStock']);
-    Route::get('/mst/repair/part', [MstPartRepairController::class, 'repairPart'])->middleware(['checkRole:IT']);
+    Route::get('/mst/repair/part', [MstPartRepairController::class, 'repairPart']);
      // mstMachine Part
-     Route::get('/mst/machine/part/{location?}', [MstMachinePartController::class, 'index'])->middleware(['checkRole:IT'])->name('mst.machine.part');
-    Route::get('/mst/machine/detail/{id}', [MstMachinePartController::class, 'detail'])->middleware(['checkRole:IT']);
-    Route::post('/mst/machine/repair', [MstMachinePartController::class, 'repair'])->middleware(['checkRole:IT']);
-    Route::post('/mst/machine/add-part', [MstMachinePartController::class, 'store'])->middleware(['checkRole:IT']);
-    Route::post('/mst/machine/add', [MstMachinePartController::class, 'storeMachine'])->middleware(['checkRole:IT']);
-    Route::get('/mst/machine/template', [MstMachinePartController::class, 'machineTemplate'])->middleware(['checkRole:IT']);
-    Route::post('/mst/machine/upload', [MstMachinePartController::class, 'machineUpload'])->middleware(['checkRole:IT']);
-    Route::get('/mst/part/template', [MstMachinePartController::class, 'partTemplate'])->middleware(['checkRole:IT']);
-    Route::post('/mst/part/upload', [MstMachinePartController::class, 'partUpload'])->middleware(['checkRole:IT']);
-    Route::post('/mst/machine/add/image', [MstMachinePartController::class, 'addImage'])->middleware(['checkRole:IT']);
+     Route::get('/mst/machine/part/{location?}', [MstMachinePartController::class, 'index'])->name('mst.machine.part');
+    Route::get('/mst/machine/detail/{id}', [MstMachinePartController::class, 'detail']);
+    Route::post('/mst/machine/repair', [MstMachinePartController::class, 'repair']);
+    Route::post('/mst/machine/add-part', [MstMachinePartController::class, 'store']);
+    Route::post('/mst/machine/add', [MstMachinePartController::class, 'storeMachine']);
+    Route::get('/mst/machine/template', [MstMachinePartController::class, 'machineTemplate']);
+    Route::post('/mst/machine/upload', [MstMachinePartController::class, 'machineUpload']);
+    Route::get('/mst/part/template', [MstMachinePartController::class, 'partTemplate']);
+    Route::post('/mst/part/upload', [MstMachinePartController::class, 'partUpload']);
+    Route::post('/mst/machine/add/image', [MstMachinePartController::class, 'addImage']);
     Route::post('mst/machine/delete/image', [MstMachinePartController::class, 'deleteImage'])->name('machine.delete.image');
     Route::post('/mst/machine/delete', [MstMachinePartController::class, 'deleteMachine']);
     Route::put('/spare-parts/{machineId}/update', [MstMachinePartController::class, 'update'])->name('spare-parts.update');
 
 
-    Route::get('/history', [HistoryController::class, 'index'])->middleware(['checkRole:IT'])->name('history');
+    Route::get('/history', [HistoryController::class, 'index'])->name('history');
      Route::post('/history/store', [HistoryController::class, 'store']);
      Route::get('/history/detail/{id}', [HistoryController::class, 'showDetail']);
 
@@ -107,21 +107,21 @@ Route::middleware(['auth'])->group(function () {
 
     //Preventive Maintanance Master
     //Master Mechine
-    Route::get('/mst/preventive', [PreventiveController::class, 'index'])->middleware(['checkRole:IT,Super Admin']);
-    Route::post('/mst/preventive/store', [PreventiveController::class, 'store'])->middleware(['checkRole:IT,Super Admin']);
-    Route::get('/mst/preventive/detail/{id}', [PreventiveController::class, 'detail'])->name('machine.detail')->middleware(['checkRole:IT,Super Admin']);
-    Route::post('/mst/checksheet/type/store', [PreventiveController::class, 'storeChecksheet'])->middleware(['checkRole:IT,Super Admin']);
-    Route::post('/mst/checksheet/item/store', [PreventiveController::class, 'storeItemChecksheet'])->middleware(['checkRole:IT,Super Admin']);
-    Route::delete('/mst/delete/checksheet/{id}', [PreventiveController::class, 'deleteChecksheet'])->middleware(['checkRole:IT,Super Admin']);
-    Route::delete('/mst/delete/checksheet/item/{id}', [PreventiveController::class, 'deleteChecksheetItem'])->middleware(['checkRole:IT,Super Admin']);
-    Route::patch('/mst/checksheet/update/{id}', [PreventiveController::class, 'updateChecksheet'])->middleware(['checkRole:IT,Super Admin']);
-    Route::patch('/mst/checksheet/item/update/{id}', [PreventiveController::class, 'updateChecksheetItem'])->middleware(['checkRole:IT,Super Admin']);
-    Route::get('/checksheet/template', [PreventiveController::class, 'template'])->middleware(['checkRole:IT,Super Admin']);
-    Route::post('/checksheet/upload', [PreventiveController::class, 'upload'])->middleware(['checkRole:IT,Super Admin']);
-    Route::get('/mst/preventive/schedule', [PreventiveController::class, 'pmSchedule'])->middleware(['checkRole:IT,Super Admin']);
-    Route::get('/mst/preventive/schedule/detail/{month}', [PreventiveController::class, 'pmScheduleDetail'])->middleware(['checkRole:IT,Super Admin']);
-    Route::get('/annual/schedule/template', [PreventiveController::class, 'scheduleTemplate'])->middleware(['checkRole:IT,Super Admin']);
-    Route::post('/annual/schedule/upload', [PreventiveController::class, 'scheduleUpload'])->middleware(['checkRole:IT,Super Admin']);
+    Route::get('/mst/preventive', [PreventiveController::class, 'index']);
+    Route::post('/mst/preventive/store', [PreventiveController::class, 'store']);
+    Route::get('/mst/preventive/detail/{id}', [PreventiveController::class, 'detail'])->name('machine.detail');
+    Route::post('/mst/checksheet/type/store', [PreventiveController::class, 'storeChecksheet']);
+    Route::post('/mst/checksheet/item/store', [PreventiveController::class, 'storeItemChecksheet']);
+    Route::delete('/mst/delete/checksheet/{id}', [PreventiveController::class, 'deleteChecksheet']);
+    Route::delete('/mst/delete/checksheet/item/{id}', [PreventiveController::class, 'deleteChecksheetItem']);
+    Route::patch('/mst/checksheet/update/{id}', [PreventiveController::class, 'updateChecksheet']);
+    Route::patch('/mst/checksheet/item/update/{id}', [PreventiveController::class, 'updateChecksheetItem']);
+    Route::get('/checksheet/template', [PreventiveController::class, 'template']);
+    Route::post('/checksheet/upload', [PreventiveController::class, 'upload']);
+    Route::get('/mst/preventive/schedule', [PreventiveController::class, 'pmSchedule']);
+    Route::get('/mst/preventive/schedule/detail/{month}', [PreventiveController::class, 'pmScheduleDetail']);
+    Route::get('/annual/schedule/template', [PreventiveController::class, 'scheduleTemplate']);
+    Route::post('/annual/schedule/upload', [PreventiveController::class, 'scheduleUpload']);
     Route::put('/annual/schedule/update', [PreventiveController::class, 'updateSchedule'])->name('annual.schedule.update');
     Route::get('/fetch-plants/{type}', [PreventiveController::class, 'fetchPlants']);
     Route::get('/fetch-shops/{type}/{plant}', [PreventiveController::class, 'fetchShops']);
@@ -133,29 +133,29 @@ Route::middleware(['auth'])->group(function () {
 
     //checksheet
     //Master Checksheet form/checksheet/scan
-    Route::get('/checksheet', [ChecksheetController::class, 'index'])->middleware(['checkRole:IT,Super Admin,Approval,Checker,User'])->name('machine');
-    Route::post('/checksheet/scan', [ChecksheetController::class, 'checksheetScan'])->middleware(['checkRole:IT,Super Admin,User']);
+    Route::get('/checksheet', [ChecksheetController::class, 'index'])->name('machine');
+    Route::post('/checksheet/scan', [ChecksheetController::class, 'checksheetScan']);
     Route::post('/checksheet/store', [ChecksheetController::class, 'storeHeadForm'])->name('checksheet.store');
-    Route::get('/checksheet/fill/{id}', [ChecksheetController::class, 'checksheetfill'])->middleware(['checkRole:IT,Super Admin,User'])->name('fillForm');
+    Route::get('/checksheet/fill/{id}', [ChecksheetController::class, 'checksheetfill'])->name('fillForm');
 
-    Route::post('/checksheet/store/detail', [ChecksheetController::class, 'storeDetailForm'])->middleware(['checkRole:IT,Super Admin,User']);
-    Route::get('/checksheet/detail/{id}', [ChecksheetController::class, 'checksheetDetail'])->middleware(['checkRole:IT,Approval,Checker,Super Admin,User'])->name('checksheet.detail');
-    Route::post('/checksheet/signature', [ChecksheetController::class, 'checksheetSignature'])->middleware(['checkRole:IT,Super Admin,User']);
+    Route::post('/checksheet/store/detail', [ChecksheetController::class, 'storeDetailForm']);
+    Route::get('/checksheet/detail/{id}', [ChecksheetController::class, 'checksheetDetail'])->name('checksheet.detail');
+    Route::post('/checksheet/signature', [ChecksheetController::class, 'checksheetSignature']);
 
-    Route::get('/checksheet/approve/{id}', [ChecksheetController::class, 'checksheetApprove'])->middleware(['checkRole:IT,Super Admin,Approval']);
-    Route::post('/checksheet/approve/store', [ChecksheetController::class, 'checksheetApproveStore'])->middleware(['checkRole:IT,Super Admin,Approval']);
-    Route::get('checksheet/update/{id}', [ChecksheetController::class, 'checksheetUpdate'])->middleware(['checkRole:IT,Super Admin,User']);
-    Route::post('/checksheet/update/detail', [ChecksheetController::class, 'checksheetUpdateDetail'])->middleware(['checkRole:IT,Super Admin,User']);
+    Route::get('/checksheet/approve/{id}', [ChecksheetController::class, 'checksheetApprove']);
+    Route::post('/checksheet/approve/store', [ChecksheetController::class, 'checksheetApproveStore']);
+    Route::get('checksheet/update/{id}', [ChecksheetController::class, 'checksheetUpdate']);
+    Route::post('/checksheet/update/detail', [ChecksheetController::class, 'checksheetUpdateDetail']);
 
-    Route::get('/checksheet/checkher/{id}', [ChecksheetController::class, 'checksheetChecker'])->middleware(['checkRole:IT,Super Admin,Checker']);
-    Route::post('/checksheet/checker/store', [ChecksheetController::class, 'checksheetCheckerStore'])->middleware(['checkRole:IT,Super Admin,Checker']);
+    Route::get('/checksheet/checkher/{id}', [ChecksheetController::class, 'checksheetChecker']);
+    Route::post('/checksheet/checker/store', [ChecksheetController::class, 'checksheetCheckerStore']);
 
-    Route::get('checksheet/generate-pdf/{id}', [ChecksheetController::class, 'generatePdf'])->middleware(['checkRole:IT,Super Admin,Approval,Checker,User']);
+    Route::get('checksheet/generate-pdf/{id}', [ChecksheetController::class, 'generatePdf']);
     Route::get('/get-plants', [ChecksheetController::class, 'getPlants'])->name('get.plants');
     Route::get('/get-shops', [ChecksheetController::class, 'getShops'])->name('get.shops');
     Route::get('/get-opNos', [ChecksheetController::class, 'getOpNos'])->name('get.opNos');
     Route::get('/get-machineNames', [ChecksheetController::class, 'getMachineNames'])->name('get.machineNames');
-    Route::post('checksheet/change-status', [ChecksheetController::class, 'changeStatus'])->middleware(['checkRole:IT,Super Admin,Checker']);
+    Route::post('checksheet/change-status', [ChecksheetController::class, 'changeStatus']);
 
 
 

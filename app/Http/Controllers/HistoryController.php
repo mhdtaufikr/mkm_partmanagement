@@ -20,32 +20,62 @@ use Yajra\DataTables\DataTables;
 class HistoryController extends Controller
 {
     public function index(Request $request)
-    {
-        if ($request->ajax()) {
-            $query = HistoricalProblem::with(['spareParts.part', 'machine'])
-                ->orderBy('date', 'desc')       // Sort by date in descending order
-                ->orderBy('start_time', 'desc'); // Then sort by start time in descending order
+{
+    // Get the logged-in user's plant and type
+    $userPlant = auth()->user()->plant;
+    $userType = auth()->user()->type;
 
-            return DataTables::of($query)
-                ->addIndexColumn()
-                ->editColumn('start_time', function ($row) {
-                    return \Carbon\Carbon::parse($row->start_time)->format('H:i');
-                })
-                ->editColumn('finish_time', function ($row) {
-                    return \Carbon\Carbon::parse($row->finish_time)->format('H:i');
-                })
-                ->addColumn('action', function($row){
-                    return '<button class="btn btn-sm btn-primary btn-detail" data-id="'.$row->id.'" data-bs-toggle="modal" data-bs-target="#modal-detail">Detail</button>';
-                })
-                ->rawColumns(['action'])
-                ->make(true);
+    if ($request->ajax()) {
+        $query = HistoricalProblem::with(['spareParts.part', 'machine'])
+            ->orderBy('date', 'desc')       // Sort by date in descending order
+            ->orderBy('start_time', 'desc'); // Then sort by start time in descending order
+
+        // Apply filters based on user's plant and type
+        if ($userPlant === 'Engine' && ($userType === 'Mechanic' || $userType === 'Electric')) {
+            $query->whereHas('machine', function($q) {
+                $q->where('plant', 'Engine')->where('shop', 'ME');
+            });
+        } elseif ($userPlant === 'Power House' && ($userType === 'Mechanic' || $userType === 'Electric')) {
+            $query->whereHas('machine', function($q) {
+                $q->where('plant', 'Power House')->where('shop', 'PH');
+            });
         }
+        // If the user's plant is 'All' or if the type does not match the specific cases, no additional filtering is applied
 
-        $machines = Machine::all();
-        $lines = Machine::select('line')->distinct()->get();
-
-        return view('history.index', compact('machines', 'lines'));
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->editColumn('start_time', function ($row) {
+                return \Carbon\Carbon::parse($row->start_time)->format('H:i');
+            })
+            ->editColumn('finish_time', function ($row) {
+                return \Carbon\Carbon::parse($row->finish_time)->format('H:i');
+            })
+            ->addColumn('action', function($row){
+                return '<button class="btn btn-sm btn-primary btn-detail" data-id="'.$row->id.'" data-bs-toggle="modal" data-bs-target="#modal-detail">Detail</button>';
+            })
+            ->rawColumns(['action'])
+            ->make(true);
     }
+
+    // Apply filters to the machines and lines queries based on user's plant and type
+    $machinesQuery = Machine::query();
+    $linesQuery = Machine::select('line')->distinct();
+
+    if ($userPlant === 'Engine' && ($userType === 'Mechanic' || $userType === 'Electric')) {
+        $machinesQuery->where('plant', 'Engine')->where('shop', 'ME');
+        $linesQuery->where('plant', 'Engine')->where('shop', 'ME');
+    } elseif ($userPlant === 'Power House' && ($userType === 'Mechanic' || $userType === 'Electric')) {
+        $machinesQuery->where('plant', 'Power House')->where('shop', 'PH');
+        $linesQuery->where('plant', 'Power House')->where('shop', 'PH');
+    }
+    // If the user's plant is 'All', no filters are applied
+
+    $machines = $machinesQuery->get();
+    $lines = $linesQuery->get();
+
+    return view('history.index', compact('machines', 'lines'));
+}
+
 
 
     // HistoryController.php
