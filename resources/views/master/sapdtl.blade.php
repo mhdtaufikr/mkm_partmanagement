@@ -33,8 +33,14 @@
                         <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
                             <div class="carousel-inner">
                                 @php
-                                $imagePaths = $part->img ? json_decode($part->img) : [];
+                                    // Ensure $part is not null and is an object
+                                    if ($part !== null && is_object($part)) {
+                                        $imagePaths = $part->img ? json_decode($part->img) : [];
+                                    } else {
+                                        $imagePaths = [];
+                                    }
                                 @endphp
+
 
                                 @if(count($imagePaths) > 0)
                                 @foreach($imagePaths as $key => $imagePath)
