@@ -41,7 +41,6 @@
                                     }
                                 @endphp
 
-
                                 @if(count($imagePaths) > 0)
                                 @foreach($imagePaths as $key => $imagePath)
                                 <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
