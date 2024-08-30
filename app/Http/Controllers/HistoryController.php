@@ -470,6 +470,7 @@ public function storehpStatus(Request $request)
 }
 
 
+
     public function formStatus($no_machine, $date, $shift,$pm_id,$checksheet_head_id){
         $no_machine = decrypt($no_machine);
         $machine = Machine::where('id',$no_machine)->first();
