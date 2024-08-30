@@ -222,6 +222,11 @@ public function storehp(Request $request)
 
     // Save the spare parts data and update the repair parts inventory if stock type is repair
     foreach ($validatedData['spare_part'] as $index => $sparePartId) {
+        // Skip this iteration if the part ID is null
+        if (is_null($sparePartId)) {
+            continue;
+        }
+
         $stockType = $validatedData['stock_type'][$index];
         $usedQty = $validatedData['used_qty'][$index];
         $location = null;
@@ -311,6 +316,7 @@ public function storehp(Request $request)
     return redirect()->route('history')->with('status', 'Historical problem recorded successfully');
 }
 
+
 public function storehpStatus(Request $request)
 {
     // Validate the request data
@@ -369,6 +375,11 @@ public function storehpStatus(Request $request)
 
     // Save the spare parts data and update the repair parts inventory if stock type is repair
     foreach ($validatedData['spare_part'] as $index => $sparePartId) {
+        // Skip processing if the spare part ID is null
+        if (is_null($sparePartId)) {
+            continue;
+        }
+
         $stockType = $validatedData['stock_type'][$index];
         $usedQty = $validatedData['used_qty'][$index];
         $location = null;
@@ -457,6 +468,7 @@ public function storehpStatus(Request $request)
 
     return redirect()->route('machine')->with('status', 'Historical problem recorded successfully');
 }
+
 
     public function formStatus($no_machine, $date, $shift,$pm_id,$checksheet_head_id){
         $no_machine = decrypt($no_machine);
