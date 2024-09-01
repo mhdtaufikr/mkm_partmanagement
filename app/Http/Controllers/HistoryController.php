@@ -301,6 +301,12 @@ public function storehp(Request $request)
             'category' => 'required|string',
             'part_type.*' => 'nullable|string',
             'repair_location.*' => 'nullable|integer',
+            'other_part_name.*' => 'nullable|string',
+            'other_part_name_description.*' => 'nullable|string',
+            'bun.*' => 'nullable|string',
+            'other_part_location.*' => 'nullable|string',
+            'Cost.*' => 'nullable|numeric',
+            'other_part_quantity.*' => 'nullable|integer',
         ]);
 
         // Handle the image upload if it exists
@@ -368,6 +374,8 @@ public function storehp(Request $request)
                         'safety_stock' => 10,
                         'sap_stock' => $sapStock,
                         'repair_stock' => 0,
+                        'total' => $sapStock,
+                        'status' => 'Active',
                     ]);
                 } else {
                     MachineSparePartsInventoryLog::create([
@@ -427,6 +435,7 @@ public function storehp(Request $request)
                     continue; // Skip if repair part not found
                 }
 
+                // Check if part exists for the specific machine in machine_spare_parts_inventories
                 $machinePart = MachineSparePartsInventory::where('part_id', $sparePartId)
                     ->where('machine_id', $validatedData['id_machine'])
                     ->first();
@@ -438,13 +447,15 @@ public function storehp(Request $request)
                         'part_id' => $sparePartId,
                         'machine_id' => $validatedData['id_machine'],
                         'critical_part' => 'Default',
-                        'type' => 'Default',
+                        'type' => 'Repair',
                         'estimation_lifetime' => 5,
                         'cost' => 0.00,
                         'last_replace' => $validatedData['date'],
                         'safety_stock' => 10,
                         'sap_stock' => 0,
                         'repair_stock' => $repairStock,
+                        'total' => $repairStock,
+                        'status' => 'Active',
                     ]);
                 } else {
                     MachineSparePartsInventoryLog::create([
@@ -475,6 +486,57 @@ public function storehp(Request $request)
             }
         }
 
+        // Process Other Parts if any
+        if ($request->has('part_type') && in_array('other', $validatedData['part_type'])) {
+            foreach ($validatedData['other_part_name'] as $index => $otherPartName) {
+                // Create a new entry in the parts table
+                $part = Part::create([
+                    'material' => $otherPartName,
+                    'material_description' => $validatedData['other_part_name_description'][$index] ?? '',
+                    'type' => 'Other',
+                    'plnt' => $validatedData['other_part_location'][$index] ?? 'other',
+                    'sloc' => $validatedData['other_part_location'][$index] ?? 'other',
+                    'vendor' => 'N/A',
+                    'bun' => $validatedData['bun'][$index] ?? 'pcs',
+                    'begining_qty' => $validatedData['other_part_quantity'][$index] ?? 0,
+                    'begining_value' => $validatedData['Cost'][$index] ?? 0,
+                    'received_qty' => 0,
+                    'received_value' => 0,
+                    'consumed_qty' => 0,
+                    'consumed_value' => 0,
+                    'total_stock' => $validatedData['other_part_quantity'][$index] ?? 0,
+                    'total_value' => $validatedData['Cost'][$index] ?? 0,
+                    'currency' => 'IDR',
+                    'img' => null,
+                ]);
+
+                // Add the new part to the machine inventory
+                MachineSparePartsInventory::create([
+                    'part_id' => $part->id,
+                    'machine_id' => $validatedData['id_machine'],
+                    'critical_part' => 'Default',
+                    'type' => 'Other',
+                    'estimation_lifetime' => 5,
+                    'cost' => $validatedData['Cost'][$index] ?? 0.00,
+                    'last_replace' => $validatedData['date'],
+                    'safety_stock' => 10,
+                    'sap_stock' => 0,
+                    'repair_stock' => 0,
+                    'total' => $validatedData['other_part_quantity'][$index] ?? 0,
+                    'status' => 'Active',
+                ]);
+
+                // Create an entry in the historical_problem_parts table
+                HistoricalProblemPart::create([
+                    'problem_id' => $problem->id,
+                    'part_id' => $part->id,
+                    'qty' => $validatedData['other_part_quantity'][$index] ?? 0,
+                    'location' => $validatedData['other_part_location'][$index] ?? 'other',
+                    'routes' => 'other',
+                ]);
+            }
+        }
+
         // If checksheet_head_id exists, log the status change
         if ($request->has('checksheet_head_id')) {
             ChecksheetStatusLog::create([
@@ -501,11 +563,6 @@ public function storehp(Request $request)
         return redirect()->back()->withErrors(['error' => 'Data Process Failed! An error occurred while processing your request. Please try again. Error Details: ' . $e->getMessage()]);
     }
 }
-
-
-
-
-
 
 
 public function storehpStatus(Request $request)

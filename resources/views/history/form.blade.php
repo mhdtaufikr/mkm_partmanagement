@@ -194,7 +194,7 @@
                                                 </div>
 
 
-                                                <!-- Checkbox Selection for Parts -->
+                                              <!-- Checkbox Selection for Parts -->
                                                 <div class="row mb-4">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
@@ -204,12 +204,15 @@
                                                                     <input class="form-check-input part-type" type="checkbox" name="part_type[]" id="sap_part" value="sap">
                                                                     <label class="form-check-label" for="sap_part">SAP Part</label>
                                                                 </div>
-                                                                <div class="form-check">
+                                                                <div class="form-check me-3">
                                                                     <input class="form-check-input part-type" type="checkbox" name="part_type[]" id="repair_part" value="repair">
                                                                     <label class="form-check-label" for="repair_part">Repair Part</label>
                                                                 </div>
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input part-type" type="checkbox" name="part_type[]" id="other_part" value="other">
+                                                                    <label class="form-check-label" for="other_part">Other</label>
+                                                                </div>
                                                             </div>
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -322,6 +325,71 @@
                                                     </table>
                                                 </div>
 
+                                                <!-- Other Parts Table -->
+                                                <div id="other-parts-section" style="display:none;">
+                                                    <h4>Other Parts</h4>
+                                                    <table class="table table-bordered table-striped" id="other-parts-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Material Name</th>
+                                                                <th>Description</th>
+                                                                <th>Bun</th>
+                                                                <th>Location</th>
+                                                                <th>Cost</th>
+                                                                <th>Quantity</th>
+
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="other-parts-container">
+                                                            <tr class="part-row">
+                                                                <!-- Material Name -->
+                                                                <td>
+                                                                    <div class="form-group">
+                                                                        <input type="text" class="form-control other_part_name" name="other_part_name[]" placeholder="Enter Material Name">
+                                                                    </div>
+                                                                </td>
+                                                                 <!-- Material Description -->
+                                                                 <td>
+                                                                    <div class="form-group">
+                                                                        <input type="text" class="form-control other_part_name" name="other_part_name_description[]" placeholder="Enter Material Description">
+                                                                    </div>
+                                                                </td>
+                                                                 <!-- Material Bun -->
+                                                                 <td>
+                                                                    <div class="form-group">
+                                                                        <input type="text" class="form-control other_part_name" name="bun[]" placeholder="Enter Material Description">
+                                                                    </div>
+                                                                </td>
+                                                                <!-- Location -->
+                                                                <td>
+                                                                    <div class="form-group">
+                                                                        <input type="text" class="form-control other_part_location" name="other_part_location[]" placeholder="Enter Location">
+                                                                    </div>
+                                                                </td>
+                                                                <!-- Cost -->
+                                                                <td>
+                                                                    <div class="form-group">
+                                                                        <input type="number" class="form-control other_part_quantity" name="Cost[]" placeholder="Enter Quantity">
+                                                                    </div>
+                                                                </td>
+                                                                <!-- Quantity -->
+                                                                <td>
+                                                                    <div class="form-group">
+                                                                        <input type="number" class="form-control other_part_quantity" name="other_part_quantity[]" placeholder="Enter Quantity">
+                                                                    </div>
+                                                                </td>
+                                                                <!-- Add/Remove Part Button -->
+                                                                <td>
+                                                                    <button type="button" class="btn btn-sm btn-primary btn-add-part-other">+</button>
+                                                                    <button type="button" class="btn btn-sm btn-danger btn-remove-part">-</button>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+
                                                 <hr>
                                                 <button type="submit" class="btn btn-primary mt-3">Submit</button>
                                             </form>
@@ -350,6 +418,7 @@
         $('.part-type').on('change', function() {
             var showSAP = $('#sap_part').is(':checked');
             var showRepair = $('#repair_part').is(':checked');
+            var showOther = $('#other_part').is(':checked'); // New "Other" option handling
 
             if (showSAP) {
                 $('#sap-parts-section').show();
@@ -361,6 +430,12 @@
                 $('#repair-parts-section').show();
             } else {
                 $('#repair-parts-section').hide();
+            }
+
+            if (showOther) {
+                $('#other-parts-section').show(); // Show "Other" parts section
+            } else {
+                $('#other-parts-section').hide(); // Hide "Other" parts section
             }
         });
 
@@ -432,25 +507,24 @@
         });
 
         // Function to handle adding a new part row for Repair table
-function addPartRowRepair() {
-    var newRow = $('#repair-parts-table .part-row:first').clone(); // Clone the first row as a template
+        function addPartRowRepair() {
+            var newRow = $('#repair-parts-table .part-row:first').clone(); // Clone the first row as a template
 
-    // Clear all input fields
-    newRow.find('input, select').val('');
+            // Clear all input fields
+            newRow.find('input, select').val('');
 
-    // Set the default stock type to "repair" and disable it to ensure it can't be changed
-    newRow.find('.stock_type').val('repair').prop('disabled', true);
+            // Set the default stock type to "repair" and disable it to ensure it can't be changed
+            newRow.find('.stock_type').val('repair').prop('disabled', true);
 
-    newRow.find('.select2-container').remove(); // Remove existing Select2 container
-    newRow.find('.spare_part').prop('disabled', false).val(null); // Ensure the dropdown is enabled and reset
+            newRow.find('.select2-container').remove(); // Remove existing Select2 container
+            newRow.find('.spare_part').prop('disabled', false).val(null); // Ensure the dropdown is enabled and reset
 
-    // Reset the repair location dropdown
-    newRow.find('.repair_location').empty().append('<option value="">Select Location</option>');
+            // Reset the repair location dropdown
+            newRow.find('.repair_location').empty().append('<option value="">Select Location</option>');
 
-    $('#repair-parts-container').append(newRow); // Append the new row to the container
-    initializeSelect2(newRow.find('.spare_part')); // Initialize Select2 for the new row
-}
-
+            $('#repair-parts-container').append(newRow); // Append the new row to the container
+            initializeSelect2(newRow.find('.spare_part')); // Initialize Select2 for the new row
+        }
 
         // Fetch Repair Locations dynamically for Repair Parts table
         $('#repair-parts-table').on('change', '.spare_part', function() {
@@ -485,6 +559,29 @@ function addPartRowRepair() {
             }
         });
 
+        /* ---------- Other Parts Table ---------- */
+
+        // Add Part Row for Other Parts Table
+        $('#other-parts-table').on('click', '.btn-add-part-other', function() {
+            addPartRowOther();
+        });
+
+        // Function to handle adding a new part row for Other Parts table
+        function addPartRowOther() {
+            var newRow = $('#other-parts-table .part-row:first').clone();
+
+            // Clear all input fields
+            newRow.find('input').val('');
+
+            // Append the new row to the Other Parts table container
+            $('#other-parts-container').append(newRow);
+        }
+
+        // Remove Part Row for any table
+        $(document).on('click', '.btn-remove-part', function() {
+            $(this).closest('.part-row').remove();
+        });
+
         // Initialize Select2 for dropdowns
         function initializeSelect2(selectElement) {
             selectElement.select2({
@@ -515,5 +612,7 @@ function addPartRowRepair() {
         }
     });
 </script>
+
+
 
 @endsection
