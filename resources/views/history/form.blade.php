@@ -11,9 +11,7 @@
     </header>
     <!-- Main page content-->
     <div class="container-fluid px-4 mt-n10">
-        <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
-            <!-- Content Header (Page header) -->
             <section class="content-header">
                 {{-- Optional content header --}}
             </section>
@@ -27,7 +25,6 @@
                                 <div class="card-header">
                                     <h3 class="card-title">Insert Daily Report</h3>
                                 </div>
-                                <!-- /.card-header -->
                                 <div class="card-body">
                                     <div class="row">
                                         @include('partials.alert')
@@ -41,157 +38,291 @@
                                                 <input type="hidden" name="report" value="Daily Report">
 
                                                 <div class="row mb-4">
-                                                    <div class="col-md-3">
-                                                        <div class="form-group">
-                                                            <label for="shop">Shop</label>
-                                                            <select class="form-control" id="shop" name="shop" required>
-                                                                <option value="Electric">Electric</option>
-                                                                <option value="Mechanic">Mechanic</option>
-                                                                <option value="Power House">Power House</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-group">
-                                                            <label for="problem">Problem</label>
-                                                            <textarea class="form-control" id="problem" name="problem" required></textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-group">
-                                                            <label for="cause">Cause</label>
-                                                            <textarea class="form-control" id="cause" name="cause" required></textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-group">
-                                                            <label for="action">Action</label>
-                                                            <textarea class="form-control" id="action" name="action" required></textarea>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div id="parts-container">
-                                                    <div class="row mb-4 part-row">
-                                                        <div class="col-md-3">
-                                                            <div class="form-group">
-                                                                <label for="spare_part">Spare Part</label>
-                                                                <select class="form-control spare_part chosen-select" name="spare_part[]" >
-                                                                    <option value="">Select Spare Part</option>
-                                                                    @foreach($spareParts as $part)
-                                                                        <option value="{{ $part->id }}" data-sap="{{ $part->begining_qty }}" data-repair="{{ $part->total_stock }}">{{ $part->material }} - {{$part->material_description}}</option>
-                                                                    @endforeach
-                                                                </select>
-
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-3">
-                                                            <div class="form-group">
-                                                                <label for="stock_type">Stock Type</label>
-                                                                <select class="form-control stock_type" name="stock_type[]">
-                                                                    <option value="sap">New (SAP)</option>
-                                                                    <option value="repair">Repair (Extend)</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-2 sap_quantity_container">
-                                                            <div class="form-group">
-                                                                <label for="sap_quantity">SAP Quantity</label>
-                                                                <input readonly type="number" class="form-control sap_quantity" name="sap_quantity[]">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-3 repair_location_container" style="display:none;">
-                                                            <div class="form-group">
-                                                                <label for="repair_location">Repair Location</label>
-                                                                <select class="form-control repair_location" name="repair_location[]">
-                                                                    <option value="">Select Location</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-2 qty">
-                                                            <div class="form-group">
-                                                                <label for="used_qty">Quantity</label>
-                                                                <input type="number" class="form-control used_qty" name="used_qty[]">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-1">
-                                                            <div class="form-group">
-                                                                <label>&nbsp;</label>
-                                                                <button type="button" class="btn btn-primary btn-add-part">+</button>
+                                                    <div class="col-md-12">
+                                                        <!-- Card for the first set of fields -->
+                                                        <div class="card border border-3 border-mkm rounded">
+                                                            <div class="card-body">
+                                                                <div class="row">
+                                                                    <div class="col-md-3">
+                                                                        <div class="form-group">
+                                                                            <label for="shop"><strong style="color: rgba(0, 103, 127, 1)">Shop</strong> </label>
+                                                                            <select class="form-control" id="shop" name="shop" required>
+                                                                                <option value="Electric">Electric</option>
+                                                                                <option value="Mechanic">Mechanic</option>
+                                                                                <option value="Power House">Power House</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <div class="form-group">
+                                                                            <label for="problem"><strong style="color: rgba(0, 103, 127, 1)">Problem</strong> </label>
+                                                                            <textarea class="form-control" id="problem" name="problem" required></textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <div class="form-group">
+                                                                            <label for="cause"><strong style="color: rgba(0, 103, 127, 1)">Cause</strong></label>
+                                                                            <textarea class="form-control" id="cause" name="cause" required></textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <div class="form-group">
+                                                                            <label for="action"><strong style="color: rgba(0, 103, 127, 1)">Action</strong></label>
+                                                                            <textarea class="form-control" id="action" name="action" required></textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-
-                                                <hr>
 
                                                 <div class="row mb-4">
-                                                    <div class="col-md-3">
-                                                        <div class="form-group">
-                                                            <label for="category">Category</label>
-                                                            <select name="category" id="category" class="form-control" required>
-                                                                <option value="">- Please Select Role -</option>
-                                                                @foreach ($dropdown as $Problem)
-                                                                    <option value="{{ $Problem->name_value }}">{{ $Problem->name_value }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-group">
-                                                            <label for="start_time">Start Time</label>
-                                                            <input type="time" class="form-control" id="start_time" name="start_time" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-group">
-                                                            <label for="finish_time">Finish Time</label>
-                                                            <input type="time" class="form-control" id="finish_time" name="finish_time" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-group">
-                                                            <label for="balance">Balance</label>
-                                                            <input readonly type="number" class="form-control" id="balance" name="balance" required>
+                                                    <div class="col-md-12">
+                                                        <!-- Card for the second set of fields -->
+                                                        <div class="card border border-3 border-mkm rounded">
+                                                            <div class="card-body">
+                                                                <div class="row">
+                                                                    <div class="col-md-3">
+                                                                        <div class="form-group">
+                                                                            <label for="category"><strong style="color: rgba(0, 103, 127, 1)">Category</strong></label>
+                                                                            <select name="category" id="category" class="form-control" required>
+                                                                                <option value="">- Please Select Role -</option>
+                                                                                @foreach ($dropdown as $Problem)
+                                                                                    <option value="{{ $Problem->name_value }}">{{ $Problem->name_value }}</option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <div class="form-group">
+                                                                            <label for="start_time"><strong style="color: rgba(0, 103, 127, 1)">Start Time</strong></label>
+                                                                            <input type="time" class="form-control" id="start_time" name="start_time" required>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <div class="form-group">
+                                                                            <label for="finish_time"><strong style="color: rgba(0, 103, 127, 1)">Finish Time</strong></label>
+                                                                            <input type="time" class="form-control" id="finish_time" name="finish_time" required>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <div class="form-group">
+                                                                            <label for="balance"><strong style="color: rgba(0, 103, 127, 1)">Balance</strong></label>
+                                                                            <input readonly type="number" class="form-control" id="balance" name="balance" required>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <script>
+                                                                        $(document).ready(function() {
+                                                                            function calculateBalance() {
+                                                                                var startTime = $('#start_time').val();
+                                                                                var finishTime = $('#finish_time').val();
+
+                                                                                if (startTime && finishTime) {
+                                                                                    // Convert time strings to Date objects
+                                                                                    var start = new Date('1970-01-01T' + startTime + 'Z');
+                                                                                    var finish = new Date('1970-01-01T' + finishTime + 'Z');
+
+                                                                                    // Calculate the difference in milliseconds
+                                                                                    var difference = finish - start;
+
+                                                                                    if (difference < 0) {
+                                                                                        // Handle cases where finish time is before start time
+                                                                                        $('#balance').val(0);
+                                                                                    } else {
+                                                                                        // Convert milliseconds to hours
+                                                                                        var hours = difference / (1000 * 60 * 60);
+                                                                                        $('#balance').val(hours.toFixed(2)); // Display the balance as a number with two decimal places
+                                                                                    }
+                                                                                } else {
+                                                                                    $('#balance').val('');
+                                                                                }
+                                                                            }
+
+                                                                            // Attach the calculation function to both time inputs
+                                                                            $('#start_time, #finish_time').on('change', calculateBalance);
+                                                                        });
+                                                                    </script>
+
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <hr>
 
                                                 <div class="row mb-4">
-                                                    <div class="col-md-3">
-                                                        <div class="form-group">
-                                                            <label for="pic">PIC</label>
-                                                            <input type="text" class="form-control" id="pic" name="pic" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-group">
-                                                            <label for="status">Status</label>
-                                                            <select class="form-control" id="status" name="status" required>
-                                                                <option value="">Select Status</option>
-                                                                <option value="Close">Close</option>
-                                                                <option value="Open">Open</option>
-                                                                <option value="Delay">Delay</option>
-                                                                <option value="Ongoing">Ongoing</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-group">
-                                                            <label for="img">Image</label>
-                                                            <input type="file" class="form-control" id="img" name="img">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-group">
-                                                            <label for="remarks">Remarks</label>
-                                                            <textarea class="form-control" id="remarks" name="remarks"></textarea>
+                                                    <div class="col-md-12">
+                                                        <!-- Card for the third set of fields -->
+                                                        <div class="card border border-3 border-mkm rounded">
+                                                            <div class="card-body">
+                                                                <div class="row">
+                                                                    <div class="col-md-3">
+                                                                        <div class="form-group">
+                                                                            <label for="pic"><strong style="color: rgba(0, 103, 127, 1)">PIC</strong></label>
+                                                                            <input type="text" class="form-control" id="pic" name="pic" required>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <div class="form-group">
+                                                                            <label for="status"><strong style="color: rgba(0, 103, 127, 1)">Status</strong></label>
+                                                                            <select class="form-control" id="status" name="status" required>
+                                                                                <option value="">Select Status</option>
+                                                                                <option value="Close">Close</option>
+                                                                                <option value="Open">Open</option>
+                                                                                <option value="Delay">Delay</option>
+                                                                                <option value="Ongoing">Ongoing</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <div class="form-group">
+                                                                            <label for="img"><strong style="color: rgba(0, 103, 127, 1)">Image</strong></label>
+                                                                            <input type="file" class="form-control" id="img" name="img">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <div class="form-group">
+                                                                            <label for="remarks"><strong style="color: rgba(0, 103, 127, 1)">Remarks</strong></label>
+                                                                            <textarea class="form-control" id="remarks" name="remarks"></textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <hr>
 
+
+                                                <!-- Checkbox Selection for Parts -->
+                                                <div class="row mb-4">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Select Part Type(s)</label>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="form-check me-3">
+                                                                    <input class="form-check-input part-type" type="checkbox" name="part_type[]" id="sap_part" value="sap">
+                                                                    <label class="form-check-label" for="sap_part">SAP Part</label>
+                                                                </div>
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input part-type" type="checkbox" name="part_type[]" id="repair_part" value="repair">
+                                                                    <label class="form-check-label" for="repair_part">Repair Part</label>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- SAP Parts Table -->
+                                                <div id="sap-parts-section" style="display:none;">
+                                                    <h4>SAP Parts</h4>
+                                                    <table class="table table-bordered table-striped" id="sap-parts-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Stock Type</th>
+                                                                <th>Spare Part</th>
+                                                                <th>SAP Quantity</th>
+                                                                <th>Quantity</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="sap-parts-container">
+                                                            <tr class="part-row">
+                                                                <!-- Stock Type Selection -->
+                                                                <td>
+                                                                    <div class="form-group">
+                                                                        <select class="form-control stock_type" name="stock_type[]" disabled>
+                                                                            <option value="sap" selected>New (SAP)</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </td>
+                                                                <!-- Spare Part Selection -->
+                                                                <td>
+                                                                    <div class="form-group">
+                                                                        <select class="form-control spare_part" name="spare_part_sap[]" >
+                                                                            <!-- Parts will be loaded dynamically -->
+                                                                        </select>
+                                                                    </div>
+                                                                </td>
+                                                                <!-- SAP Quantity -->
+                                                                <td class="sap_quantity_container">
+                                                                    <div class="form-group">
+                                                                        <input readonly type="number" class="form-control sap_quantity" name="sap_quantity[]">
+                                                                    </div>
+                                                                </td>
+                                                                <!-- Used Quantity -->
+                                                                <td class="qty">
+                                                                    <div class="form-group">
+                                                                        <input type="number" class="form-control used_qty" name="used_qty_sap[]">
+                                                                    </div>
+                                                                </td>
+                                                                <!-- Add Part Button -->
+                                                                <td>
+                                                                    <button type="button" class="btn btn-sm btn-primary btn-add-part-sap">+</button>
+                                                                    <button type="button" class="btn btn-sm btn-danger btn-remove-part">-</button>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <!-- Repair Parts Table -->
+                                                <div id="repair-parts-section" style="display:none;">
+                                                    <h4>Repair Parts</h4>
+                                                    <table class="table table-bordered table-striped" id="repair-parts-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Stock Type</th>
+                                                                <th>Spare Part</th>
+                                                                <th>Repair Location</th>
+                                                                <th>Quantity</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="repair-parts-container">
+                                                            <tr class="part-row">
+                                                                <!-- Stock Type Selection -->
+                                                                <td>
+                                                                    <div class="form-group">
+                                                                        <select class="form-control stock_type" name="stock_type[]" disabled>
+                                                                            <option value="repair" selected>Repair (Extend)</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </td>
+                                                                <!-- Spare Part Selection -->
+                                                                <td>
+                                                                    <div class="form-group">
+                                                                        <select class="form-control spare_part" name="spare_part_repair[]" >
+                                                                            <!-- Parts will be loaded dynamically -->
+                                                                        </select>
+                                                                    </div>
+                                                                </td>
+                                                                <!-- Repair Location Selection -->
+                                                                <td class="repair_location_container">
+                                                                    <div class="form-group">
+                                                                        <select class="form-control repair_location" name="repair_location[]">
+                                                                            <!-- Locations will be loaded dynamically -->
+                                                                        </select>
+                                                                    </div>
+                                                                </td>
+                                                                <!-- Used Quantity -->
+                                                                <td class="qty">
+                                                                    <div class="form-group">
+                                                                        <input type="number" class="form-control used_qty" name="used_qty_repair[]">
+                                                                    </div>
+                                                                </td>
+                                                                <!-- Add Part Button -->
+                                                                <td>
+                                                                    <button type="button" class="btn btn-sm btn-primary btn-add-part-repair">+</button>
+                                                                    <button type="button" class="btn btn-sm btn-danger btn-remove-part">-</button>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <hr>
                                                 <button type="submit" class="btn btn-primary mt-3">Submit</button>
                                             </form>
                                         </div>
@@ -210,112 +341,178 @@
             </section>
             <!-- /.content -->
         </div>
-        <!-- /.content-wrapper -->
     </div>
 </main>
 
 <script>
     $(document).ready(function() {
-        // Initialize Chosen for dynamically searchable dropdown
-        $('.chosen-select').chosen({
-            width: '100%',
-            no_results_text: 'No results matched', // Customize the text displayed when no results are found
-            allow_single_deselect: true
+        // Handle Part Type Selection using Checkboxes
+        $('.part-type').on('change', function() {
+            var showSAP = $('#sap_part').is(':checked');
+            var showRepair = $('#repair_part').is(':checked');
+
+            if (showSAP) {
+                $('#sap-parts-section').show();
+            } else {
+                $('#sap-parts-section').hide();
+            }
+
+            if (showRepair) {
+                $('#repair-parts-section').show();
+            } else {
+                $('#repair-parts-section').hide();
+            }
         });
 
-        function handleStockTypeChange(row) {
-            var stockType = row.find('.stock_type').val();
-            if (stockType === 'sap') {
-                row.find('.sap_quantity_container').show();
-                row.find('.repair_location_container').hide();
-                row.find('.repair_quantity_container').hide();
-            } else if (stockType === 'repair') {
-                row.find('.sap_quantity_container').hide();
-                row.find('.repair_location_container').show();
-                row.find('.repair_quantity_container').show();
-                row.find('.spare_part').trigger('change'); // Trigger change to load repair locations
-            }
+        // Initialize Select2 for the first row in SAP and Repair tables
+        initializeSelect2($('#sap-parts-table .part-row:first').find('.spare_part'));
+        initializeSelect2($('#repair-parts-table .part-row:first').find('.spare_part'));
+
+        /* ---------- SAP Parts Table ---------- */
+
+        // Add Part Row for SAP Table
+        $('#sap-parts-table').on('click', '.btn-add-part-sap', function() {
+            addPartRowSap();
+        });
+
+        // Function to handle adding a new part row for SAP table
+        function addPartRowSap() {
+            var newRow = $('#sap-parts-table .part-row:first').clone();
+
+            // Clear all input fields
+            newRow.find('input').val('');
+            newRow.find('select').val(''); // Clear select fields
+
+            // Set the stock type to "sap" and ensure it is disabled
+            newRow.find('.stock_type').val('sap').prop('disabled', true); // Set and disable stock type
+
+            // Remove existing Select2 container and initialize Select2 again
+            newRow.find('.select2-container').remove(); // Remove existing Select2 container
+            newRow.find('.spare_part').prop('disabled', false).val(null); // Ensure the dropdown is enabled and reset
+
+            // Append the new row to the SAP table container
+            $('#sap-parts-container').append(newRow);
+
+            // Initialize Select2 for the new row
+            initializeSelect2(newRow.find('.spare_part'));
         }
 
-        function addPartRow() {
-            var newRow = $('.part-row:first').clone();
-            newRow.find('input, select').val('');
-            newRow.find('.chosen-select').chosen('destroy').chosen(); // Reinitialize Chosen for new row
-            newRow.find('.sap_quantity_container').show();
-            newRow.find('.repair_location_container').hide();
-            newRow.find('.repair_quantity_container').hide();
-            $('#parts-container').append(newRow);
-        }
-
-        $('#parts-container').on('change', '.spare_part', function() {
+        // Fetch SAP Quantity dynamically for SAP table
+        $('#sap-parts-table').on('change', '.spare_part', function() {
             var row = $(this).closest('.part-row');
-            var selectedOption = $(this).find('option:selected');
-            var sapStock = selectedOption.data('sap');
-            var repairStock = selectedOption.data('repair');
+            var partId = $(this).val();
 
-            row.find('.sap_quantity').val(sapStock);
-
-            // Fetch repair locations if stock type is repair
-            if (row.find('.stock_type').val() === 'repair') {
-                var partId = $(this).val();
-
+            if (partId) {
+                // Fetch SAP Quantity via AJAX
                 $.ajax({
-                    url: '/get-repair-locations-for-part/' + partId,
+                    url: '/get-sap-quantity', // Ensure this route and controller method exist
                     method: 'GET',
-                    success: function(data) {
-                        if (Array.isArray(data)) {
+                    data: { part_id: partId },
+                    success: function(response) {
+                        if (response.sap_quantity) {
+                            row.find('.sap_quantity').val(response.sap_quantity); // Update SAP quantity input
+                        } else {
+                            row.find('.sap_quantity').val(''); // Clear if no quantity
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching SAP quantity:', xhr.responseText);
+                    }
+                });
+            } else {
+                row.find('.sap_quantity').val(''); // Clear SAP quantity if no part is selected
+            }
+        });
+
+        /* ---------- Repair Parts Table ---------- */
+
+        // Add Part Row for Repair Table
+        $('#repair-parts-table').on('click', '.btn-add-part-repair', function() {
+            addPartRowRepair();
+        });
+
+        // Function to handle adding a new part row for Repair table
+function addPartRowRepair() {
+    var newRow = $('#repair-parts-table .part-row:first').clone(); // Clone the first row as a template
+
+    // Clear all input fields
+    newRow.find('input, select').val('');
+
+    // Set the default stock type to "repair" and disable it to ensure it can't be changed
+    newRow.find('.stock_type').val('repair').prop('disabled', true);
+
+    newRow.find('.select2-container').remove(); // Remove existing Select2 container
+    newRow.find('.spare_part').prop('disabled', false).val(null); // Ensure the dropdown is enabled and reset
+
+    // Reset the repair location dropdown
+    newRow.find('.repair_location').empty().append('<option value="">Select Location</option>');
+
+    $('#repair-parts-container').append(newRow); // Append the new row to the container
+    initializeSelect2(newRow.find('.spare_part')); // Initialize Select2 for the new row
+}
+
+
+        // Fetch Repair Locations dynamically for Repair Parts table
+        $('#repair-parts-table').on('change', '.spare_part', function() {
+            var row = $(this).closest('.part-row');
+            var repairPartId = $(this).val();
+
+            if (repairPartId) {
+                // Fetch Repair Locations via AJAX using the repair_part_id in the URL
+                $.ajax({
+                    url: '/get-repair-locations-for-part/' + repairPartId,  // Include repair_part_id in the URL
+                    method: 'GET',
+                    success: function(response) {
+                        console.log('AJAX Response:', response); // Log the response to inspect it
+
+                        if (Array.isArray(response) && response.length > 0) {
                             var repairLocationSelect = row.find('.repair_location');
                             repairLocationSelect.empty().append('<option value="">Select Location</option>');
-                            data.forEach(function(location) {
+                            response.forEach(function(location) {
                                 repairLocationSelect.append('<option value="' + location.id + '" data-repaired-qty="' + location.repaired_qty + '">' + location.sloc + ' - ' + location.repaired_qty + ' Qty</option>');
                             });
                         } else {
-                            console.error('Unexpected data format:', data);
+                            console.error('No locations found for the selected part.');
+                            row.find('.repair_location').empty().append('<option value="">No locations available</option>');
                         }
                     },
                     error: function(xhr, status, error) {
                         console.error('Error fetching repair locations:', xhr.responseText);
                     }
                 });
+            } else {
+                row.find('.repair_location').html(''); // Clear repair location dropdown if no part is selected
             }
         });
 
-        $('#parts-container').on('change', '.stock_type', function() {
-            var row = $(this).closest('.part-row');
-            handleStockTypeChange(row);
-        });
-
-        $('#parts-container').on('change', '.repair_location', function() {
-            var row = $(this).closest('.part-row');
-            var selectedOption = $(this).find('option:selected');
-            var repairQty = selectedOption.data('repaired-qty');
-            row.find('.repair_quantity').val(repairQty);
-        });
-
-        $('#parts-container').on('click', '.btn-add-part', function() {
-            addPartRow();
-        });
-
-        // Initialize the first part row
-        handleStockTypeChange($('.part-row:first'));
-
-        // Trigger the change event on page load to set initial state
-        $('#parts-container').find('.stock_type').trigger('change');
-
-        // Calculate balance based on start and end time
-        $('#start_time, #finish_time').change(function() {
-            var startTime = $('#start_time').val();
-            var finishTime = $('#finish_time').val();
-            if (startTime && finishTime) {
-                var start = new Date("1970-01-01T" + startTime + "Z");
-                var end = new Date("1970-01-01T" + finishTime + "Z");
-                var diff = (end - start) / (1000 * 60 * 60); // Difference in hours
-                if (diff < 0) {
-                    diff += 24; // Adjust for overnight times
-                }
-                $('#balance').val(diff);
-            }
-        });
+        // Initialize Select2 for dropdowns
+        function initializeSelect2(selectElement) {
+            selectElement.select2({
+                width: '100%',
+                placeholder: 'Select Spare Part',
+                ajax: {
+                    url: "{{ route('fetch.parts') }}", // Route to the controller method
+                    dataType: 'json',
+                    delay: 250, // Delay to prevent rapid requests
+                    data: function(params) {
+                        return {
+                            term: params.term, // Search term from user input
+                            stock_type: $(this).closest('.part-row').find('.stock_type').val() // Pass selected stock type to server
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.results,
+                            pagination: {
+                                more: data.pagination.more
+                            }
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1
+            });
+        }
     });
 </script>
 

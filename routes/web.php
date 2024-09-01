@@ -103,6 +103,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/historical-problems/store', [HistoryController::class, 'storehp'])->name('historical');
     Route::post('/historical-problems/store/status', [HistoryController::class, 'storehpStatus'])->name('historicalStatus');
     Route::get('/form/{no_machine}/{date}/{shift}/{id_pm}/{id_checksheet_head}', [HistoryController::class, 'formStatus'])->name('formStatus');
+    Route::get('/fetch-parts', [HistoryController::class, 'fetchParts'])->name('fetch.parts');
+    Route::get('/get-sap-quantity', [HistoryController::class, 'getSapQuantity'])->name('get.sap.quantity');
 
 
     //Preventive Maintanance Master

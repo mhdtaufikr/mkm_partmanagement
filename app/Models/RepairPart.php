@@ -15,5 +15,6 @@ class RepairPart extends Model
     {
         return $this->belongsTo(Part::class, 'part_id', 'id');
     }
+
 }
 
