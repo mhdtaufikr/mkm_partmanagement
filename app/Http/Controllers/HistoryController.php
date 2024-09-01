@@ -373,9 +373,7 @@ public function storehp(Request $request)
                         'last_replace' => $validatedData['date'],
                         'safety_stock' => 10,
                         'sap_stock' => $sapStock,
-                        'repair_stock' => 0,
-                        'total' => $sapStock,
-                        'status' => 'Active',
+                        'repair_stock' => 0
                     ]);
                 } else {
                     MachineSparePartsInventoryLog::create([
@@ -453,9 +451,7 @@ public function storehp(Request $request)
                         'last_replace' => $validatedData['date'],
                         'safety_stock' => 10,
                         'sap_stock' => 0,
-                        'repair_stock' => $repairStock,
-                        'total' => $repairStock,
-                        'status' => 'Active',
+                        'repair_stock' => $repairStock
                     ]);
                 } else {
                     MachineSparePartsInventoryLog::create([
@@ -521,9 +517,7 @@ public function storehp(Request $request)
                     'last_replace' => $validatedData['date'],
                     'safety_stock' => 10,
                     'sap_stock' => 0,
-                    'repair_stock' => 0,
-                    'total' => $validatedData['other_part_quantity'][$index] ?? 0,
-                    'status' => 'Active',
+                    'repair_stock' => 0
                 ]);
 
                 // Create an entry in the historical_problem_parts table
@@ -563,6 +557,7 @@ public function storehp(Request $request)
         return redirect()->back()->withErrors(['error' => 'Data Process Failed! An error occurred while processing your request. Please try again. Error Details: ' . $e->getMessage()]);
     }
 }
+
 
 
 public function storehpStatus(Request $request)
