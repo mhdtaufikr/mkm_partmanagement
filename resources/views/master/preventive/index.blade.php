@@ -105,8 +105,8 @@
                                                     <label for="">OP. Name</label>
                                                     <select name="id" id="type" class="form-control">
                                                         <option value="">- Please Select Op No. -</option>
-                                                        @foreach ($machine as $machines)
-                                                            <option value="{{ $machines->id }}">{{ $machines->op_no }} - {{ $machines->machine_name }}</option>
+                                                        @foreach ($machines as $machine) <!-- Change $machines to match the controller -->
+                                                            <option value="{{ $machine->id }}">{{ $machine->op_no }} - {{ $machine->machine_name }}</option>
                                                         @endforeach
                                                     </select>
                                                   </div>
@@ -227,31 +227,29 @@
                       @endphp
                       @foreach ($item as $data)
                       <tr>
-                          <td>{{ $no++ }}</td>
-                          <td>
+                        <td>{{ $no++ }}</td>
+                        <td>
                             @if(!empty($data->machine_no))
                                 {{ $data->machine_no }}
                             @else
                                 Not completed yet
                             @endif
                         </td>
-
-                          <td>{{$data->op_name}}</td>
-                          <td>{{$data->type}}</td>
-                          <td>{{$data->machine_name}}</td>
-                          <td>{{$data->no_document}}</td>
-                          <td>{{ \Carbon\Carbon::parse($data->effective_date)->format('d-M-Y') }}</td>
-                          <td>{{$data->no_procedure}}</td>
-                          <td>
+                        <td>{{$data->op_name}}</td>
+                        <td>{{$data->type}}</td>
+                        <td>{{$data->machine_name}}</td>
+                        <td>{{$data->no_document}}</td>
+                        <td>{{ \Carbon\Carbon::parse($data->effective_date)->format('d-M-Y') }}</td>
+                        <td>{{$data->no_procedure}}</td>
+                        <td>
                             <a href="preventive/detail/{{ encrypt($data->id) }}" class="btn btn-primary btn-sm">
-                              <i class="fas fa-info"></i>
-                          </a>
-
-                              <button title="Delete Dropdown" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modal-delete{{ $data->id }}">
-                                  <i class="fas fa-trash-alt"></i>
-                              </button>
-                          </td>
-                      </tr>
+                                <i class="fas fa-info"></i>
+                            </a>
+                            <button title="Delete Dropdown" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modal-delete{{ $data->id }}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
 
                       @endforeach
                     </tbody>

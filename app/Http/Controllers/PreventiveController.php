@@ -27,13 +27,25 @@ class PreventiveController extends Controller
     $existingMachineIds = PreventiveMaintenance::pluck('machine_id')->toArray();
 
     // Get the list of machines excluding those that already exist in preventive_maintenances
-    $machine = Machine::get();
+    $machines = Machine::whereNotIn('id', $existingMachineIds)->get();
 
-    $item = PreventiveMaintenanceView::get();
+    // Join PreventiveMaintenance with Machine to get related machine details
+    $item = PreventiveMaintenance::join('machines', 'preventive_maintenances.machine_id', '=', 'machines.id')
+        ->select(
+            'preventive_maintenances.*',
+            'machines.machine_no',
+            'machines.op_no',
+            'machines.machine_name'
+        )
+        ->get();
+
+    // Fetch dropdown values for category
     $dropdown = Dropdown::where('category', 'Category')->get();
 
-    return view('master.preventive.index', compact('item', 'dropdown', 'machine'));
+    return view('master.preventive.index', compact('item', 'dropdown', 'machines'));
 }
+
+
 
 
 
@@ -91,15 +103,31 @@ class PreventiveController extends Controller
 
 
 
-    public function detail($id){
+    public function detail($id)
+{
     $id = decrypt($id);
 
-    $machine = PreventiveMaintenanceView::where('id',$id)->first();
-    $checksheet = Checksheet::where('preventive_maintenances_id',$id)->get();
-    $checksheetItem = ChecksheetItem::where('preventive_maintenances_id',$id)->get();
-    $dropdown = Dropdown::where('category','ChecksheetType')->get();
-    return view('master.preventive.detail',compact('machine','checksheet','checksheetItem','dropdown'));
-    }
+    // Fetch the machine details by joining PreventiveMaintenance with Machine
+    $machine = PreventiveMaintenance::join('machines', 'preventive_maintenances.machine_id', '=', 'machines.id')
+        ->select(
+            'preventive_maintenances.*',
+            'machines.machine_no',
+            'machines.op_no',
+            'machines.machine_name'
+        )
+        ->where('preventive_maintenances.id', $id)
+        ->first();
+
+    // Fetch the checksheet and checksheet items related to the preventive maintenance ID
+    $checksheet = Checksheet::where('preventive_maintenances_id', $id)->get();
+    $checksheetItem = ChecksheetItem::where('preventive_maintenances_id', $id)->get();
+
+    // Fetch dropdown values for checksheet types
+    $dropdown = Dropdown::where('category', 'ChecksheetType')->get();
+
+    return view('master.preventive.detail', compact('machine', 'checksheet', 'checksheetItem', 'dropdown'));
+}
+
 
     public function storeChecksheet(Request $request){
         // Validate the request data

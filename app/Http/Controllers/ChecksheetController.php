@@ -166,12 +166,20 @@ public function getMachineNames(Request $request)
 
 public function checksheetScan(Request $request){
     if (empty($request->no_mechine)) {
-        $item = PreventiveMaintenanceView::where('plant', $request->plant)
-        ->where('op_name', $request->op_no)
-        ->first();
-    }else {
-        $item = PreventiveMaintenanceView::where('machine_no', $request->no_mechine)->first();
+        // Join PreventiveMaintenance with Machine to filter by plant and op_no
+        $item = PreventiveMaintenance::join('machines', 'preventive_maintenances.machine_id', '=', 'machines.id')
+            ->select('preventive_maintenances.*', 'machines.plant', 'machines.op_no', 'machines.machine_no')
+            ->where('machines.plant', $request->plant)
+            ->where('machines.op_no', $request->op_no)
+            ->first();
+    } else {
+        // Join PreventiveMaintenance with Machine to filter by machine_no
+        $item = PreventiveMaintenance::join('machines', 'preventive_maintenances.machine_id', '=', 'machines.id')
+            ->select('preventive_maintenances.*', 'machines.plant', 'machines.op_no', 'machines.machine_no')
+            ->where('machines.machine_no', $request->no_mechine)
+            ->first();
     }
+
 
     $plannedDates = DB::table('pm_schedule_details')
     ->join('pm_schedule_masters', 'pm_schedule_details.pm_schedule_master_id', '=', 'pm_schedule_masters.id')
