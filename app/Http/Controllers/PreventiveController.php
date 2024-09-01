@@ -291,58 +291,92 @@ class PreventiveController extends Controller
             }
         }
 
+
         public function pmSchedule()
         {
+            // Fetching items with details, preventiveMaintenance, and machine details
             $items = PmScheduleMaster::with(['details' => function ($query) {
                 $query->orderBy('annual_date'); // Sorting details by date
-            }, 'preventiveMaintenance.machine'])
+            }, 'preventiveMaintenance.machine', 'machine']) // Include machine relationship directly
                 ->get()
                 ->groupBy(function ($item) {
-                    return $item->preventiveMaintenance->type ?? 'Unknown';
+                    // Check if type exists in PmScheduleMaster; if not, fall back to 'Unknown'
+                    return $item->type ?? 'Unknown';
                 })
                 ->map(function ($group) {
                     return $group->groupBy(function ($item) {
-                        return $item->preventiveMaintenance->machine->line ?? 'Unknown';
+                        // Check if preventiveMaintenance exists, and if machine exists within it, else use machine directly from PmScheduleMaster
+                        if ($item->preventiveMaintenance && $item->preventiveMaintenance->machine) {
+                            return $item->preventiveMaintenance->machine->line ?? 'Unknown';
+                        } elseif ($item->machine) {
+                            return $item->machine->line ?? 'Unknown';
+                        } else {
+                            return 'Unknown';
+                        }
                     });
                 });
 
-            $types = DB::table('pm_filter_view')->distinct()->pluck('type');
+
+            // Define the types available for selection
+            $types = ['Mechanic', 'Electric', 'Powerhouse'];
 
             return view('master.schedule.index', compact('items', 'types'));
         }
 
-                    public function fetchPlants($type)
-            {
-                $plants = DB::table('pm_filter_view')
-                    ->where('type', $type)
-                    ->distinct()
-                    ->pluck('plant');
 
-                return response()->json($plants);
-            }
 
-            public function fetchShops($type, $plant)
-            {
-                $shops = DB::table('pm_filter_view')
-                    ->where('type', $type)
-                    ->where('plant', $plant)
-                    ->distinct()
-                    ->pluck('shop');
+        public function fetchPlants($type)
+        {
+            // Determine the shop value based on the selected type
+            $shopValue = ($type === 'Powerhouse') ? 'PH' : 'ME';
 
-                return response()->json($shops);
-            }
+            // Fetch distinct plants from machines table based on the shop value
+            $plants = DB::table('machines')
+                ->where('shop', $shopValue)
+                ->distinct()
+                ->pluck('plant');
 
-            public function fetchOpNos($type, $plant, $shop)
-            {
-                $opNos = DB::table('pm_filter_view')
-                    ->where('type', $type)
-                    ->where('plant', $plant)
-                    ->where('shop', $shop)
-                    ->distinct()
-                    ->pluck('op_no');
+            return response()->json($plants);
+        }
 
-                return response()->json($opNos);
-            }
+        public function fetchShops($type, $plant)
+        {
+            // Determine the shop value based on the selected type
+            $shopValue = ($type === 'Powerhouse') ? 'PH' : 'ME';
+
+            // Fetch distinct shops from machines table based on the shop value and plant
+            $shops = DB::table('machines')
+                ->where('shop', $shopValue)
+                ->where('plant', $plant)
+                ->distinct()
+                ->pluck('shop');
+
+            return response()->json($shops);
+        }
+
+        public function fetchOpNos($type, $plant, $shop)
+{
+    // Determine the shop value based on the selected type
+    $shopValue = ($type === 'Powerhouse') ? 'PH' : 'ME';
+
+    // Fetch distinct OP Nos and machine names from machines table based on the shop value, plant, and shop
+    $opNosAndMachines = DB::table('machines')
+        ->where('shop', $shopValue)
+        ->where('plant', $plant)
+        ->where('shop', $shop)
+        ->distinct()
+        ->select('op_no', 'machine_name')
+        ->get();
+
+    // Format the result as an array of strings like "op_no - machine_name"
+    $formattedResults = $opNosAndMachines->map(function($machine) {
+        return $machine->op_no . ' - ' . $machine->machine_name;
+    });
+
+    return response()->json($formattedResults);
+}
+
+
 
         public function pmScheduleDetail($month)
         {
@@ -436,71 +470,105 @@ class PreventiveController extends Controller
 
 
 
-    public function scheduleStore(Request $request)
+public function scheduleStore(Request $request)
 {
-    // Step 1: Query the pm_filter_view to get pm_id and machine_id
-    $filter = DB::table('pm_filter_view')
-        ->where('type', $request->type)
-        ->where('plant', $request->plant)
-        ->where('shop', $request->shop)
-        ->where('op_no', $request->op_no)
-        ->first(['pm_id', 'machine_id']);
+    // Start a database transaction
+    DB::beginTransaction();
 
-    if (!$filter) {
-        return redirect()->back()->with('error', 'Invalid selection. Please try again.');
-    }
+    try {
+        // Step 1: Validate input data
+        $validatedData = $request->validate([
+            'type' => 'required|string',
+            'plant' => 'required|string',
+            'op_no' => 'required|string',
+            'frequency' => 'required|integer|min:1|max:12',
+            'date' => 'required|integer|min:1|max:31',
+        ]);
 
-    // Step 2: Check if the schedule already exists
-    $existingSchedule = DB::table('pm_schedule_masters')
-        ->where('pm_id', $filter->pm_id)
-        ->whereIn('id', function ($query) use ($filter) {
-            $query->select('pm_schedule_master_id')
-                ->from('pm_schedule_details')
-                ->where('pm_schedule_masters.pm_id', $filter->pm_id);
-        })
-        ->first();
+        // Extract the actual op_no from the combined op_no and machine_name
+        $opNoParts = explode(' - ', $request->op_no);
+        $op_no = trim($opNoParts[0]);  // Get the operation number part
 
-    if ($existingSchedule) {
-        return redirect()->back()->with('failed', 'Schedule for this PM ID and Machine ID already exists.');
-    }
+        // Step 2: Get machine_id from machines table based on plant and op_no
+        $machine = DB::table('machines')
+            ->where('plant', $request->plant)
+            ->where('op_no', $op_no)
+            ->first(['id']); // Fetching machine_id
 
-    // Step 3: Insert into pm_schedule_masters
-    $pmScheduleMasterId = DB::table('pm_schedule_masters')->insertGetId([
-        'pm_id' => $filter->pm_id,
-        'frequency' => $request->frequency,
-        'created_at' => now(),
-        'updated_at' => now(),
-    ]);
-
-    // Step 4: Calculate and insert the schedule details
-    $frequency = (int)$request->frequency;
-    $date = $request->date;
-    $year = now()->year;
-
-    $months = [];
-    for ($i = 0; $i < 12; $i += $frequency) {
-        $month = $i + $frequency;
-        if ($month <= 12) {
-            $months[] = $month;
+        if (!$machine) {
+            return redirect()->back()->with('failed', 'Invalid machine selection. Please try again.');
         }
-    }
 
-    $scheduleDetails = [];
-    foreach ($months as $month) {
-        $scheduleDetails[] = [
-            'pm_schedule_master_id' => $pmScheduleMasterId,
-            'annual_date' => \Carbon\Carbon::createFromDate($year, $month, $date)->toDateString(),
-            'status' => 'Scheduled',
+        $machine_id = $machine->id; // Assign the machine_id
+
+        // Debugging output
+        \Log::info('Machine found with ID: ' . $machine_id);
+
+        // Step 3: Attempt to fetch pm_id if available
+        $filter = DB::table('pm_filter_view')
+            ->where('type', $request->type)
+            ->where('plant', $request->plant)
+            ->where('op_no', $op_no) // Use the extracted op_no here
+            ->first(['pm_id']); // Only pm_id is required now
+
+        $pm_id = $filter->pm_id ?? null; // pm_id can be null now
+
+        // Debugging output
+        \Log::info('PM ID fetched: ' . ($pm_id ? $pm_id : 'NULL'));
+
+        // Step 4: Insert into pm_schedule_masters with machine_id and type
+        $pmScheduleMasterId = DB::table('pm_schedule_masters')->insertGetId([
+            'pm_id' => $pm_id, // pm_id is optional now
+            'machine_id' => $machine_id, // Using machine_id from the query
+            'type' => $request->type, // type is added
+            'frequency' => $request->frequency,
             'created_at' => now(),
             'updated_at' => now(),
-        ];
+        ]);
+
+        // Step 5: Calculate and insert the schedule details
+        $frequency = (int)$request->frequency;
+        $date = $request->date;
+        $year = now()->year;
+
+        $months = [];
+        for ($i = 0; $i < 12; $i += $frequency) {
+            $month = $i + $frequency;
+            if ($month <= 12) {
+                $months[] = $month;
+            }
+        }
+
+        $scheduleDetails = [];
+        foreach ($months as $month) {
+            $scheduleDetails[] = [
+                'pm_schedule_master_id' => $pmScheduleMasterId,
+                'annual_date' => \Carbon\Carbon::createFromDate($year, $month, $date)->toDateString(),
+                'status' => 'Scheduled',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        // Insert the schedule details
+        DB::table('pm_schedule_details')->insert($scheduleDetails);
+
+        // Commit the transaction
+        DB::commit();
+
+        return redirect()->back()->with('status', 'Schedule added successfully.');
+
+    } catch (\Exception $e) {
+        // Rollback the transaction on error
+        DB::rollBack();
+
+        // Log the error for debugging purposes
+        \Log::error('Error adding schedule: ' . $e->getMessage());
+
+        return redirect()->back()->with('failed', 'Failed to add schedule. Please try again.');
     }
-
-    // Insert the schedule details
-    DB::table('pm_schedule_details')->insert($scheduleDetails);
-
-    return redirect()->back()->with('status', 'Schedule added successfully.');
 }
+
 
 
 }

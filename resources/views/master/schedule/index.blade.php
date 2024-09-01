@@ -106,7 +106,7 @@
                                 <div class="modal-body">
                                     <div class="row">
                                         <!-- Type Dropdown -->
-                                        <div class="col-md-3 mb-3">
+                                        <div class="col-md-4 mb-3">
                                             <label for="type" class="form-label">Type</label>
                                             <select id="type" name="type" class="form-select" required>
                                                 <option value="" disabled selected>Select Type</option>
@@ -117,28 +117,29 @@
                                         </div>
 
                                         <!-- Plant Dropdown -->
-                                        <div class="col-md-3 mb-3">
+                                        <div class="col-md-4 mb-3">
                                             <label for="plant" class="form-label">Plant</label>
                                             <select id="plant" name="plant" class="form-select" required>
                                                 <option value="" disabled selected>Select Plant</option>
                                             </select>
                                         </div>
 
-                                        <!-- Shop Dropdown -->
-                                        <div class="col-md-3 mb-3">
+                                        <!-- Shop Dropdown (Disabled by default) -->
+                                        <div hidden class="col-md-3 mb-3">
                                             <label for="shop" class="form-label">Shop</label>
-                                            <select id="shop" name="shop" class="form-select" required>
+                                            <select id="shop" name="shop" class="form-select" disabled>
                                                 <option value="" disabled selected>Select Shop</option>
                                             </select>
                                         </div>
 
                                         <!-- OP Number Dropdown -->
-                                        <div class="col-md-3 mb-3">
+                                        <div class="col-md-4 mb-3">
                                             <label for="op_no" class="form-label">OP No</label>
                                             <select id="op_no" name="op_no" class="form-select" required>
                                                 <option value="" disabled selected>Select OP No</option>
                                             </select>
                                         </div>
+
 
                                         <div class="col-md-6 mb-3">
                                             <label for="frequency" class="form-label">Frequency</label>
@@ -164,49 +165,64 @@
                     </div>
                 </div>
                 <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const typeSelect = document.getElementById('type');
-                        const plantSelect = document.getElementById('plant');
-                        const shopSelect = document.getElementById('shop');
-                        const opNoSelect = document.getElementById('op_no');
+                       document.addEventListener('DOMContentLoaded', function () {
+    const typeSelect = document.getElementById('type');
+    const plantSelect = document.getElementById('plant');
+    const shopSelect = document.getElementById('shop');
+    const opNoSelect = document.getElementById('op_no');
 
-                        typeSelect.addEventListener('change', function () {
-                            fetch(`/fetch-plants/${this.value}`)
-                                .then(response => response.json())
-                                .then(data => {
-                                    plantSelect.innerHTML = '<option value="" disabled selected>Select Plant</option>';
-                                    data.forEach(plant => {
-                                        plantSelect.innerHTML += `<option value="${plant}">${plant}</option>`;
-                                    });
-                                    shopSelect.innerHTML = '<option value="" disabled selected>Select Shop</option>';
-                                    opNoSelect.innerHTML = '<option value="" disabled selected>Select OP No</option>';
-                                });
-                        });
+    typeSelect.addEventListener('change', function () {
+        const selectedType = this.value;
 
-                        plantSelect.addEventListener('change', function () {
-                            fetch(`/fetch-shops/${typeSelect.value}/${this.value}`)
-                                .then(response => response.json())
-                                .then(data => {
-                                    shopSelect.innerHTML = '<option value="" disabled selected>Select Shop</option>';
-                                    data.forEach(shop => {
-                                        shopSelect.innerHTML += `<option value="${shop}">${shop}</option>`;
-                                    });
-                                    opNoSelect.innerHTML = '<option value="" disabled selected>Select OP No</option>';
-                                });
-                        });
+        // Set the shop value based on the type selection
+        if (selectedType === 'Mechanic' || selectedType === 'Electric') {
+            shopSelect.value = 'ME';
+        } else {
+            shopSelect.value = 'PH';
+        }
 
-                        shopSelect.addEventListener('change', function () {
-                            fetch(`/fetch-opnos/${typeSelect.value}/${plantSelect.value}/${this.value}`)
-                                .then(response => response.json())
-                                .then(data => {
-                                    opNoSelect.innerHTML = '<option value="" disabled selected>Select OP No</option>';
-                                    data.forEach(opNo => {
-                                        opNoSelect.innerHTML += `<option value="${opNo}">${opNo}</option>`;
-                                    });
-                                });
-                        });
-                    });
+        // Disable the shop dropdown
+        shopSelect.disabled = true;
+
+        // Fetch plants based on the type
+        fetch(`/fetch-plants/${selectedType}`)
+            .then(response => response.json())
+            .then(data => {
+                plantSelect.innerHTML = '<option value="" disabled selected>Select Plant</option>';
+                data.forEach(plant => {
+                    plantSelect.innerHTML += `<option value="${plant}">${plant}</option>`;
+                });
+
+                // Clear the OP No dropdown
+                opNoSelect.innerHTML = '<option value="" disabled selected>Select OP No</option>';
+            })
+            .catch(error => {
+                console.error('Error fetching plants:', error);
+            });
+    });
+
+    plantSelect.addEventListener('change', function () {
+        const selectedType = typeSelect.value;
+        const selectedPlant = this.value;
+        const shopValue = (selectedType === 'Powerhouse') ? 'PH' : 'ME';
+
+        // Fetch OP Nos based on the type, plant, and shop
+        fetch(`/fetch-opnos/${selectedType}/${selectedPlant}/${shopValue}`)
+            .then(response => response.json())
+            .then(data => {
+                opNoSelect.innerHTML = '<option value="" disabled selected>Select OP No</option>';
+                data.forEach(opNoAndMachine => {
+                    opNoSelect.innerHTML += `<option value="${opNoAndMachine}">${opNoAndMachine}</option>`;
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching OP Nos:', error);
+            });
+    });
+});
+
                 </script>
+
 
 
                 @foreach($items as $type => $lines)
@@ -239,28 +255,47 @@
                                     @php
                                         $rowCount = $schedules->count();
                                         $scheduleMap = [];
+
                                         foreach($schedules as $schedule) {
                                             foreach($schedule->details as $detail) {
                                                 $month = \Carbon\Carbon::createFromFormat('Y-m-d', $detail->annual_date)->month;
                                                 $icon = $detail->actual_date ? '<i class="fas fa-circle"></i>' : '<i class="far fa-circle"></i>';
-                                                $scheduleMap[$schedule->preventiveMaintenance->machine->op_no][$month] = $icon;
+
+                                                // Determine op_no based on availability of preventiveMaintenance or machine relationship
+                                                $opNo = optional(optional($schedule->preventiveMaintenance)->machine)->op_no ?? optional($schedule->machine)->op_no;
+
+                                                $scheduleMap[$opNo][$month] = $icon;
                                             }
                                         }
                                     @endphp
-                                    @foreach($schedules->unique('preventiveMaintenance.machine.op_no') as $schedule)
+
+                                    @foreach($schedules->unique(function($schedule) {
+                                        // Determine op_no based on availability of preventiveMaintenance or machine relationship
+                                        return optional(optional($schedule->preventiveMaintenance)->machine)->op_no ?? optional($schedule->machine)->op_no;
+                                    }) as $schedule)
                                         <tr>
                                             @if($loop->first)
                                                 <td rowspan="{{ $rowCount }}" class="text-center align-middle">{{ $no++ }}</td>
                                                 <td rowspan="{{ $rowCount }}" class="text-center align-middle">{{ $line }}</td>
                                             @endif
-                                            <td class="text-center align-middle">{{ $schedule->preventiveMaintenance->machine->op_no ?? '' }}</td>
-                                            <td class="text-center align-middle">{{ $schedule->preventiveMaintenance->machine->process ?? '' }}</td>
-                                            <td class="text-center align-middle">{{ $schedule->preventiveMaintenance->machine->install_date ?? '' }}</td>
+
+                                            <!-- Determine op_no, process, and install_date based on availability of preventiveMaintenance or machine -->
+                                            @php
+                                                $opNo = optional(optional($schedule->preventiveMaintenance)->machine)->op_no ?? optional($schedule->machine)->op_no;
+                                                $process = optional(optional($schedule->preventiveMaintenance)->machine)->process ?? optional($schedule->machine)->process;
+                                                $installDate = optional(optional($schedule->preventiveMaintenance)->machine)->install_date ?? optional($schedule->machine)->install_date;
+                                            @endphp
+
+                                            <td class="text-center align-middle">{{ $opNo }}</td>
+                                            <td class="text-center align-middle">{{ $process }}</td>
+                                            <td class="text-center align-middle">{{ $installDate }}</td>
+
                                             @for($month = 1; $month <= 12; $month++)
                                                 <td class="text-center align-middle">
-                                                    {!! $scheduleMap[$schedule->preventiveMaintenance->machine->op_no][$month] ?? '' !!}
+                                                    {!! $scheduleMap[$opNo][$month] ?? '' !!}
                                                 </td>
                                             @endfor
+
                                             <td class="text-center align-middle">
                                                 <!-- Button to trigger modal -->
                                                 <button type="button" class="btn btn-sm btn-primary edit-schedule" data-schedule="{{ $schedule->toJson() }}" data-bs-toggle="modal" data-bs-target="#editScheduleModal">
@@ -271,6 +306,7 @@
                                     @endforeach
                                 @endforeach
                             </tbody>
+
                         </table>
                     </div>
                 @endforeach
