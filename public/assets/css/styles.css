@@ -5579,19 +5579,19 @@ textarea.form-control-lg {
 }
 .nav-tabs .nav-link {
   margin-bottom: -1px;
-  background: none;
+  background: rgba(0, 103, 127, 1);
   border: 1px solid transparent;
   border-top-left-radius: 0.35rem;
   border-top-right-radius: 0.35rem;
 }
 .nav-tabs .nav-link:hover, .nav-tabs .nav-link:focus {
-  border-color: #e0e5ec #e0e5ec #d4dae3;
+  border-color: white;
   isolation: isolate;
 }
 .nav-tabs .nav-link.disabled {
-  color: #69707a;
+  color:  rgba(0, 103, 127, 1) ;
   background-color: transparent;
-  border-color: transparent;
+  border-color: rgba(0, 103, 127, 1);
 }
 .nav-tabs .nav-link.active,
 .nav-tabs .nav-item.show .nav-link {
