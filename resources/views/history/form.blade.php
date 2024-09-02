@@ -355,7 +355,7 @@
                                                                 <td>
                                                                     <div class="form-group">
                                                                         <select class="form-control stock_type" name="stock_type[]" disabled>
-                                                                            <option value="repair" selected>Repair (Extend)</option>
+                                                                            <option value="repair" selected>Repair (Expense)</option>
                                                                         </select>
                                                                     </div>
                                                                 </td>
