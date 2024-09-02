@@ -200,10 +200,10 @@
                         let statusClass = '';
                         switch (data) {
                             case 'Close': statusClass = 'btn-success'; break;
-                            case 'Open': statusClass = 'btn-primary'; break;
+                            case 'Open': statusClass = 'btn-danger'; break;
                             case 'Delay': statusClass = 'btn-warning'; break;
                             case 'Ongoing': statusClass = 'btn-info'; break;
-                            default: statusClass = 'btn-danger';
+                            default: statusClass = 'btn-primary';
                         }
                         return '<button class="btn ' + statusClass + ' btn-sm">' + data + '</button>';
                     }
