@@ -194,28 +194,94 @@
                                                 </div>
 
 
-                                              <!-- Checkbox Selection for Parts -->
-                                                <div class="row mb-4">
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label>Select Part Type(s)</label>
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="form-check me-3">
-                                                                    <input class="form-check-input part-type" type="checkbox" name="part_type[]" id="sap_part" value="sap">
-                                                                    <label class="form-check-label" for="sap_part">SAP Part</label>
-                                                                </div>
-                                                                <div class="form-check me-3">
-                                                                    <input class="form-check-input part-type" type="checkbox" name="part_type[]" id="repair_part" value="repair">
-                                                                    <label class="form-check-label" for="repair_part">Repair Part</label>
-                                                                </div>
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input part-type" type="checkbox" name="part_type[]" id="other_part" value="other">
-                                                                    <label class="form-check-label" for="other_part">Other</label>
+                                                <div class="card border border-3 border-mkm rounded">
+                                                    <div class="card-body">
+                                                        <div class="row mb-4">
+                                                            <!-- Spare Part Requirement Selection -->
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="need_spare_part">Do you need a spare part?</label>
+                                                                    <select id="need_spare_part" class="form-select" required>
+                                                                        <option value="" disabled selected>Select an option</option>
+                                                                        <option value="yes">Yes</option>
+                                                                        <option value="no">No</option>
+                                                                    </select>
                                                                 </div>
                                                             </div>
+
+                                                            <!-- Checkbox Selection for Parts -->
+                                                            <div class="col-md-6" id="part-selection" style="display: none;"> <!-- Initially hidden -->
+                                                                <div class="form-group">
+                                                                    <label>Select Part Type(s)</label>
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="form-check me-3">
+                                                                            <input class="form-check-input part-type" type="checkbox" name="part_type[]" id="sap_part" value="sap">
+                                                                            <label class="form-check-label" for="sap_part">SAP Part</label>
+                                                                        </div>
+                                                                        <div class="form-check me-3">
+                                                                            <input class="form-check-input part-type" type="checkbox" name="part_type[]" id="repair_part" value="repair">
+                                                                            <label class="form-check-label" for="repair_part">Repair Part / Expense</label>
+                                                                        </div>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input part-type" type="checkbox" name="part_type[]" id="other_part" value="other">
+                                                                            <label class="form-check-label" for="other_part">Other / New Expense</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div> <!-- End of part-selection div -->
                                                         </div>
                                                     </div>
                                                 </div>
+
+<script>
+    $(document).ready(function() {
+    // Handle Spare Part Requirement Selection
+    $('#need_spare_part').on('change', function() {
+        var needSparePart = $(this).val();
+
+        if (needSparePart === 'yes') {
+            $('#part-selection').show();  // Show the checkboxes if 'Yes' is selected
+        } else {
+            $('#part-selection').hide();  // Hide the checkboxes if 'No' is selected
+            $('.part-type').prop('checked', false);  // Uncheck all checkboxes if hiding
+            $('#sap-parts-section, #repair-parts-section, #other-parts-section').hide();  // Hide all sections
+        }
+    });
+
+    // Handle Part Type Selection using Checkboxes
+    $('.part-type').on('change', function() {
+        var showSAP = $('#sap_part').is(':checked');
+        var showRepair = $('#repair_part').is(':checked');
+        var showOther = $('#other_part').is(':checked');
+
+        if (showSAP) {
+            $('#sap-parts-section').show();
+        } else {
+            $('#sap-parts-section').hide();
+        }
+
+        if (showRepair) {
+            $('#repair-parts-section').show();
+        } else {
+            $('#repair-parts-section').hide();
+        }
+
+        if (showOther) {
+            $('#other-parts-section').show();
+        } else {
+            $('#other-parts-section').hide();
+        }
+    });
+
+    // Initialize Select2 for the first row in SAP and Repair tables
+    initializeSelect2($('#sap-parts-table .part-row:first').find('.spare_part'));
+    initializeSelect2($('#repair-parts-table .part-row:first').find('.spare_part'));
+
+    /* (Rest of your JavaScript code remains unchanged) */
+
+});
+
+</script>
 
                                                 <!-- SAP Parts Table -->
                                                 <div id="sap-parts-section" style="display:none;">
@@ -272,7 +338,7 @@
 
                                                 <!-- Repair Parts Table -->
                                                 <div id="repair-parts-section" style="display:none;">
-                                                    <h4>Repair Parts</h4>
+                                                    <h4>Repair Parts / Expense</h4>
                                                     <table class="table table-bordered table-striped" id="repair-parts-table">
                                                         <thead>
                                                             <tr>
@@ -327,15 +393,11 @@
 
                                                 <!-- Other Parts Table -->
                                                 <div id="other-parts-section" style="display:none;">
-                                                    <h4>Other Parts</h4>
+                                                    <h4>Other Parts / New Expense</h4>
                                                     <table class="table table-bordered table-striped" id="other-parts-table">
                                                         <thead>
                                                             <tr>
                                                                 <th>Material Name</th>
-                                                                <th>Description</th>
-                                                                <th>Bun</th>
-                                                                <th>Location</th>
-                                                                <th>Cost</th>
                                                                 <th>Quantity</th>
 
                                                                 <th>Action</th>
@@ -347,30 +409,6 @@
                                                                 <td>
                                                                     <div class="form-group">
                                                                         <input type="text" class="form-control other_part_name" name="other_part_name[]" placeholder="Enter Material Name">
-                                                                    </div>
-                                                                </td>
-                                                                 <!-- Material Description -->
-                                                                 <td>
-                                                                    <div class="form-group">
-                                                                        <input type="text" class="form-control other_part_name" name="other_part_name_description[]" placeholder="Enter Material Description">
-                                                                    </div>
-                                                                </td>
-                                                                 <!-- Material Bun -->
-                                                                 <td>
-                                                                    <div class="form-group">
-                                                                        <input type="text" class="form-control other_part_name" name="bun[]" placeholder="Enter Material Description">
-                                                                    </div>
-                                                                </td>
-                                                                <!-- Location -->
-                                                                <td>
-                                                                    <div class="form-group">
-                                                                        <input type="text" class="form-control other_part_location" name="other_part_location[]" placeholder="Enter Location">
-                                                                    </div>
-                                                                </td>
-                                                                <!-- Cost -->
-                                                                <td>
-                                                                    <div class="form-group">
-                                                                        <input type="number" class="form-control other_part_quantity" name="Cost[]" placeholder="Enter Quantity">
                                                                     </div>
                                                                 </td>
                                                                 <!-- Quantity -->

@@ -340,18 +340,12 @@ public function storehp(Request $request)
         ]);
 
         // Process SAP parts if any
-        if ($request->has('spare_part_sap') && !empty(array_filter($validatedData['spare_part_sap']))) {
+        if (!empty(array_filter($validatedData['spare_part_sap'] ?? []))) {
             foreach ($validatedData['spare_part_sap'] as $index => $sparePartId) {
-                if (is_null($sparePartId)) {
-                    continue;
-                }
+                if (is_null($sparePartId)) continue;
 
-                $stockType = 'sap'; // Stock type is SAP for these parts
                 $usedQty = $validatedData['used_qty_sap'][$index] ?? null;
-
-                if (is_null($usedQty)) {
-                    continue;
-                }
+                if (is_null($usedQty)) continue;
 
                 $location = 'SAP';
 
@@ -399,24 +393,18 @@ public function storehp(Request $request)
                     'part_id' => $sparePartId,
                     'qty' => $usedQty,
                     'location' => $location,
-                    'routes' => $stockType,
+                    'routes' => 'sap',
                 ]);
             }
         }
 
         // Process Repair parts if any
-        if ($request->has('spare_part_repair') && !empty(array_filter($validatedData['spare_part_repair']))) {
+        if (!empty(array_filter($validatedData['spare_part_repair'] ?? []))) {
             foreach ($validatedData['spare_part_repair'] as $index => $sparePartId) {
-                if (is_null($sparePartId)) {
-                    continue;
-                }
+                if (is_null($sparePartId)) continue;
 
-                $stockType = 'repair'; // Stock type is Repair for these parts
                 $usedQty = $validatedData['used_qty_repair'][$index] ?? null;
-
-                if (is_null($usedQty)) {
-                    continue;
-                }
+                if (is_null($usedQty)) continue;
 
                 if (!isset($validatedData['repair_location'][$index])) {
                     return redirect()->back()->withErrors(['repair_location' => 'Repair location is required when stock type is repair.']);
@@ -477,7 +465,7 @@ public function storehp(Request $request)
                     'part_id' => $sparePartId,
                     'qty' => $usedQty,
                     'location' => $location,
-                    'routes' => $stockType,
+                    'routes' => 'repair',
                 ]);
             }
         }
@@ -485,25 +473,28 @@ public function storehp(Request $request)
         // Process Other Parts if any
         if ($request->has('part_type') && in_array('other', $validatedData['part_type'])) {
             foreach ($validatedData['other_part_name'] as $index => $otherPartName) {
-                // Create a new entry in the parts table
+                // Generate material name by the system
+                $materialName = 'MAT-' . strtoupper(substr($otherPartName, 0, 3)) . '-' . uniqid();
+
+                // Create a new entry in the parts table with default values for some fields
                 $part = Part::create([
-                    'material' => $otherPartName,
-                    'material_description' => $validatedData['other_part_name_description'][$index] ?? '',
-                    'type' => 'Other',
-                    'plnt' => $validatedData['other_part_location'][$index] ?? 'other',
-                    'sloc' => $validatedData['other_part_location'][$index] ?? 'other',
-                    'vendor' => 'N/A',
-                    'bun' => $validatedData['bun'][$index] ?? 'pcs',
-                    'begining_qty' => $validatedData['other_part_quantity'][$index] ?? 0,
-                    'begining_value' => $validatedData['Cost'][$index] ?? 0,
-                    'received_qty' => 0,
-                    'received_value' => 0,
-                    'consumed_qty' => 0,
-                    'consumed_value' => 0,
-                    'total_stock' => $validatedData['other_part_quantity'][$index] ?? 0,
-                    'total_value' => $validatedData['Cost'][$index] ?? 0,
-                    'currency' => 'IDR',
-                    'img' => null,
+                    'material' => $materialName, // Auto-generated material name
+                    'material_description' => $otherPartName, // User-provided description
+                    'type' => 'Other', // Set type as 'Other'
+                    'plnt' => 'OTHER', // Default value for plant
+                    'sloc' => 'OTHER', // Default value for storage location
+                    'vendor' => 'N/A', // Default vendor
+                    'bun' => 'PCS', // Default unit of measurement
+                    'begining_qty' => 0, // Default starting quantity
+                    'begining_value' => 0, // Default starting value
+                    'received_qty' => 0, // Default received quantity
+                    'received_value' => 0, // Default received value
+                    'consumed_qty' => 0, // Default consumed quantity
+                    'consumed_value' => 0, // Default consumed value
+                    'total_stock' => $validatedData['other_part_quantity'][$index] ?? 0, // User-provided quantity
+                    'total_value' => 0, // Default total value
+                    'currency' => 'IDR', // Currency
+                    'img' => null, // No image provided
                 ]);
 
                 // Add the new part to the machine inventory
@@ -512,24 +503,25 @@ public function storehp(Request $request)
                     'machine_id' => $validatedData['id_machine'],
                     'critical_part' => 'Default',
                     'type' => 'Other',
-                    'estimation_lifetime' => 5,
-                    'cost' => $validatedData['Cost'][$index] ?? 0.00,
-                    'last_replace' => $validatedData['date'],
-                    'safety_stock' => 10,
-                    'sap_stock' => 0,
-                    'repair_stock' => 0
+                    'estimation_lifetime' => 5, // Default estimation lifetime
+                    'cost' => 0.00, // Default cost
+                    'last_replace' => $validatedData['date'], // Date of last replacement
+                    'safety_stock' => 10, // Default safety stock
+                    'sap_stock' => 0, // Default SAP stock
+                    'repair_stock' => 0, // Default repair stock
                 ]);
 
                 // Create an entry in the historical_problem_parts table
                 HistoricalProblemPart::create([
                     'problem_id' => $problem->id,
                     'part_id' => $part->id,
-                    'qty' => $validatedData['other_part_quantity'][$index] ?? 0,
-                    'location' => $validatedData['other_part_location'][$index] ?? 'other',
-                    'routes' => 'other',
+                    'qty' => $validatedData['other_part_quantity'][$index] ?? 0, // User-provided quantity
+                    'location' => 'OTHER', // Default location
+                    'routes' => 'other', // Route as 'other'
                 ]);
             }
         }
+
 
         // If checksheet_head_id exists, log the status change
         if ($request->has('checksheet_head_id')) {
@@ -557,6 +549,7 @@ public function storehp(Request $request)
         return redirect()->back()->withErrors(['error' => 'Data Process Failed! An error occurred while processing your request. Please try again. Error Details: ' . $e->getMessage()]);
     }
 }
+
 
 
 
@@ -782,25 +775,28 @@ public function storehpStatus(Request $request)
         // Process Other Parts if any
         if ($request->has('part_type') && in_array('other', $validatedData['part_type'])) {
             foreach ($validatedData['other_part_name'] as $index => $otherPartName) {
-                // Create a new entry in the parts table
+                // Generate material name by the system
+                $materialName = 'MAT-' . strtoupper(substr($otherPartName, 0, 3)) . '-' . uniqid();
+
+                // Create a new entry in the parts table with default values for some fields
                 $part = Part::create([
-                    'material' => $otherPartName,
-                    'material_description' => $validatedData['other_part_name_description'][$index] ?? '',
-                    'type' => 'Other',
-                    'plnt' => $validatedData['other_part_location'][$index] ?? 'other',
-                    'sloc' => $validatedData['other_part_location'][$index] ?? 'other',
-                    'vendor' => 'N/A',
-                    'bun' => $validatedData['bun'][$index] ?? 'pcs',
-                    'begining_qty' => $validatedData['other_part_quantity'][$index] ?? 0,
-                    'begining_value' => $validatedData['Cost'][$index] ?? 0,
-                    'received_qty' => 0,
-                    'received_value' => 0,
-                    'consumed_qty' => 0,
-                    'consumed_value' => 0,
-                    'total_stock' => $validatedData['other_part_quantity'][$index] ?? 0,
-                    'total_value' => $validatedData['Cost'][$index] ?? 0,
-                    'currency' => 'IDR',
-                    'img' => null,
+                    'material' => $materialName, // Auto-generated material name
+                    'material_description' => $otherPartName, // User-provided description
+                    'type' => 'Other', // Set type as 'Other'
+                    'plnt' => 'OTHER', // Default value for plant
+                    'sloc' => 'OTHER', // Default value for storage location
+                    'vendor' => 'N/A', // Default vendor
+                    'bun' => 'PCS', // Default unit of measurement
+                    'begining_qty' => 0, // Default starting quantity
+                    'begining_value' => 0, // Default starting value
+                    'received_qty' => 0, // Default received quantity
+                    'received_value' => 0, // Default received value
+                    'consumed_qty' => 0, // Default consumed quantity
+                    'consumed_value' => 0, // Default consumed value
+                    'total_stock' => $validatedData['other_part_quantity'][$index] ?? 0, // User-provided quantity
+                    'total_value' => 0, // Default total value
+                    'currency' => 'IDR', // Currency
+                    'img' => null, // No image provided
                 ]);
 
                 // Add the new part to the machine inventory
@@ -809,26 +805,25 @@ public function storehpStatus(Request $request)
                     'machine_id' => $validatedData['id_machine'],
                     'critical_part' => 'Default',
                     'type' => 'Other',
-                    'estimation_lifetime' => 5,
-                    'cost' => $validatedData['Cost'][$index] ?? 0.00,
-                    'last_replace' => $validatedData['date'],
-                    'safety_stock' => 10,
-                    'sap_stock' => 0,
-                    'repair_stock' => 0,
-                    'total' => $validatedData['other_part_quantity'][$index] ?? 0, // Ensure total is calculated correctly
-                    'status' => 'Active',
+                    'estimation_lifetime' => 5, // Default estimation lifetime
+                    'cost' => 0.00, // Default cost
+                    'last_replace' => $validatedData['date'], // Date of last replacement
+                    'safety_stock' => 10, // Default safety stock
+                    'sap_stock' => 0, // Default SAP stock
+                    'repair_stock' => 0, // Default repair stock
                 ]);
 
                 // Create an entry in the historical_problem_parts table
                 HistoricalProblemPart::create([
                     'problem_id' => $problem->id,
                     'part_id' => $part->id,
-                    'qty' => $validatedData['other_part_quantity'][$index] ?? 0,
-                    'location' => $validatedData['other_part_location'][$index] ?? 'other',
-                    'routes' => 'other',
+                    'qty' => $validatedData['other_part_quantity'][$index] ?? 0, // User-provided quantity
+                    'location' => 'OTHER', // Default location
+                    'routes' => 'other', // Route as 'other'
                 ]);
             }
         }
+
 
         // If checksheet_head_id exists, log the status change
         if ($request->has('checksheet_head_id')) {
