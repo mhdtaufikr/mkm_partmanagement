@@ -378,26 +378,44 @@ class PreventiveController extends Controller
 
 
 
-        public function pmScheduleDetail($month)
-        {
-            $items = PmScheduleMaster::with(['details' => function ($query) use ($month) {
-                $query->whereMonth('annual_date', $month);
-            }, 'preventiveMaintenance.machine'])
-            ->whereHas('details', function ($query) use ($month) {
-                $query->whereMonth('annual_date', $month);
-            })
-            ->get()
-            ->groupBy(function ($item) {
-                return $item->preventiveMaintenance->type ?? 'Unknown';
-            })
-            ->map(function ($group) {
-                return $group->groupBy(function ($item) {
-                    return $item->preventiveMaintenance->machine->line ?? 'Unknown';
-                });
-            });
+public function pmScheduleDetail($month)
+{
+    $items = PmScheduleMaster::with([
+        'details' => function ($query) use ($month) {
+            $query->whereMonth('annual_date', $month);
+        },
+        'preventiveMaintenance.machine' // Ensure this relation is eager-loaded
+    ])
+    ->whereHas('details', function ($query) use ($month) {
+        $query->whereMonth('annual_date', $month);
+    })
+    ->get()
+    ->map(function ($item) {
+        // Fetch the machine details using machine_id
+        $machine = Machine::find($item->machine_id);
 
-            return view('master.schedule.detail', compact('items', 'month'));
+        if ($machine) {
+            $item->machine_line = $machine->line;
+            $item->machine_op_no = $machine->op_no;
+            $item->machine_process = $machine->process;
+            $item->machine_install_date = $machine->install_date;
+        } else {
+            $item->machine_line = 'Unknown';
+            $item->machine_op_no = 'Unknown';
+            $item->machine_process = 'Unknown';
+            $item->machine_install_date = 'Unknown';
         }
+
+        return $item;
+    })
+    ->groupBy(function ($item) {
+        return $item->type ?: 'Unknown'; // Use type directly from PmScheduleMaster
+    });
+
+    return view('master.schedule.detail', compact('items', 'month'));
+}
+
+
 
 
 
@@ -406,8 +424,9 @@ class PreventiveController extends Controller
         return Excel::download(new ScheduleTemplateExport, 'annual_schedule_template.xlsx');
     }
 
-        public function scheduleUpload(Request $request)
+    public function scheduleUpload(Request $request)
     {
+        // Validate the uploaded file
         $validator = Validator::make($request->all(), [
             'excel-file' => 'required|mimes:xlsx,csv',
         ]);
@@ -427,9 +446,12 @@ class PreventiveController extends Controller
             return redirect()->back()->with('status', 'File imported successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('failed', 'Import failed: ' . $e->getMessage());
+
+            // Return back with all error messages collected
+            return redirect()->back()->with('failed', 'Import failed with errors: ' . $e->getMessage());
         }
     }
+
 
     public function updateSchedule(Request $request)
 {

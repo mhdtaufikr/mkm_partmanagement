@@ -167,6 +167,65 @@
                     </div>
                 </div>
 
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+ const typeSelect = document.getElementById('type');
+ const plantSelect = document.getElementById('plant');
+ const shopSelect = document.getElementById('shop');
+ const opNoSelect = document.getElementById('op_no');
+
+ typeSelect.addEventListener('change', function () {
+     const selectedType = this.value;
+
+     // Set the shop value based on the type selection
+     if (selectedType === 'Mechanic' || selectedType === 'Electric') {
+         shopSelect.value = 'ME';
+     } else {
+         shopSelect.value = 'PH';
+     }
+
+     // Disable the shop dropdown
+     shopSelect.disabled = true;
+
+     // Fetch plants based on the type
+     fetch(`/fetch-plants/${selectedType}`)
+         .then(response => response.json())
+         .then(data => {
+             plantSelect.innerHTML = '<option value="" disabled selected>Select Plant</option>';
+             data.forEach(plant => {
+                 plantSelect.innerHTML += `<option value="${plant}">${plant}</option>`;
+             });
+
+             // Clear the OP No dropdown
+             opNoSelect.innerHTML = '<option value="" disabled selected>Select OP No</option>';
+         })
+         .catch(error => {
+             console.error('Error fetching plants:', error);
+         });
+ });
+
+ plantSelect.addEventListener('change', function () {
+     const selectedType = typeSelect.value;
+     const selectedPlant = this.value;
+     const shopValue = (selectedType === 'Powerhouse') ? 'PH' : 'ME';
+
+     // Fetch OP Nos based on the type, plant, and shop
+     fetch(`/fetch-opnos/${selectedType}/${selectedPlant}/${shopValue}`)
+         .then(response => response.json())
+         .then(data => {
+             opNoSelect.innerHTML = '<option value="" disabled selected>Select OP No</option>';
+             data.forEach(opNoAndMachine => {
+                 opNoSelect.innerHTML += `<option value="${opNoAndMachine}">${opNoAndMachine}</option>`;
+             });
+         })
+         .catch(error => {
+             console.error('Error fetching OP Nos:', error);
+         });
+ });
+});
+
+             </script>
+
                 <!-- Nav Tabs for Each Line -->
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                     @foreach($items as $type => $lines)
