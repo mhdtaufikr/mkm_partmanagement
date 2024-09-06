@@ -62,7 +62,7 @@
                                 Bar Chart Example
                             </div>
                             <div class="card-body">
-                                <div id="chartdiv" style="height: 400px;"></div>
+                                <div id="chartdiv" style="height: 265px;"></div>
                             </div>
                         </div>
                     </div>
@@ -74,7 +74,7 @@
                                 Line Chart Example
                             </div>
                             <div class="card-body">
-                                <div id="chartdiv2" style="height: 400px;"></div>
+                                <div id="chartdiv2" style="height: 265px;"></div>
                             </div>
                         </div>
                     </div>
@@ -86,7 +86,7 @@
                                 Pie Chart Example
                             </div>
                             <div class="card-body">
-                                <div id="chartdiv3" style="height: 400px;"></div>
+                                <div id="chartdiv3" style="height: 265px;"></div>
                             </div>
                         </div>
                     </div>
@@ -98,7 +98,7 @@
                                 Radar Chart Example
                             </div>
                             <div class="card-body">
-                                <div id="chartdiv4" style="height: 400px;"></div>
+                                <div id="chartdiv4" style="height: 265px;"></div>
                             </div>
                         </div>
                     </div>

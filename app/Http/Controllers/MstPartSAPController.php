@@ -54,14 +54,34 @@ class MstPartSAPController extends Controller
     public function sapUpload(Request $request)
     {
         try {
-            DB::transaction(function () use ($request) {
-                Excel::import(new PartsSAPImport, $request->file('excel-file'));
-            });
+            // Increase the execution time to handle large files
+            set_time_limit(1200);
+
+            // Start database transaction
+            DB::beginTransaction();
+
+            // Initialize error log array
+            $errorLog = [];
+
+            // Import the file
+            Excel::import(new PartsSAPImport($errorLog), $request->file('excel-file'));
+
+            // If there are any errors, rollback the transaction and return the error log
+            if (!empty($errorLog)) {
+                DB::rollBack();
+                return redirect()->back()->with('failed', 'Failed to import file. Errors: ' . implode(", ", $errorLog));
+            }
+
+            // Commit the transaction if no errors
+            DB::commit();
             return redirect()->back()->with('status', 'File imported successfully.');
         } catch (\Exception $e) {
+            DB::rollBack();
             return redirect()->back()->with('failed', 'Failed to import file: ' . $e->getMessage());
         }
     }
+
+
 
     public function sapPartDetail($id) {
         $id = decrypt($id);

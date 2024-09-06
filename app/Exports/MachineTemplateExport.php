@@ -26,8 +26,7 @@ class MachineTemplateExport implements WithHeadings, FromArray, WithEvents
             'serial_number',
             'Mfg. Date',
             'Install Date',
-            'electrical control',
-            'Power Cap. (KVA)'
+            'Specification(remarks)'
         ];
     }
 

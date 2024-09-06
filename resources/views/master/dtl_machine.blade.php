@@ -189,7 +189,7 @@
 
                                     <div class="card mb-4 border border-3 border-mkm rounded" style="position: relative; padding-top: 10px; height: 60px;">
                                         <div class="position-absolute text-white py-1 rounded-pill text-center" style="top: -15px; left: 10px; right: 10px; background-color: rgba(0, 103, 127, 1);">
-                                            <strong>Specification (Electrical Control)</strong>
+                                            <strong>Specification (Remarks)</strong>
                                         </div>
                                         <div class="card-body d-flex align-items-center justify-content-center p-1 text-center">
                                             <p class="m-0">{{ $machine->electrical_co ?? '-' }}</p>

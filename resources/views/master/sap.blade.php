@@ -116,12 +116,6 @@
                                                     <th>Material</th>
                                                     <th>Plnt</th>
                                                     <th>SLoc</th>
-                                                    <th>Beginning Qty</th>
-                                                    <th>Beginning Value</th>
-                                                    <th>Received Qty</th>
-                                                    <th>Received Value</th>
-                                                    <th>Consumed Qty</th>
-                                                    <th>Consumed Value</th>
                                                     <th>Total Stock</th>
                                                     <th>Total Value</th>
                                                 </tr>
@@ -160,12 +154,6 @@
                 { "data": "material", "name": "material" },
                 { "data": "plnt", "name": "plnt" },
                 { "data": "sloc", "name": "sloc" },
-                { "data": "begining_qty", "name": "begining_qty", "render": $.fn.dataTable.render.number(',', '.', 0) },
-                { "data": "begining_value", "name": "begining_value", "render": $.fn.dataTable.render.number(',', '.', 0) },
-                { "data": "received_qty", "name": "received_qty", "render": $.fn.dataTable.render.number(',', '.', 0) },
-                { "data": "received_value", "name": "received_value", "render": $.fn.dataTable.render.number(',', '.', 0) },
-                { "data": "consumed_qty", "name": "consumed_qty", "render": $.fn.dataTable.render.number(',', '.', 0) },
-                { "data": "consumed_value", "name": "consumed_value", "render": $.fn.dataTable.render.number(',', '.', 0) },
                 { "data": "total_stock", "name": "total_stock", "render": $.fn.dataTable.render.number(',', '.', 0) },
                 { "data": "total_value", "name": "total_value", "render": $.fn.dataTable.render.number(',', '.', 0) },
                 { "data": "encrypted_id", "name": "encrypted_id", "visible": false }, // Add hidden encrypted ID for row click
