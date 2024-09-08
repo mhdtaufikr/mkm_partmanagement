@@ -27,6 +27,10 @@ class MstPartSAPController extends Controller
 
             $items = $query->get()->map(function ($item) {
                 $item->encrypted_id = encrypt($item->id); // Add encrypted id for row URL
+
+                // Calculate total value per unit
+                $item->total_value_per_unit = $item->total_stock > 0 ? $item->total_value / $item->total_stock : 0;
+
                 return $item;
             });
 
@@ -40,6 +44,7 @@ class MstPartSAPController extends Controller
 
         return view('master.sap', compact('parts')); // Pass the parts variable to the view
     }
+
 
 
 

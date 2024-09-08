@@ -118,6 +118,7 @@
                                                     <th>SLoc</th>
                                                     <th>Total Stock</th>
                                                     <th>Total Value</th>
+                                                    <th>Total Value Per Unit</th> <!-- New column for value per unit -->
                                                 </tr>
                                             </thead>
                                             <tbody></tbody>
@@ -138,57 +139,58 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
 
 <script>
-    $(document).ready(function() {
-        // Fetch the current plant from the URL or set to null
-        var plnt = '{{ request()->segment(4) ?? '' }}'; // Assuming plant is the 4th segment in your URL
+ $(document).ready(function() {
+    var plnt = '{{ request()->segment(4) ?? '' }}'; // Assuming plant is the 4th segment in your URL
 
-        var table = $('#tableUser').DataTable({
-            "processing": true,
-            "serverSide": true,
-            "ajax": {
-                "url": plnt ? "{{ url('/mst/sap/part') }}/" + plnt : "{{ route('mst.sap.part') }}",
-                "type": "GET"
-            },
-            "columns": [
-                { "data": "DT_RowIndex", "name": "DT_RowIndex", "orderable": false, "searchable": false },
-                { "data": "material", "name": "material" },
-                { "data": "plnt", "name": "plnt" },
-                { "data": "sloc", "name": "sloc" },
-                { "data": "total_stock", "name": "total_stock", "render": $.fn.dataTable.render.number(',', '.', 0) },
-                { "data": "total_value", "name": "total_value", "render": $.fn.dataTable.render.number(',', '.', 0) },
-                { "data": "encrypted_id", "name": "encrypted_id", "visible": false }, // Add hidden encrypted ID for row click
-            ],
-            "order": [[1, 'asc']],
-            "dom": 'Blfrtip', // Enable buttons and length menu
-            "buttons": [
-                {
-                    title: 'SAP Part Data Export',
-                    text: '<i class="fas fa-file-excel"></i> Export to Excel',
-                    extend: 'excel',
-                    className: 'btn btn-success btn-sm mb-2',
-                    exportOptions: {
-                        columns: ':visible', // Export only visible columns
-                        modifier: {
-                            search: 'applied', // Export only filtered data
-                            order: 'applied', // Export data in current order
-                            page: 'all' // Export all pages of data
-                        }
+    var table = $('#tableUser').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            "url": plnt ? "{{ url('/mst/sap/part') }}/" + plnt : "{{ route('mst.sap.part') }}",
+            "type": "GET"
+        },
+        "columns": [
+            { "data": "DT_RowIndex", "name": "DT_RowIndex", "orderable": false, "searchable": false },
+            { "data": "material", "name": "material" },
+            { "data": "plnt", "name": "plnt" },
+            { "data": "sloc", "name": "sloc" },
+            { "data": "total_stock", "name": "total_stock", "render": $.fn.dataTable.render.number(',', '.', 0) },
+            { "data": "total_value", "name": "total_value", "render": $.fn.dataTable.render.number(',', '.', 0) },
+            { "data": "total_value_per_unit", "name": "total_value_per_unit", "render": $.fn.dataTable.render.number(',', '.', 0) }, // New column
+            { "data": "encrypted_id", "name": "encrypted_id", "visible": false }, // Add hidden encrypted ID for row click
+        ],
+        "order": [[1, 'asc']],
+        "dom": 'Blfrtip', // Enable buttons and length menu
+        "buttons": [
+            {
+                title: 'SAP Part Data Export',
+                text: '<i class="fas fa-file-excel"></i> Export to Excel',
+                extend: 'excel',
+                className: 'btn btn-success btn-sm mb-2',
+                exportOptions: {
+                    columns: ':visible', // Export only visible columns
+                    modifier: {
+                        search: 'applied', // Export only filtered data
+                        order: 'applied', // Export data in current order
+                        page: 'all' // Export all pages of data
                     }
                 }
-            ],
-            "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
-            "pageLength": 10, // Set the default number of rows to display
-            "createdRow": function(row, data, dataIndex) {
-                $(row).attr('onclick', 'window.location.href="{{ url("/mst/sap/part/info/") }}/'+data.encrypted_id+'"');
-                $(row).css('cursor', 'pointer');
             }
-        });
-
-        // Initialize Chosen plugin for multi-select
-        $('.chosen-select').chosen({
-            width: '100%',
-            no_results_text: 'No results matched'
-        });
+        ],
+        "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+        "pageLength": 10, // Set the default number of rows to display
+        "createdRow": function(row, data, dataIndex) {
+            $(row).attr('onclick', 'window.location.href="{{ url("/mst/sap/part/info/") }}/'+data.encrypted_id+'"');
+            $(row).css('cursor', 'pointer');
+        }
     });
+
+    // Initialize Chosen plugin for multi-select
+    $('.chosen-select').chosen({
+        width: '100%',
+        no_results_text: 'No results matched'
+    });
+});
+
 </script>
 @endsection

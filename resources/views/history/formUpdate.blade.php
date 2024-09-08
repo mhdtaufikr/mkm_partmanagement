@@ -36,6 +36,8 @@
                                                 <input type="hidden" name="date" value="{{ $date }}">
                                                 <input type="hidden" name="shift" value="{{ $shift }}"> --}}
                                                 <input type="hidden" name="report" value="Daily Report">
+                                                <input type="hidden" name="parent_id" id="" value="{{$parent_id}}">
+                                                <input type="hidden" name="id_machine" value="{{$data->id_machine}}">
 
                                                 <div class="row mb-4">
                                                     <div class="col-md-12 mb-4">
@@ -51,20 +53,21 @@
 
                                                             <div class="row mb-4">
                                                                 <div class="col-md-3">
-                                                                    <label for="line"><strong style="color: rgba(0, 103, 127, 1)">Line</strong> </label>
-                                                                    <select class="form-control" id="line" name="line" required>
+                                                                    <label for="line"><strong style="color: rgba(0, 103, 127, 1)">Line</strong></label>
+                                                                    <select disabled class="form-control" id="line" name="line" required>
                                                                         <option value="">-- Select Line --</option>
                                                                         @foreach($lines as $line)
-                                                                            <option value="{{ $line->line }}">{{ $line->line }}</option>
+                                                                            <option value="{{ $data->machine->line }}" {{ $line->line === $data->machine->line ? 'selected' : '' }}>{{ $line->line }}</option>
                                                                         @endforeach
                                                                     </select>
                                                                 </div>
 
                                                                 <div class="col-md-3">
-                                                                    <label for="machine"><strong style="color: rgba(0, 103, 127, 1)">Machine No (Op No)</strong> </label>
-                                                                    <select class="form-control" id="no_machine" name="id_machine" required>
-                                                                        <option value="">-- Select Machine --</option>
+                                                                    <label for="machine"><strong style="color: rgba(0, 103, 127, 1)">Machine No (Op No)</strong></label>
+                                                                    <select disabled class="form-control" id="no_machine" name="id_machine" required>
+                                                                        <option value="{{ $data->id_machine }}" selected>{{ $data->machine->op_no }}</option>
                                                                     </select>
+
                                                                 </div>
 
 
@@ -96,11 +99,7 @@
                                                                     <div class="col-md-3">
                                                                         <div class="form-group">
                                                                             <label for="shop"><strong style="color: rgba(0, 103, 127, 1)">Shop</strong> </label>
-                                                                            <select class="form-control" id="shop" name="shop" required>
-                                                                                <option value="Electric">Electric</option>
-                                                                                <option value="Mechanic">Mechanic</option>
-                                                                                <option value="Power House">Power House</option>
-                                                                            </select>
+                                                                            <input class="form-control" type="text" name="shop" id="" value="{{$data->shop}}" readonly>
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-md-3">

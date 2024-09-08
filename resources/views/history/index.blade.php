@@ -5,15 +5,14 @@
     <header class="page-header page-header-dark bg-gradient-primary-to-secondary pb-10">
         <div class="container-fluid px-4">
             <div class="page-header-content pt-4">
-                 <div class="row align-items-center justify-content-between">
+                <div class="row align-items-center justify-content-between">
                     <div class="col-auto mt-4">
                         <h1 class="page-header-title">
                             <div class="page-header-icon"><i data-feather="tool"></i></div>
-                                Daily Report
+                            Daily Report
                         </h1>
                         <div class="page-header-subtitle">Manage Daily Report</div>
                     </div>
-                    {{-- <div class="col-12 col-xl-auto mt-4">Optional page header content</div> --}}
                 </div>
             </div>
         </div>
@@ -27,7 +26,7 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">List of Daily Report</h3>
+                                    <h3 class="card-title">List of Daily Reports</h3>
                                 </div>
 
                                 @include('partials.alert')
@@ -35,89 +34,64 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="mb-3 col-sm-12">
-                                            <button type="button" class="btn btn-dark btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#modal-add">
-                                                <i class="fas fa-plus-square"></i>  Input Daily Report
+                                            <a href="{{ route('form') }}" class="btn btn-dark btn-sm mb-2">
+                                                <i class="fas fa-plus-square"></i> Input Daily Report
+                                            </a>
+                                            <button class="btn btn-info btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#openReportModal">
+                                                <i class="fas fa-plus-square"></i> Update Daily Report
                                             </button>
                                         </div>
                                     </div>
-<!-- Modal for Adding Daily Report -->
-<div class="modal fade" id="modal-add" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modal-add-label">Add Daily Report</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="historical-problem-form" action="{{ url('/history/store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div>
-                                <label for="line" class="form-label">Line</label>
-                                <select class="form-control" id="line" name="line" required>
-                                    <option value="">-- Select Line --</option>
-                                    @foreach($lines as $line)
-                                        <option value="{{ $line->line }}">{{ $line->line }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
 
-                            <div>
-                                <label for="shift" class="form-label">Shift</label>
-                                <select class="form-control" id="shift" name="shift" required>
-                                    <option value="Day">Day</option>
-                                    <option value="Night">Night</option>
-                                </select>
-                            </div>
+                                    <!-- Modal for selecting the open daily report -->
+                                    <div class="modal fade" id="openReportModal" tabindex="-1" aria-labelledby="openReportModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="openReportModalLabel">Select Open Daily Report</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <table class="table table-bordered" id="openReportsTable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Date</th>
+                                                                <th>Shift</th>
+                                                                <th>Plant</th>
+                                                                <th>Line</th>
+                                                                <th>OP No.</th>
+                                                                <th>Shop</th>
+                                                                <th>Problem</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <!-- Loop through open reports and display them -->
+                                                            @foreach ($openReports as $report)
+                                                                <tr>
+                                                                    <td>{{ $report->date }}</td>
+                                                                    <td>{{ $report->shift }}</td>
+                                                                    <td>{{ $report->machine->plant ?? 'N/A' }}</td> <!-- Display the plant -->
+                                                                    <td>{{ $report->machine->line ?? 'N/A' }}</td>  <!-- Display the line -->
+                                                                    <td>{{ $report->machine->op_no ?? 'N/A' }}</td> <!-- Display the OP No -->
+                                                                    <td>{{ $report->shop }}</td>
+                                                                    <td>{{ $report->problem }}</td>
+                                                                    <td>
+                                                                        <!-- Form for selecting the report -->
+                                                                        <form action="{{ url('form/update/' . encrypt($report->id)) }}" method="GET">
+                                                                            @csrf
+                                                                            <button type="submit" class="btn btn-primary">Select</button>
+                                                                        </form>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                        </div>
-                        <div class="col-md-6">
-                            <div>
-                                <label for="no_machine" class="form-label">Machine No (Op No)</label>
-                                <select class="form-control" id="no_machine" name="no_machine" required>
-                                    <option value="">-- Select Machine --</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="date" class="form-label">Date</label>
-                                <input type="date" class="form-control" id="date" name="date" value="{{ date('Y-m-d') }}" required>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary mt-3" form="historical-problem-form">Submit</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    document.getElementById('line').addEventListener('change', function() {
-        const line = this.value;
-        fetch(`/get-op-nos/${line}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                const noMachineSelect = document.getElementById('no_machine');
-                noMachineSelect.innerHTML = '<option value="">-- Select Machine --</option>';
-                data.forEach(machine => {
-                    const option = document.createElement('option');
-                    option.value = machine.id;
-                    option.textContent = machine.op_no;
-                    noMachineSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching machine data:', error);
-                alert('Error fetching machine data: ' + error.message);
-            });
-    });
-</script>
                                     <!-- DataTable -->
                                     <div class="table-responsive">
                                         <table id="tablehistory" class="table table-bordered table-striped">
@@ -136,6 +110,7 @@
                                                     <th>PIC</th>
                                                     <th>Remarks</th>
                                                     <th>Status</th>
+                                                    <th>Flag</th> <!-- New column for flag -->
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -144,7 +119,6 @@
                                             </tbody>
                                         </table>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -153,25 +127,27 @@
             </section>
         </div>
     </div>
+
     <!-- Modal Structure -->
-<div class="modal fade" id="modal-detail" tabindex="-1" aria-labelledby="modal-detail-label" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modal-detail-label">Detail of Historical Problem</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="modal-body-content">
-                <!-- Dynamic content will be loaded here -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <div class="modal fade" id="modal-detail" tabindex="-1" aria-labelledby="modal-detail-label" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-detail-label">Detail of Historical Problem</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modal-body-content">
+                    <!-- Dynamic content will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 </main>
+
 <script>
     $(document).ready(function() {
         var table = $("#tablehistory").DataTable({
@@ -206,6 +182,14 @@
                             default: statusClass = 'btn-primary';
                         }
                         return '<button class="btn ' + statusClass + ' btn-sm">' + data + '</button>';
+                    }
+                },
+                {
+                    // Add a flag icon if the record has a parent (indicating it was reopened)
+                    "data": "parent_id",
+                    "name": "parent_id",
+                    "render": function(data, type, row) {
+                        return data ? '<i class="fas fa-flag" style="color: rgba(0, 103, 127, 1)"></i>' : '';
                     }
                 },
                 {
@@ -257,7 +241,4 @@
     });
 </script>
 
-
-
-<!-- DataTables script remains unchanged -->
 @endsection

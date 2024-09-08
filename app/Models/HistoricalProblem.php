@@ -22,4 +22,9 @@ class HistoricalProblem extends Model
     {
         return $this->belongsTo(Machine::class, 'id_machine');
     }
+    public function children()
+{
+    return $this->hasMany(HistoricalProblem::class, 'parent_id');
+}
+
 }
