@@ -748,85 +748,41 @@
                                                                     $no = 1;
                                                                 @endphp
                                                                 @foreach ($combinedData as $data)
-                                                                <tr>
-                                                                    <td>
-                                                                        <div class="row align-items-center">
-                                                                            <div class="col-md-2">
-                                                                                {{ $no++ }}
-                                                                            </div>
-                                                                            <div class="col-md-4">
-                                                                                @if($data->status_logs->isNotEmpty())
-                                                                                    <span class="badge bg-primary ms-2" style="padding: 0.35rem 0.75rem; margin-left: 10px; font-size: 0.85rem;">Log</span>
-                                                                                @endif
-                                                                            </div>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td>{{ $data->Category }}</td>
-                                                                    <td>{{ $data->date }}</td>
-                                                                    <td>{{ $data->data->shift ?? '-' }}</td>
-                                                                    <td>{{ $data->data->shop }}</td>
-                                                                    <td>
-                                                                        @if($data->type == 'Daily Report')
-                                                                            {{ $data->data->problem }}
-                                                                        @else
-                                                                           PM schedule
-                                                                        @endif
-                                                                    </td>
-                                                                    <td>
-                                                                        @if($data->type == 'Daily Report')
-                                                                            {{ $data->data->cause }}
-                                                                        @else
-                                                                           PM schedule
-                                                                        @endif
-                                                                    </td>
-                                                                    <td>
-                                                                        @if($data->type == 'Daily Report')
-                                                                            {{ $data->data->action }}
-                                                                        @else
-                                                                           PM schedule
-                                                                        @endif
-                                                                    </td>
-                                                                    <td>
-                                                                        {{ $data->data->start_time ? date('H:i', strtotime($data->data->start_time)) : '-' }} -
-                                                                        {{ $data->data->finish_time ? date('H:i', strtotime($data->data->finish_time)) : '-' }}
-                                                                        @if($data->data->balance)
-                                                                            (Total: {{ number_format($data->data->balance, 2) }} hours)
-                                                                        @endif
-                                                                    </td>
-
-                                                                    <td>{{ $data->data->remarks ?? 'OK' }}</td>
-                                                                    <td>{{ $data->data->pic ?? 'Hmd. Prod' }}</td>
-                                                                    <td>
-                                                                        @if($data->type == 'Daily Report')
-                                                                            @if($data->data->status == 'Open')
-                                                                                <span class="badge bg-warning">Open</span>
-                                                                            @elseif($data->data->status == 'Close')
-                                                                                <span class="badge bg-success">Close</span>
-                                                                            @else
-                                                                                <span class="badge">Unknown Status</span>
+                                                                    @if($data->data->status == 'Close' && $data->data->parent_id) <!-- Show only the child with status 'Close' -->
+                                                                    <tr>
+                                                                        <td>
+                                                                            {{ $no++ }}
+                                                                            @if($data->status_logs->isNotEmpty() || $data->data->parent_id) <!-- Show flag if status logs exist or record has a parent -->
+                                                                            <i class="fas fa-flag" style="color: rgba(0, 103, 127, 1); margin-left: 10px;"></i>
                                                                             @endif
-                                                                        @else
-                                                                            @if($data->data->pm_status == 'Open')
-                                                                                <span class="badge bg-warning">Open</span>
-                                                                            @elseif($data->data->pm_status == 'Close')
-                                                                                <span class="badge bg-success">Close</span>
-                                                                            @else
-                                                                                <span class="badge">Unknown Status</span>
+                                                                        </td>
+                                                                        <td>{{ $data->Category }}</td>
+                                                                        <td>{{ $data->date }}</td>
+                                                                        <td>{{ $data->data->shift ?? '-' }}</td>
+                                                                        <td>{{ $data->data->shop }}</td>
+                                                                        <td>{{ $data->data->problem }}</td>
+                                                                        <td>{{ $data->data->cause }}</td>
+                                                                        <td>{{ $data->data->action }}</td>
+                                                                        <td>
+                                                                            {{ $data->data->start_time ? date('H:i', strtotime($data->data->start_time)) : '-' }} -
+                                                                            {{ $data->data->finish_time ? date('H:i', strtotime($data->data->finish_time)) : '-' }}
+                                                                            @if($data->data->balance)
+                                                                                (Total: {{ number_format($data->data->balance, 2) }} hours)
                                                                             @endif
-                                                                        @endif
-                                                                    </td> <!-- Status with conditional badge based on type -->
-                                                                    <td>
-                                                                        @if($data->type == 'Daily Report')
-                                                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-detail-{{ $data->data->id }}">Detail</button>
-                                                                        @else
-                                                                        <a target="_blank" title="Detail" class=" btn btn-sm btn-primary" href="{{url("checksheet/detail/".encrypt($data->data->id_ch))}} ">
-                                                                            Detail
-                                                                        </a>
-                                                                        @endif
-                                                                    </td>
-                                                                </tr>
+                                                                        </td>
+                                                                        <td>{{ $data->data->remarks ?? 'OK' }}</td>
+                                                                        <td>{{ $data->data->pic ?? 'Hmd. Prod' }}</td>
+                                                                        <td>
+                                                                            <span class="badge bg-success">Close</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-detail-{{ $data->data->id }}">Detail</button>
+                                                                        </td>
+                                                                    </tr>
+                                                                    @endif
                                                                 @endforeach
                                                             </tbody>
+
                                                         </table>
 
                                                     </div>

@@ -62,97 +62,98 @@ class MstMachinePartController extends Controller
 }
 
 
-    public function detail($id) {
-        $id = decrypt($id);
-        $machine = Machine::with(['inventoryStatus', 'spareParts', 'spareParts.repairs','spareParts.logs' ])->where('id', $id)->first();
+public function detail($id) {
+    $id = decrypt($id);
+    $machine = Machine::with(['inventoryStatus', 'spareParts', 'spareParts.repairs', 'spareParts.logs'])->where('id', $id)->first();
 
-        // Get all parts with their total repair quantities
-        $parts = Part::withSum('repairs as total_repaired_qty', 'repaired_qty')->get();
+    // Get all parts with their total repair quantities
+    $parts = Part::withSum('repairs as total_repaired_qty', 'repaired_qty')->get();
 
-        // Fetch historical problems for the specified machine ID
-        $historicalProblems = HistoricalProblem::with(['spareParts.part', 'machine'])
-            ->where('id_machine', $id)
-            ->get();
+    // Fetch historical problems with parent and spare parts relationships for the specified machine ID
+    $historicalProblems = HistoricalProblem::with(['spareParts.part', 'machine', 'parent'])
+        ->where('id_machine', $id)
+        ->get();
 
-        // Fetch preventive maintenance records for the specified machine ID
-        $query = PreventiveMaintenanceView::select(
-            'preventive_maintenance_view.id',
-            'preventive_maintenance_view.id_ch',
-            'preventive_maintenance_view.machine_no',
-            'preventive_maintenance_view.op_name',
-            'preventive_maintenance_view.machine_name',
-            'preventive_maintenance_view.no_document',
-            'preventive_maintenance_view.type',
-            'preventive_maintenance_view.dept',
-            'preventive_maintenance_view.shop',
-            'preventive_maintenance_view.effective_date',
-            'preventive_maintenance_view.mfg_date',
-            'preventive_maintenance_view.process',
-            'preventive_maintenance_view.revision',
-            'preventive_maintenance_view.no_procedure',
-            'preventive_maintenance_view.plant',
-            'preventive_maintenance_view.location',
-            'preventive_maintenance_view.line',
-            'preventive_maintenance_view.created_at',
-            'preventive_maintenance_view.updated_at',
-            'checksheet_form_heads.id as checksheet_id',
-            'checksheet_form_heads.planning_date',
-            'checksheet_form_heads.actual_date',
-            'checksheet_form_heads.pic',
-            'checksheet_form_heads.pm_status',
-            'checksheet_form_heads.status',
-            'checksheet_form_heads.created_by',
-            'checksheet_form_heads.remark',
-            'checksheet_form_heads.created_at as checksheet_created_at',
-            'checksheet_form_heads.updated_at as checksheet_updated_at'
-        )
-        ->join('checksheet_form_heads', 'preventive_maintenance_view.id', '=', 'checksheet_form_heads.preventive_maintenances_id')
-        ->where('preventive_maintenance_view.machine_id', $id);
+    // Fetch preventive maintenance records for the specified machine ID
+    $query = PreventiveMaintenanceView::select(
+        'preventive_maintenance_view.id',
+        'preventive_maintenance_view.id_ch',
+        'preventive_maintenance_view.machine_no',
+        'preventive_maintenance_view.op_name',
+        'preventive_maintenance_view.machine_name',
+        'preventive_maintenance_view.no_document',
+        'preventive_maintenance_view.type',
+        'preventive_maintenance_view.dept',
+        'preventive_maintenance_view.shop',
+        'preventive_maintenance_view.effective_date',
+        'preventive_maintenance_view.mfg_date',
+        'preventive_maintenance_view.process',
+        'preventive_maintenance_view.revision',
+        'preventive_maintenance_view.no_procedure',
+        'preventive_maintenance_view.plant',
+        'preventive_maintenance_view.location',
+        'preventive_maintenance_view.line',
+        'preventive_maintenance_view.created_at',
+        'preventive_maintenance_view.updated_at',
+        'checksheet_form_heads.id as checksheet_id',
+        'checksheet_form_heads.planning_date',
+        'checksheet_form_heads.actual_date',
+        'checksheet_form_heads.pic',
+        'checksheet_form_heads.pm_status',
+        'checksheet_form_heads.status',
+        'checksheet_form_heads.created_by',
+        'checksheet_form_heads.remark',
+        'checksheet_form_heads.created_at as checksheet_created_at',
+        'checksheet_form_heads.updated_at as checksheet_updated_at'
+    )
+    ->join('checksheet_form_heads', 'preventive_maintenance_view.id', '=', 'checksheet_form_heads.preventive_maintenances_id')
+    ->where('preventive_maintenance_view.machine_id', $id);
 
-        if (Auth::user()->role == "Checker" || Auth::user()->role == "Approval") {
-            $preventiveMaintenances = $query->orderBy('checksheet_form_heads.created_at', 'desc')->get();
-        } elseif (Auth::user()->role == "user") {
-            $preventiveMaintenances = $query->where('checksheet_form_heads.created_by', Auth::user()->name)->orderBy('checksheet_form_heads.created_at', 'desc')->get();
-        } else {
-            $preventiveMaintenances = $query->orderBy('checksheet_form_heads.created_at', 'desc')->get();
-        }
-
-        // Attach logs to each preventive maintenance record
-        foreach ($preventiveMaintenances as $pm) {
-            $pm->logs = ChecksheetStatusLog::where('checksheet_header_id', $pm->checksheet_id)->orderBy('created_at', 'desc')->get();
-        }
-
-        // Fetch the logs for each part
-        foreach ($parts as $part) {
-            $part->logs = MachineSparePartsInventoryLog::where('inventory_id', $part->id)->orderBy('created_at', 'desc')->get();
-        }
-
-        // Combine the data into a single collection
-        $combinedData = collect();
-        foreach ($historicalProblems as $problem) {
-            $combinedData->push((object) [
-                'date' => $problem->date,
-                'type' => "Daily Report",
-                'data' => $problem,
-                'Category' => $problem->report,
-                'status_logs' => collect()
-            ]);
-        }
-
-        // Add preventive maintenance records to the collection
-        foreach ($preventiveMaintenances as $pm) {
-            $combinedData->push((object) [
-                'date' => $pm->planning_date,
-                'type' => 'Preventive Maintenance',
-                'data' => $pm,
-                'Category' => 'Preventive Maintenance',
-                'status_logs' => $pm->logs
-            ]);
-        }
-        // Sort the combined data by date
-        $combinedData = $combinedData->sortBy('date');
-        return view('master.dtl_machine', compact('machine', 'parts', 'combinedData'));
+    if (Auth::user()->role == "Checker" || Auth::user()->role == "Approval") {
+        $preventiveMaintenances = $query->orderBy('checksheet_form_heads.created_at', 'desc')->get();
+    } elseif (Auth::user()->role == "user") {
+        $preventiveMaintenances = $query->where('checksheet_form_heads.created_by', Auth::user()->name)->orderBy('checksheet_form_heads.created_at', 'desc')->get();
+    } else {
+        $preventiveMaintenances = $query->orderBy('checksheet_form_heads.created_at', 'desc')->get();
     }
+
+    // Attach logs to each preventive maintenance record
+    foreach ($preventiveMaintenances as $pm) {
+        $pm->logs = ChecksheetStatusLog::where('checksheet_header_id', $pm->checksheet_id)->orderBy('created_at', 'desc')->get();
+    }
+
+    // Fetch the logs for each part
+    foreach ($parts as $part) {
+        $part->logs = MachineSparePartsInventoryLog::where('inventory_id', $part->id)->orderBy('created_at', 'desc')->get();
+    }
+
+    // Combine the data into a single collection
+    $combinedData = collect();
+    foreach ($historicalProblems as $problem) {
+        $combinedData->push((object) [
+            'date' => $problem->date,
+            'type' => "Daily Report",
+            'data' => $problem,
+            'Category' => $problem->report,
+            'status_logs' => collect()
+        ]);
+    }
+
+    // Add preventive maintenance records to the collection
+    foreach ($preventiveMaintenances as $pm) {
+        $combinedData->push((object) [
+            'date' => $pm->planning_date,
+            'type' => 'Preventive Maintenance',
+            'data' => $pm,
+            'Category' => 'Preventive Maintenance',
+            'status_logs' => $pm->logs
+        ]);
+    }
+    // Sort the combined data by date
+    $combinedData = $combinedData->sortBy('date');
+    return view('master.dtl_machine', compact('machine', 'parts', 'combinedData'));
+}
+
 
 
 
