@@ -38,12 +38,7 @@
                                                 <input type="hidden" name="report" value="Daily Report">
 
                                                 <div class="row mb-4">
-                                                    <div class="col-md-12 mb-4">
-                                                        <div class="form-group form-check">
-                                                            <input type="checkbox" class="form-check-input" id="include_kpi" name="include_kpi">
-                                                            <label class="form-check-label" for="include_kpi"><strong style="color: rgba(0, 103, 127, 1)">KPI</strong></label>
-                                                        </div>
-                                                    </div>
+
                                                     <div class="col-md-12">
 
                                                         <div class="card border border-3 border-mkm rounded">
@@ -134,15 +129,29 @@
                                                             <div class="card-body">
                                                                 <div class="row">
                                                                     <div class="col-md-3">
-                                                                        <div class="form-group">
-                                                                            <label for="category"><strong style="color: rgba(0, 103, 127, 1)">Class Trouble</strong></label>
-                                                                            <select name="category" id="category" class="form-control" required>
-                                                                                <option value="">- Please Select Class Trouble -</option>
-                                                                                @foreach ($dropdown as $Problem)
-                                                                                    <option value="{{ $Problem->name_value }}">{{ $Problem->name_value }}</option>
-                                                                                @endforeach
-                                                                            </select>
+                                                                        <div class="row">
+                                                                            <div class="col-md-3 d-flex flex-column justify-content-center align-items-center">
+                                                                                <label class="form-check-label" for="include_kpi">
+                                                                                    <strong style="color: rgba(0, 103, 127, 1)">KPI</strong>
+                                                                                </label>
+                                                                                <div class="form-group form-check">
+                                                                                    <input type="checkbox" class="form-check-input" id="include_kpi" name="include_kpi">
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="col-md-9">
+                                                                                <div class="form-group">
+                                                                                    <label for="category"><strong style="color: rgba(0, 103, 127, 1)">Class Trouble</strong></label>
+                                                                                    <select name="category" id="category" class="form-control" required>
+                                                                                        <option value="">- Please Select Class Trouble -</option>
+                                                                                        @foreach ($dropdown as $Problem)
+                                                                                            <option value="{{ $Problem->name_value }}">{{ $Problem->name_value }}</option>
+                                                                                        @endforeach
+                                                                                    </select>
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
+
                                                                     </div>
                                                                     <div class="col-md-3">
                                                                         <div class="form-group">
