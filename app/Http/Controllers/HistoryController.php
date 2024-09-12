@@ -16,110 +16,111 @@ use App\Models\ChecksheetStatusLog;
 use App\Models\MachineSparePartsInventory;
 use DB;
 use Yajra\DataTables\DataTables;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Log;
+use App\Exports\HistoricalProblemTemplateExport;
+use App\Imports\HistoricalProblemImport;
 
 class HistoryController extends Controller
 {
     public function index(Request $request)
-    {
-        // Dapatkan plant dan type dari pengguna yang sedang login
-        $userPlant = auth()->user()->plant;
-        $userType = auth()->user()->type;
+{
+    $userPlant = auth()->user()->plant;
+    $userType = auth()->user()->type;
 
-        if ($request->ajax()) {
-            $query = HistoricalProblem::with(['spareParts.part', 'machine'])
-                ->where(function ($q) {
-                    // Get all HistoricalProblem records that are not "Open" or
-                    // where they don't have any child data (no other record has their id as parent_id)
-                    $q->where('status', '!=', 'Open')
-                      ->orWhereDoesntHave('children'); // Filter out if the record has child data
-                })
-                ->orderBy('date', 'desc')       // Urutkan berdasarkan tanggal secara menurun
-                ->orderBy('start_time', 'desc'); // Lalu urutkan berdasarkan waktu mulai secara menurun
+    if ($request->ajax()) {
+        // Modify query to fetch both parent and child records
+        $query = HistoricalProblem::with(['spareParts.part', 'machine', 'children'])
+            ->orderBy('date', 'desc')
+            ->orderBy('start_time', 'desc');
 
-            // Terapkan filter berdasarkan plant dan type pengguna
-            if (($userPlant === 'Engine' || $userPlant === 'Stamping') && ($userType === 'Mechanic' || $userType === 'Electric')) {
-                $query->whereHas('machine', function($q) use ($userPlant) {
-                    $q->where('plant', $userPlant)->where('shop', 'ME');
-                });
-            } elseif (($userPlant === 'Engine' || $userPlant === 'Stamping') && $userType === 'Power House') {
-                $query->whereHas('machine', function($q) use ($userPlant) {
-                    $q->where('plant', $userPlant)->where('shop', 'PH');
-                });
-            }
-
-            // Return the filtered data to DataTables
-            return DataTables::of($query)
-                ->addIndexColumn()
-                ->editColumn('start_time', function ($row) {
-                    return \Carbon\Carbon::parse($row->start_time)->format('H:i');
-                })
-                ->editColumn('finish_time', function ($row) {
-                    return \Carbon\Carbon::parse($row->finish_time)->format('H:i');
-                })
-                ->addColumn('flag', function($row) {
-                    // Add flag icon if the record has a parent (child data)
-                    return $row->parent_id ? '<i class="fas fa-flag" style="color: rgba(0, 103, 127, 1)"></i>' : '';
-                })
-                ->addColumn('action', function($row){
-                    return '<button class="btn btn-sm btn-primary btn-detail" data-id="'.$row->id.'" data-bs-toggle="modal" data-bs-target="#modal-detail">Detail</button>';
-                })
-                ->rawColumns(['action', 'flag'])
-                ->make(true);
-        }
-
-        // Terapkan filter untuk kueri machines dan lines berdasarkan plant dan type pengguna
-        $machinesQuery = Machine::query();
-        $linesQuery = Machine::select('line')->distinct();
-
+        // Apply user filters based on plant and type
         if (($userPlant === 'Engine' || $userPlant === 'Stamping') && ($userType === 'Mechanic' || $userType === 'Electric')) {
-            $machinesQuery->where('plant', $userPlant)->where('shop', 'ME');
-            $linesQuery->where('plant', $userPlant)->where('shop', 'ME');
-        } elseif (($userPlant === 'Engine' || $userPlant === 'Stamping') && $userType === 'Power House') {
-            $machinesQuery->where('plant', $userPlant)->where('shop', 'PH');
-            $linesQuery->where('plant', $userPlant)->where('shop', 'PH');
-        }
-
-        $machines = $machinesQuery->get();
-        $lines = $linesQuery->get();
-
-        // Fetch only open daily reports
-      // Fetch only open daily reports without child or with child that is still open
-// Fetch only open daily reports without child or with child that is still open
-$openReports = HistoricalProblem::where('status', 'Open')
-    ->where(function ($query) {
-        // Exclude records that have a closed child record
-        $query->doesntHave('children')
-            ->orWhereHas('children', function ($q) {
-                $q->where('status', 'Open');
+            $query->whereHas('machine', function($q) use ($userPlant) {
+                $q->where('plant', $userPlant)->where('shop', 'ME');
             });
-    })
-    ->whereHas('machine', function ($q) use ($userPlant, $userType) {
-        // Filter based on userPlant and userType
-
-        // Show everything if the plant and type are 'All'
-        if ($userPlant !== 'All' && $userType !== 'All') {
-            $q->where('plant', $userPlant);  // Filter by plant from machines table
-
-            // Additional filtering by shop if user type is not 'All'
-            if ($userType !== 'All') {
-                $q->whereHas('historicalProblems', function ($q2) use ($userType) {
-                    $q2->where('shop', $userType);  // Filter by type from historical_problems table (shop)
-                });
-            }
+        } elseif (($userPlant === 'Engine' || $userPlant === 'Stamping') && $userType === 'Power House') {
+            $query->whereHas('machine', function($q) use ($userPlant) {
+                $q->where('plant', $userPlant)->where('shop', 'PH');
+            });
         }
-    })
-    ->get();
 
+        // Process data for DataTables
+        return DataTables::of($query)
+        ->addIndexColumn()
+        ->editColumn('start_time', function ($row) {
+            return \Carbon\Carbon::parse($row->start_time)->format('H:i');
+        })
+        ->editColumn('finish_time', function ($row) {
+            return \Carbon\Carbon::parse($row->finish_time)->format('H:i');
+        })
+        ->editColumn('status', function ($row) {
+            // Show the latest child's status in the table (if child exists and has a status)
+            $latestChild = $row->children()->latest()->first();
+            return $latestChild ? $latestChild->status : $row->status;
+        })
+        ->editColumn('machine.op_no', function ($row) {
+            // Add hyperlink to OP No., opening in a new tab
+            return '<a href="/mst/machine/detail/' . encrypt($row->machine->id) . '" target="_blank">' . $row->machine->op_no . '</a>';
+        })
+        ->addColumn('flag', function($row) {
+            // Show a flag if the record has a parent or children
+            return $row->parent_id || $row->children()->exists() ? '<i class="fas fa-flag" style="color: rgba(0, 103, 127, 1)"></i>' : '';
+        })
+        ->addColumn('action', function($row){
+            return '<button class="btn btn-sm btn-primary btn-detail" data-id="'.$row->id.'" data-bs-toggle="modal" data-bs-target="#modal-detail">Detail</button>';
+        })
+        ->rawColumns(['action', 'flag', 'machine.op_no']) // Include 'machine.op_no' in rawColumns to render HTML
+        ->make(true);
 
-        return view('history.index', compact('machines', 'lines', 'openReports'));
     }
+
+    // Additional queries for machines and lines based on user plant and type
+    $machinesQuery = Machine::query();
+    $linesQuery = Machine::select('line')->distinct();
+
+    if (($userPlant === 'Engine' || $userPlant === 'Stamping') && ($userType === 'Mechanic' || $userType === 'Electric')) {
+        $machinesQuery->where('plant', $userPlant)->where('shop', 'ME');
+        $linesQuery->where('plant', $userPlant)->where('shop', 'ME');
+    } elseif (($userPlant === 'Engine' || $userPlant === 'Stamping') && $userType === 'Power House') {
+        $machinesQuery->where('plant', $userPlant)->where('shop', 'PH');
+        $linesQuery->where('plant', $userPlant)->where('shop', 'PH');
+    }
+
+    $machines = $machinesQuery->get();
+    $lines = $linesQuery->get();
+
+    // Fetch open reports (status = 'Open')
+    $openReports = HistoricalProblem::where('status', 'Open')
+        ->where(function ($query) {
+            $query->doesntHave('children')
+                ->orWhereHas('children', function ($q) {
+                    $q->where('status', 'Open');
+                });
+        })
+        ->whereHas('machine', function ($q) use ($userPlant, $userType) {
+            if ($userPlant !== 'All' && $userType !== 'All') {
+                $q->where('plant', $userPlant);
+
+                if ($userType !== 'All') {
+                    $q->whereHas('historicalProblems', function ($q2) use ($userType) {
+                        $q2->where('shop', $userType);
+                    });
+                }
+            }
+        })
+        ->get();
+
+    return view('history.index', compact('machines', 'lines', 'openReports'));
+}
+
+
 
 
     public function showDetail($id)
     {
-        // Fetch the current record with spare parts and machine details
-        $data = HistoricalProblem::with(['spareParts.part', 'machine'])->findOrFail($id);
+        // Fetch the current record (which could be parent or child) with spare parts and machine details
+        $data = HistoricalProblem::with(['spareParts.part', 'machine', 'children'])->findOrFail($id);
 
         // Check if the current record has a parent
         $parent = null;
@@ -127,9 +128,14 @@ $openReports = HistoricalProblem::where('status', 'Open')
             $parent = HistoricalProblem::with(['spareParts.part', 'machine'])->find($data->parent_id);
         }
 
-        // Return the partial view with both the current and parent data
-        return view('history.partials', compact('data', 'parent'));
+        // Fetch the latest child if it exists
+        $latestChild = $data->children()->latest()->first();
+
+        // Return the view with the current, parent, and latest child data
+        return view('history.partials', compact('data', 'parent', 'latestChild'));
     }
+
+
 
 
     public function getOpNos($line)
@@ -970,5 +976,37 @@ public function formUpdate($id)
     return view('history.formUpdate', compact('data', 'lines', 'dropdown','parent_id'));
 }
 
+
+public function uploadBulk(Request $request)
+    {
+        // Validate the uploaded file
+        $request->validate([
+            'excel-file' => 'required|file|mimes:xlsx,csv',
+        ]);
+
+        $errorLog = [];  // Initialize an error log array
+
+        // Try to import the uploaded file using the HistoricalProblemImport class
+        try {
+            Excel::import(new HistoricalProblemImport($errorLog), $request->file('excel-file'));
+
+            // If there are errors, pass them to the response
+            if (!empty($errorLog)) {
+                return redirect()->back()->with('failed', 'Import failed. Check the error logs for details.')->with('errorLogs', $errorLog);
+            }
+
+            // If successful, return a success message
+            return redirect()->back()->with('success', 'Historical problems imported successfully.');
+        } catch (\Exception $e) {
+            // Return the exception message in case of a failure
+            return redirect()->back()->with('failed', 'Import failed: ' . $e->getMessage());
+        }
+    }
+
+    public function templateBulk()
+    {
+        // Return an Excel file as a template for historical problems
+        return Excel::download(new HistoricalProblemTemplateExport, 'historical_problems_template.xlsx');
+    }
 
 }

@@ -93,6 +93,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/history', [HistoryController::class, 'index'])->name('history');
      Route::post('/history/store', [HistoryController::class, 'store']);
      Route::get('/history/detail/{id}', [HistoryController::class, 'showDetail']);
+     Route::post('/history/upload', [HistoryController::class, 'uploadBulk']);
+     Route::get('/history/template', [HistoryController::class, 'templateBulk']);
 
     Route::get('/get-parts/{machineId}', [HistoryController::class, 'getParts']);
 
