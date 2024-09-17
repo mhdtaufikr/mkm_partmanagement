@@ -297,35 +297,68 @@ class PreventiveController extends Controller
 
 
 
-        public function pmSchedule()
-        {
-            // Fetching items with details, preventiveMaintenance, and machine details
-            $items = PmScheduleMaster::with(['details' => function ($query) {
-                $query->orderBy('annual_date'); // Sorting details by date
-            }, 'preventiveMaintenance.machine', 'machine']) // Include machine relationship directly
-                ->get()
-                ->groupBy(function ($item) {
-                    // Check if type exists in PmScheduleMaster; if not, fall back to 'Unknown'
-                    return $item->type ?? 'Unknown';
-                })
-                ->map(function ($group) {
-                    return $group->groupBy(function ($item) {
-                        // Check if preventiveMaintenance exists, and if machine exists within it, else use machine directly from PmScheduleMaster
-                        if ($item->preventiveMaintenance && $item->preventiveMaintenance->machine) {
-                            return $item->preventiveMaintenance->machine->line ?? 'Unknown';
-                        } elseif ($item->machine) {
-                            return $item->machine->line ?? 'Unknown';
-                        } else {
-                            return 'Unknown';
-                        }
-                    });
-                });
+public function pmSchedule($type)
+{
+    // Define the types for ME Engine, ME Stamping, and Power House
+    $types = ['Mechanic', 'Electric', 'Powerhouse'];
 
-            // Define the types available for selection
-            $types = ['Mechanic', 'Electric', 'Powerhouse'];
+    // Base query to fetch items with related details, preventiveMaintenance, and machine details
+    $query = PmScheduleMaster::with(['details' => function ($query) {
+        $query->orderBy('annual_date'); // Sort the details by date
+    }, 'preventiveMaintenance.machine', 'machine']);
 
+    // Adjust the query based on the type (me_engine, me_stamping, power_house)
+    switch ($type) {
+        case 'me_engine':
+            // Filter for ME Engine schedules where the plant is 'ENGINE'
+            $query->whereHas('machine', function ($q) {
+                $q->where('plant', 'ENGINE')->whereIn('shop', ['ME']);
+            })
+            ->whereIn('type', ['Mechanic', 'Electric']); // Only include 'Mechanic' and 'Electric' types
+            break;
+
+        case 'me_stamping':
+            // Filter for ME Stamping schedules where the plant is 'STAMPING'
+            $query->whereHas('machine', function ($q) {
+                $q->where('plant', 'STAMPING')->whereIn('shop', ['ME']);
+            })
+            ->whereIn('type', ['Mechanic', 'Electric']); // Only include 'Mechanic' and 'Electric' types
+            break;
+
+        case 'power_house':
+            // Filter for Power House schedules where the shop is 'PH'
+            $query->whereHas('machine', function ($q) {
+                $q->where('shop', 'PH');
+            });
+            break;
+
+        default:
+            // If no valid type is provided, return an empty collection or handle it appropriately
+            $items = collect();
             return view('master.schedule.index', compact('items', 'types'));
-        }
+    }
+
+    // Execute the query and group by type and line
+    $items = $query->get()->groupBy(function ($item) {
+        // Group by the type: 'Mechanic', 'Electric', 'Powerhouse'
+        return $item->type ?? 'Unknown';
+    })->map(function ($group) {
+        return $group->groupBy(function ($item) {
+            // Group by the machine's line, falling back to 'Unknown'
+            if ($item->preventiveMaintenance && $item->preventiveMaintenance->machine) {
+                return $item->preventiveMaintenance->machine->line ?? 'Unknown';
+            } elseif ($item->machine) {
+                return $item->machine->line ?? 'Unknown';
+            } else {
+                return 'Unknown';
+            }
+        });
+    });
+
+    // Return the view with the filtered items
+    return view('master.schedule.index', compact('items', 'types'));
+}
+
 
 
 

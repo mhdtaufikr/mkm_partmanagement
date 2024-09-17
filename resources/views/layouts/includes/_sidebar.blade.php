@@ -72,6 +72,25 @@
                     </nav>
                 </div>
 
+
+                 <!-- Sidenav Accordion (Master PM) -->
+                 <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapsemasterSchedule" aria-expanded="false" aria-controls="collapsemasterSchedule">
+                    <div class="nav-link-icon"><i class="fas fa-database"></i></div>
+                    Master Schedule
+                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+
+                <!-- Nested Navigation for Master PM -->
+                <div class="collapse" id="collapsemasterSchedule" data-bs-parent="#accordionSidenav">
+                    <nav class="sidenav-menu-nested nav">
+                        <a class="nav-link" href="{{ url('/mst/preventive/schedule/me_engine') }}">ME Engine</a>
+                        <a class="nav-link" href="{{ url('/mst/preventive/schedule/me_stamping') }}">ME Stamping</a>
+                        <a class="nav-link" href="{{ url('/mst/preventive/schedule/power_house') }}">Power House</a>
+
+
+                    </nav>
+                </div>
+
                 <!-- Sidenav Accordion (Master PM) -->
                 <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapsemaster" aria-expanded="false" aria-controls="collapsemaster">
                     <div class="nav-link-icon"><i class="fas fa-database"></i></div>
@@ -83,7 +102,7 @@
                 <div class="collapse" id="collapsemaster" data-bs-parent="#accordionSidenav">
                     <nav class="sidenav-menu-nested nav">
                         <a class="nav-link" href="{{ url('/mst/preventive') }}">PM Form</a>
-                        <a class="nav-link" href="{{ url('/mst/preventive/schedule') }}">PM Schedule</a>
+
                     </nav>
                 </div>
 

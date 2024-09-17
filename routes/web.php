@@ -125,7 +125,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/mst/checksheet/item/update/{id}', [PreventiveController::class, 'updateChecksheetItem']);
     Route::get('/checksheet/template', [PreventiveController::class, 'template']);
     Route::post('/checksheet/upload', [PreventiveController::class, 'upload']);
-    Route::get('/mst/preventive/schedule', [PreventiveController::class, 'pmSchedule']);
+    Route::get('/mst/preventive/schedule/{type}', [PreventiveController::class, 'pmSchedule']);
     Route::get('/mst/preventive/schedule/detail/{month}', [PreventiveController::class, 'pmScheduleDetail']);
     Route::get('/annual/schedule/template', [PreventiveController::class, 'scheduleTemplate']);
     Route::post('/annual/schedule/upload', [PreventiveController::class, 'scheduleUpload']);
