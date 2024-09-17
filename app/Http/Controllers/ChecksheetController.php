@@ -180,13 +180,13 @@ public function checksheetScan(Request $request){
             ->first();
     }
 
-
     $plannedDates = DB::table('pm_schedule_details')
     ->join('pm_schedule_masters', 'pm_schedule_details.pm_schedule_master_id', '=', 'pm_schedule_masters.id')
-    ->where('pm_schedule_masters.pm_id', $item->id)
-    ->whereNull('pm_schedule_details.actual_date')
+    ->where('pm_schedule_masters.machine_id', $item->machine_id) // Use machine_id here
+    ->whereNull('pm_schedule_details.actual_date') // Ensure we are only looking for schedules without an actual date
     ->select('pm_schedule_details.id', 'pm_schedule_details.annual_date')
     ->get();
+
 
 
 
