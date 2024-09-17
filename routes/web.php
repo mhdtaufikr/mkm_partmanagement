@@ -12,6 +12,7 @@ use App\Http\Controllers\MstPartRepairController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\PreventiveController;
 use App\Http\Controllers\ChecksheetController;
+use App\Http\Controllers\SummaryController;
 
 
 
@@ -64,6 +65,9 @@ Route::middleware(['auth'])->group(function () {
      Route::post('/mst/part/add/image', [MstPartSAPController::class, 'addImage']);
      Route::post('/mst/sap/part/store/', [MstPartSAPController::class, 'sapPartDetailStore']);
      Route::post('/mst/sap/part/delete', [MstPartSAPController::class, 'sapPartDelete']);
+     Route::get('/part/info', [MstPartSAPController::class, 'partInfo'])->name('part.info');
+
+
 
 
 
@@ -163,6 +167,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/get-opNos', [ChecksheetController::class, 'getOpNos'])->name('get.opNos');
     Route::get('/get-machineNames', [ChecksheetController::class, 'getMachineNames'])->name('get.machineNames');
     Route::post('checksheet/change-status', [ChecksheetController::class, 'changeStatus']);
+
+
+    Route::get('/summary', [SummaryController::class, 'index']);
 
 
 

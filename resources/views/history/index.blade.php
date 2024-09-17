@@ -185,96 +185,92 @@
 </main>
 
 <script>
-    $(document).ready(function() {
-        var table = $("#tablehistory").DataTable({
-            "processing": true,
-            "serverSide": true,
-            "responsive": true,
-            "autoWidth": false,
-            "ajax": "{{ route('history') }}",
-            "columns": [
-                { "data": "DT_RowIndex", "name": "DT_RowIndex", "orderable": false, "searchable": false },
-                { "data": "machine.op_no", "name": "machine.op_no" },
-                { "data": "date", "name": "date" },
-                { "data": "shift", "name": "shift" },
-                { "data": "shop", "name": "shop" },
-                { "data": "problem", "name": "problem" },
-                { "data": "cause", "name": "cause" },
-                { "data": "start_time", "name": "start_time" },
-                { "data": "finish_time", "name": "finish_time" },
-                { "data": "balance", "name": "balance" },
-                { "data": "pic", "name": "pic" },
-                { "data": "remarks", "name": "remarks" },
-                {
-                    "data": "status",
-                    "name": "status",
-                    "render": function(data, type, row) {
-                        let statusClass = '';
-                        switch (data) {
-                            case 'Close': statusClass = 'btn-success'; break;
-                            case 'Open': statusClass = 'btn-danger'; break;
-                            case 'Delay': statusClass = 'btn-warning'; break;
-                            case 'Ongoing': statusClass = 'btn-info'; break;
-                            default: statusClass = 'btn-primary';
-                        }
-                        return '<button class="btn ' + statusClass + ' btn-sm">' + data + '</button>';
+   $(document).ready(function() {
+    var table = $("#tablehistory").DataTable({
+        "processing": true,
+        "serverSide": true,
+        "responsive": true,
+        "autoWidth": false,
+        "ajax": "{{ route('history') }}",
+        "columns": [
+            { "data": "DT_RowIndex", "name": "DT_RowIndex", "orderable": false, "searchable": false },
+            { "data": "machine.op_no", "name": "machine.op_no" },
+            { "data": "date", "name": "date" },
+            { "data": "shift", "name": "shift" },
+            { "data": "shop", "name": "shop" },
+            { "data": "problem", "name": "problem" },
+            { "data": "cause", "name": "cause" },
+            { "data": "start_time", "name": "start_time" },
+            { "data": "finish_time", "name": "finish_time" },
+            { "data": "balance", "name": "balance" },
+            { "data": "pic", "name": "pic" },
+            { "data": "remarks", "name": "remarks" },
+            {
+                "data": "status",
+                "name": "status",
+                "render": function(data) {
+                    let statusClass = '';
+                    switch (data) {
+                        case 'Close': statusClass = 'btn-success'; break;
+                        case 'Open': statusClass = 'btn-danger'; break;
+                        case 'Delay': statusClass = 'btn-warning'; break;
+                        case 'Ongoing': statusClass = 'btn-info'; break;
+                        default: statusClass = 'btn-primary';
                     }
-                },
-                {
-                    // Add a flag icon if the record has a parent (indicating it was reopened)
-                    "data": "parent_id",
-                    "name": "parent_id",
-                    "render": function(data, type, row) {
-                        return data ? '<i class="fas fa-flag" style="color: rgba(0, 103, 127, 1)"></i>' : '';
-                    }
-                },
-                {
-                    "data": "id",
-                    "name": "id",
-                    "orderable": false,
-                    "searchable": false,
-                    "render": function(data, type, row) {
-                        return `<button class="btn btn-sm btn-primary btn-detail" data-id="${data}" data-bs-toggle="modal" data-bs-target="#modal-detail">Detail</button>`;
+                    return '<button class="btn ' + statusClass + ' btn-sm">' + data + '</button>';
+                }
+            },
+            {
+                "data": "flag",
+                "name": "flag",
+                "orderable": false, // No sorting on this column
+                "searchable": false // Disable searching on this column
+            },
+            {
+                "data": "action",
+                "name": "action",
+                "orderable": false,
+                "searchable": false
+            }
+        ],
+        "dom": 'Blfrtip', // Enable buttons and length menu
+        "buttons": [
+            {
+                title: 'History Data Export',
+                text: '<i class="fas fa-file-excel"></i> Export to Excel',
+                extend: 'excel',
+                className: 'btn btn-success btn-sm mb-2',
+                exportOptions: {
+                    columns: ':visible',
+                    modifier: {
+                        search: 'applied',
+                        order: 'applied',
+                        page: 'all'
                     }
                 }
-            ],
-            "dom": 'Blfrtip', // Enable buttons and length menu
-            "buttons": [
-                {
-                    title: 'History Data Export',
-                    text: '<i class="fas fa-file-excel"></i> Export to Excel',
-                    extend: 'excel',
-                    className: 'btn btn-success btn-sm mb-2',
-                    exportOptions: {
-                        columns: ':visible', // Export only visible columns
-                        modifier: {
-                            search: 'applied', // Export only filtered data
-                            order: 'applied', // Export data in current order
-                            page: 'all' // Export all pages of data
-                        }
-                    }
-                }
-            ],
-            "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
-            "pageLength": 10, // Set the default number of rows to display
-        });
+            }
+        ],
+        "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+        "pageLength": 10
+    });
 
-        // Load modal content dynamically when the detail button is clicked
-        $('#tablehistory').on('click', '.btn-detail', function() {
-            var id = $(this).data('id');
-            $.ajax({
-                url: "{{ url('/history/detail') }}/" + id,
-                method: 'GET',
-                success: function(data) {
-                    $('#modal-body-content').html(data);
-                    $('#modal-detail').modal('show');
-                },
-                error: function(xhr, status, error) {
-                    alert('An error occurred while fetching details: ' + error);
-                }
-            });
+    // Load modal content dynamically when the detail button is clicked
+    $('#tablehistory').on('click', '.btn-detail', function() {
+        var id = $(this).data('id');
+        $.ajax({
+            url: "{{ url('/history/detail') }}/" + id,
+            method: 'GET',
+            success: function(data) {
+                $('#modal-body-content').html(data);
+                $('#modal-detail').modal('show');
+            },
+            error: function(xhr, status, error) {
+                alert('An error occurred while fetching details: ' + error);
+            }
         });
     });
+});
+
 </script>
 
 @endsection

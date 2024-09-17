@@ -126,31 +126,37 @@ public function detail($id) {
     foreach ($parts as $part) {
         $part->logs = MachineSparePartsInventoryLog::where('inventory_id', $part->id)->orderBy('created_at', 'desc')->get();
     }
+        // Combine the data into a single collection
+        $combinedData = collect();
+        foreach ($historicalProblems as $problem) {
+            $hasChildren = $problem->children()->exists(); // Check if the record has children
+            $isChild = !is_null($problem->parent_id); // Check if the record is a child
 
-    // Combine the data into a single collection
-    $combinedData = collect();
-    foreach ($historicalProblems as $problem) {
-        $combinedData->push((object) [
-            'date' => $problem->date,
-            'type' => "Daily Report",
-            'data' => $problem,
-            'Category' => $problem->report,
-            'status_logs' => collect()
-        ]);
-    }
+            $combinedData->push((object) [
+                'date' => $problem->date,
+                'type' => "Daily Report",
+                'data' => $problem,
+                'Category' => $problem->report,
+                'status_logs' => collect(),
+                'flag' => $isChild || $hasChildren // Set flag if the record is a child or has children
+            ]);
+        }
 
-    // Add preventive maintenance records to the collection
-    foreach ($preventiveMaintenances as $pm) {
-        $combinedData->push((object) [
-            'date' => $pm->planning_date,
-            'type' => 'Preventive Maintenance',
-            'data' => $pm,
-            'Category' => 'Preventive Maintenance',
-            'status_logs' => $pm->logs
-        ]);
-    }
-    // Sort the combined data by date
-    $combinedData = $combinedData->sortBy('date');
+        // Add preventive maintenance records to the collection
+        foreach ($preventiveMaintenances as $pm) {
+            $combinedData->push((object) [
+                'date' => $pm->planning_date,
+                'type' => 'Preventive Maintenance',
+                'data' => $pm,
+                'Category' => 'Preventive Maintenance',
+                'status_logs' => $pm->logs,
+                'parent_flag' => false // Preventive maintenance does not have parent_id, so no flag
+            ]);
+        }
+
+        // Sort the combined data by date
+        $combinedData = $combinedData->sortBy('date');
+
     return view('master.dtl_machine', compact('machine', 'parts', 'combinedData'));
 }
 

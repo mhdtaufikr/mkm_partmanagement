@@ -748,41 +748,38 @@
                                                                     $no = 1;
                                                                 @endphp
                                                                 @foreach ($combinedData as $data)
-                                                                    @if($data->data->status == 'Close' && $data->data->parent_id) <!-- Show only the child with status 'Close' -->
-                                                                    <tr>
-                                                                        <td>
-                                                                            {{ $no++ }}
-                                                                            @if($data->status_logs->isNotEmpty() || $data->data->parent_id) <!-- Show flag if status logs exist or record has a parent -->
-                                                                            <i class="fas fa-flag" style="color: rgba(0, 103, 127, 1); margin-left: 10px;"></i>
-                                                                            @endif
-                                                                        </td>
-                                                                        <td>{{ $data->Category }}</td>
-                                                                        <td>{{ $data->date }}</td>
-                                                                        <td>{{ $data->data->shift ?? '-' }}</td>
-                                                                        <td>{{ $data->data->shop }}</td>
-                                                                        <td>{{ $data->data->problem }}</td>
-                                                                        <td>{{ $data->data->cause }}</td>
-                                                                        <td>{{ $data->data->action }}</td>
-                                                                        <td>
-                                                                            {{ $data->data->start_time ? date('H:i', strtotime($data->data->start_time)) : '-' }} -
-                                                                            {{ $data->data->finish_time ? date('H:i', strtotime($data->data->finish_time)) : '-' }}
-                                                                            @if($data->data->balance)
-                                                                                (Total: {{ number_format($data->data->balance, 2) }} hours)
-                                                                            @endif
-                                                                        </td>
-                                                                        <td>{{ $data->data->remarks ?? 'OK' }}</td>
-                                                                        <td>{{ $data->data->pic ?? 'Hmd. Prod' }}</td>
-                                                                        <td>
-                                                                            <span class="badge bg-success">Close</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-detail-{{ $data->data->id }}">Detail</button>
-                                                                        </td>
-                                                                    </tr>
-                                                                    @endif
+                                                                <tr>
+                                                                    <td>
+                                                                        {{ $no++ }}
+                                                                        @if($data->status_logs->isNotEmpty() || $data->flag) <!-- Show flag if status logs exist or the record is a parent/child -->
+                                                                        <i class="fas fa-flag" style="color: rgba(0, 103, 127, 1); margin-left: 10px;"></i>
+                                                                        @endif
+                                                                    </td>
+                                                                    <td>{{ $data->Category }}</td>
+                                                                    <td>{{ $data->date }}</td>
+                                                                    <td>{{ $data->data->shift ?? '-' }}</td>
+                                                                    <td>{{ $data->data->shop }}</td>
+                                                                    <td>{{ $data->data->problem }}</td>
+                                                                    <td>{{ $data->data->cause }}</td>
+                                                                    <td>{{ $data->data->action }}</td>
+                                                                    <td>
+                                                                        {{ $data->data->start_time ? date('H:i', strtotime($data->data->start_time)) : '-' }} -
+                                                                        {{ $data->data->finish_time ? date('H:i', strtotime($data->data->finish_time)) : '-' }}
+                                                                        @if($data->data->balance)
+                                                                            (Total: {{ number_format($data->data->balance, 2) }} hours)
+                                                                        @endif
+                                                                    </td>
+                                                                    <td>{{ $data->data->remarks ?? 'OK' }}</td>
+                                                                    <td>{{ $data->data->pic ?? 'Hmd. Prod' }}</td>
+                                                                    <td>
+                                                                        <span class="badge bg-success">Close</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-detail-{{ $data->data->id }}">Detail</button>
+                                                                    </td>
+                                                                </tr>
                                                                 @endforeach
                                                             </tbody>
-
                                                         </table>
 
                                                     </div>

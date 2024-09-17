@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
 
+
 class MstPartSAPController extends Controller
 {
     public function sapPart(Request $request, $plnt = null)
@@ -220,6 +221,33 @@ class MstPartSAPController extends Controller
             // Return an error response
             return redirect()->back()->with('failed', 'An error occurred while deleting parts. Please try again. ' . $e->getMessage());
         }
+    }
+
+    public function partInfo(Request $request)
+    {
+        if ($request->ajax()) {
+            // Fetch parts and their repair quantities
+            $parts = Part::select('parts.*')
+                ->leftJoin('repair_parts', 'repair_parts.part_id', '=', 'parts.id')
+                ->selectRaw('SUM(repair_parts.repaired_qty) as repair_qty')
+                ->groupBy('parts.id')
+                ->get();
+
+            return DataTables::of($parts)
+                ->addIndexColumn()
+                ->editColumn('total_stock', function($part) {
+                    return number_format($part->total_stock, 2);
+                })
+                ->addColumn('repair_qty', function($part) {
+                    return number_format($part->repair_qty ?? 0, 2);
+                })
+                ->addColumn('total_qty', function($part) {
+                    return number_format($part->total_stock + ($part->repair_qty ?? 0), 2);
+                })
+                ->make(true);
+        }
+
+        return view('master.info');
     }
 
 }

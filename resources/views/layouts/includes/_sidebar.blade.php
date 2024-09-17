@@ -24,6 +24,18 @@
                     Preventive Maintenance
                 </a>
 
+                <!-- Sidenav Link (Preventive Maintenance) -->
+                <a class="nav-link" href="{{ url('/summary') }}">
+                    <div class="nav-link-icon"><i class="fas fa-book"></i></div>
+                    Summary Report
+                </a>
+
+                 <!-- Sidenav Link (Preventive Maintenance) -->
+                 <a class="nav-link" href="{{ url('/part/info') }}">
+                    <div class="nav-link-icon"><i class="fas fa-info"></i></div>
+                    Part Info
+                </a>
+
                 <!-- Sidenav Menu Heading (Master) -->
                 <div class="sidenav-menu-heading">Master</div>
 

@@ -63,16 +63,27 @@ class HistoryController extends Controller
             // Add hyperlink to OP No., opening in a new tab
             return '<a href="/mst/machine/detail/' . encrypt($row->machine->id) . '" target="_blank">' . $row->machine->op_no . '</a>';
         })
-        ->addColumn('flag', function($row) {
-            // Show a flag if the record has a parent or children
-            return $row->parent_id || $row->children()->exists() ? '<i class="fas fa-flag" style="color: rgba(0, 103, 127, 1)"></i>' : '';
+        ->addColumn('flag', function ($row) {
+            // Check if the row is a child (has a parent_id)
+            $isChild = !is_null($row->parent_id);
+            // Check if the row is a parent (has children)
+            $hasChildren = $row->children()->exists();
+
+            // Return flag if it's either a parent or a child
+            if ($isChild || $hasChildren) {
+                return '<i class="fas fa-flag" style="color: rgba(0, 103, 127, 1);"></i>';
+            }
+
+            return ''; // Return empty if neither a parent nor child
         })
+
+
+
         ->addColumn('action', function($row){
             return '<button class="btn btn-sm btn-primary btn-detail" data-id="'.$row->id.'" data-bs-toggle="modal" data-bs-target="#modal-detail">Detail</button>';
         })
         ->rawColumns(['action', 'flag', 'machine.op_no']) // Include 'machine.op_no' in rawColumns to render HTML
         ->make(true);
-
     }
 
     // Additional queries for machines and lines based on user plant and type
@@ -113,6 +124,9 @@ class HistoryController extends Controller
 
     return view('history.index', compact('machines', 'lines', 'openReports'));
 }
+
+
+
 
 
 
