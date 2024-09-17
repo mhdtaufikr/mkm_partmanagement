@@ -256,7 +256,11 @@
                 </tr>
                 <tr>
                     @for($month = 1; $month <= 12; $month++)
-                        <th>{{ DateTime::createFromFormat('!m', $month)->format('M') }}</th>
+                        <th>
+                            <a style="color: white" target="_blank" href="{{ url('/mst/preventive/schedule/detail/' . $month) }}">
+                                {{ DateTime::createFromFormat('!m', $month)->format('M') }}
+                            </a>
+                        </th>
                     @endfor
                 </tr>
             </thead>
