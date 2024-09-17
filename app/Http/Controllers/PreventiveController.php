@@ -321,7 +321,6 @@ class PreventiveController extends Controller
                     });
                 });
 
-
             // Define the types available for selection
             $types = ['Mechanic', 'Electric', 'Powerhouse'];
 
@@ -419,9 +418,6 @@ public function pmScheduleDetail($month)
 
     return view('master.schedule.detail', compact('items', 'month'));
 }
-
-
-
 
 
         public function scheduleTemplate()

@@ -239,84 +239,93 @@
 
                 <!-- Tab Content for Each Line -->
                 <div class="tab-content" id="myTabContent">
-                    @foreach($items as $type => $lines)
-                        <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="content-{{ Str::slug($type) }}" role="tabpanel" aria-labelledby="tab-{{ Str::slug($type) }}">
-                            <div class="table-responsive mt-4">
-                                <table class="table table-striped table-bordered">
-                                    <thead class="text-center align-middle">
-                                        <tr>
-                                            <th rowspan="2">No.</th>
-                                            <th rowspan="2">Line</th>
-                                            <th rowspan="2">OP No</th>
-                                            <th rowspan="2">Process Name</th>
-                                            <th rowspan="2">Year</th>
-                                            <th colspan="12">2024</th>
-                                            <th rowspan="2">Action</th>
-                                        </tr>
-                                        <tr>
-                                            @for($month = 1; $month <= 12; $month++)
-                                                <th>
-                                                    <a style="color: white" target="_blank" href="{{ url('/mst/preventive/schedule/detail/' . $month) }}">
-                                                        {{ DateTime::createFromFormat('!m', $month)->format('M') }}
-                                                    </a>
-                                                </th>
-                                            @endfor
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @php $no = 1; @endphp
-                                        @foreach($lines as $line => $schedules)
-                                            @php
-                                                $rowCount = $schedules->count();
-                                                $scheduleMap = [];
-                                                foreach($schedules as $schedule) {
-                                                    foreach($schedule->details as $detail) {
-                                                        $month = \Carbon\Carbon::createFromFormat('Y-m-d', $detail->annual_date)->month;
-                                                        $icon = $detail->actual_date ? '<i class="fas fa-circle"></i>' : '<i class="far fa-circle"></i>';
-                                                        $opNo = optional(optional($schedule->preventiveMaintenance)->machine)->op_no ?? optional($schedule->machine)->op_no;
-                                                        $scheduleMap[$opNo][$month] = $icon;
-                                                    }
-                                                }
-                                            @endphp
+                  <!-- Loop through each type (Electric, Mechanic, Powerhouse) -->
+@foreach($items as $type => $lines)
+<div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="content-{{ Str::slug($type) }}" role="tabpanel" aria-labelledby="tab-{{ Str::slug($type) }}">
+    <div class="table-responsive mt-4">
+        <table class="table table-striped table-bordered">
+            <thead class="text-center align-middle">
+                <tr>
+                    <th rowspan="2">No.</th>
+                    <th rowspan="2">Line</th>
+                    <th rowspan="2">OP No</th>
+                    <th rowspan="2">Process Name</th>
+                    <th rowspan="2">Year</th>
+                    <th colspan="12">2024</th>
+                    <th rowspan="2">Action</th>
+                </tr>
+                <tr>
+                    @for($month = 1; $month <= 12; $month++)
+                        <th>{{ DateTime::createFromFormat('!m', $month)->format('M') }}</th>
+                    @endfor
+                </tr>
+            </thead>
+            <tbody>
+                @php $no = 1; @endphp
 
-                                            @foreach($schedules->unique(function($schedule) {
-                                                return optional(optional($schedule->preventiveMaintenance)->machine)->op_no ?? optional($schedule->machine)->op_no;
-                                            }) as $schedule)
-                                                <tr>
-                                                    @if($loop->first)
-                                                        <td rowspan="{{ $rowCount }}" class="text-center align-middle">{{ $no++ }}</td>
-                                                        <td rowspan="{{ $rowCount }}" class="text-center align-middle">{{ $line }}</td>
-                                                    @endif
+                <!-- Loop over each line -->
+                @foreach($lines as $line => $schedules)
+                    @php
+                        // Count how many schedules there are for this line
+                        $rowCount = $schedules->count();
+                        $scheduleMap = [];
 
-                                                    @php
-                                                        $opNo = optional(optional($schedule->preventiveMaintenance)->machine)->op_no ?? optional($schedule->machine)->op_no;
-                                                        $process = optional(optional($schedule->preventiveMaintenance)->machine)->process ?? optional($schedule->machine)->process;
-                                                        $installDate = optional(optional($schedule->preventiveMaintenance)->machine)->install_date ?? optional($schedule->machine)->install_date;
-                                                    @endphp
+                        // Build the schedule map for the given line
+                        foreach($schedules as $schedule) {
+                            $opNo = optional(optional($schedule->preventiveMaintenance)->machine)->op_no ?? optional($schedule->machine)->op_no;
 
-                                                    <td class="text-center align-middle">{{ $opNo }}</td>
-                                                    <td class="text-center align-middle">{{ $process }}</td>
-                                                    <td class="text-center align-middle">{{ $installDate }}</td>
+                            foreach($schedule->details as $detail) {
+                                $month = \Carbon\Carbon::createFromFormat('Y-m-d', $detail->annual_date)->month;
+                                $icon = $detail->actual_date ? '<i class="fas fa-circle"></i>' : '<i class="far fa-circle"></i>';
+                                $scheduleMap[$opNo][$month] = $icon;
+                            }
+                        }
+                    @endphp
 
-                                                    @for($month = 1; $month <= 12; $month++)
-                                                        <td class="text-center align-middle">
-                                                            {!! $scheduleMap[$opNo][$month] ?? '' !!}
-                                                        </td>
-                                                    @endfor
+                    <!-- Loop through each schedule in this line -->
+                    @foreach($schedules as $index => $schedule)
+                        <tr>
+                            <!-- Only show the No. and Line for the first schedule -->
+                            @if($index === 0)
+                                <td rowspan="{{ $rowCount }}" class="text-center align-middle">{{ $no++ }}</td>
+                                <td rowspan="{{ $rowCount }}" class="text-center align-middle">{{ $line }}</td>
+                            @endif
 
-                                                    <td class="text-center align-middle">
-                                                        <button type="button" class="btn btn-sm btn-primary edit-schedule" data-schedule="{{ $schedule->toJson() }}" data-bs-toggle="modal" data-bs-target="#editScheduleModal">
-                                                            Edit
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                            @php
+                                // Extract OP No, Process Name, and Install Date
+                                $opNo = optional(optional($schedule->preventiveMaintenance)->machine)->op_no ?? optional($schedule->machine)->op_no;
+                                $process = optional(optional($schedule->preventiveMaintenance)->machine)->process ?? optional($schedule->machine)->process;
+                                $installDate = optional(optional($schedule->preventiveMaintenance)->machine)->install_date ?? optional($schedule->machine)->install_date;
+                            @endphp
+
+                            <!-- Display the OP No, Process Name, and Install Date -->
+                            <td class="text-center align-middle">{{ $opNo }}</td>
+                            <td class="text-center align-middle">{{ $process }}</td>
+                            <td class="text-center align-middle">{{ $installDate }}</td>
+
+                            <!-- Loop over each month (January - December) and show the schedule -->
+                            @for($month = 1; $month <= 12; $month++)
+                                <td class="text-center align-middle">
+                                    {!! $scheduleMap[$opNo][$month] ?? '' !!}
+                                </td>
+                            @endfor
+
+                            <!-- Action Button (e.g., Edit) -->
+                            <td class="text-center align-middle">
+                                <button type="button" class="btn btn-sm btn-primary edit-schedule" data-schedule="{{ $schedule->toJson() }}" data-bs-toggle="modal" data-bs-target="#editScheduleModal">
+                                    Edit
+                                </button>
+                            </td>
+                        </tr>
                     @endforeach
+                @endforeach
+            </tbody>
+
+        </table>
+    </div>
+</div>
+@endforeach
+
                 </div>
             </div>
         </div>
