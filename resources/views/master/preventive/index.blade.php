@@ -235,7 +235,7 @@
                                 Not completed yet
                             @endif
                         </td>
-                        <td>{{$data->op_name}}</td>
+                        <td>{{$data->op_no}}</td>
                         <td>{{$data->type}}</td>
                         <td>{{$data->machine_name}}</td>
                         <td>{{$data->no_document}}</td>

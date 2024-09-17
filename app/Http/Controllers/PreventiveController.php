@@ -274,22 +274,27 @@ class PreventiveController extends Controller
             return Excel::download(new TemplateExport, 'template.xlsx');
         }
         public function upload(Request $request)
-        {
-            // Validate the file upload
-            $request->validate([
-                'excel-file' => 'required|file|mimes:xlsx,xls,csv',
-            ]);
+{
+    // Validate the file upload
+    $request->validate([
+        'excel-file' => 'required|file|mimes:xlsx,xls,csv',
+    ]);
 
-            try {
-                // Ensure the file path is correctly retrieved
-                Excel::import(new ChecksheetImport, $request->file('excel-file'));
+    \Log::info('File uploaded successfully, attempting to process...');
 
-                return back()->with('status', 'File imported successfully.');
-            } catch (\Exception $e) {
-                // Handle any errors that may occur during the import process
-                return back()->with('failed', 'Error importing file: ' . $e->getMessage());
-            }
-        }
+    try {
+        // Ensure the file path is correctly retrieved
+        Excel::import(new ChecksheetImport, $request->file('excel-file'));
+
+        \Log::info('File imported successfully.');
+        return back()->with('status', 'File imported successfully.');
+    } catch (\Exception $e) {
+        // Log the error message
+        \Log::error('Error importing file: ' . $e->getMessage());
+        return back()->with('failed', 'Error importing file: ' . $e->getMessage());
+    }
+}
+
 
 
         public function pmSchedule()

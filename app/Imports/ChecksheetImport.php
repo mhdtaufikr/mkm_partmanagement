@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class ChecksheetImport implements ToCollection, WithHeadingRow
 {
@@ -18,9 +19,18 @@ class ChecksheetImport implements ToCollection, WithHeadingRow
     private $currentChecksheetId = null;
 
     public function collection(Collection $rows)
-    {
-        DB::transaction(function () use ($rows) {
-            foreach ($rows as $row) {
+{
+    // Start a transaction
+    DB::beginTransaction();
+
+    $errorMessages = []; // Array to collect error messages
+
+    try {
+        foreach ($rows as $row) {
+            try {
+                // Log the row data for debugging purposes
+                Log::info('Processing row: ', $row->toArray());
+
                 // Handle dates from the row
                 $effectiveDate = $this->transformDate($row['effective_date']);
                 $mfgDate = $this->transformDate($row['manufacture_date']);
@@ -32,14 +42,11 @@ class ChecksheetImport implements ToCollection, WithHeadingRow
                     ->first();
 
                 if (!$machine) {
-                    // Rollback transaction and return error message
-                    DB::rollBack();
                     throw new \Exception('Operation number '.$row['no_op_no'].' does not exist in the machine table for the given plant and line.');
                 }
 
-                // Check if we need to create a new preventive maintenance record
+                // Preventive Maintenance record creation
                 if ($this->currentPreventiveMaintenanceId === null || $machine->id !== $previousMachineId) {
-                    // Insert or update preventive maintenance
                     $preventiveMaintenance = PreventiveMaintenance::updateOrCreate(
                         [
                             'machine_id' => $machine->id,
@@ -61,9 +68,8 @@ class ChecksheetImport implements ToCollection, WithHeadingRow
                     $this->currentPreventiveMaintenanceId = $preventiveMaintenance->id;
                 }
 
-                // Check if we need to create a new checksheet record
+                // Checksheet record creation
                 if ($this->currentChecksheetId === null || $row['checksheet_category'] !== $previousChecksheetCategory || $row['checksheet_type'] !== $previousChecksheetType) {
-                    // Insert or update checksheet and get the ID directly
                     $checksheet = Checksheet::updateOrCreate(
                         [
                             'preventive_maintenances_id' => $this->currentPreventiveMaintenanceId,
@@ -97,9 +103,30 @@ class ChecksheetImport implements ToCollection, WithHeadingRow
                 $previousMachineId = $machine->id;
                 $previousChecksheetCategory = $row['checksheet_category'];
                 $previousChecksheetType = $row['checksheet_type'];
+            } catch (\Exception $e) {
+                // Collect the error message but continue processing the next row
+                $errorMessages[] = $e->getMessage();
+                Log::error('Error in row: '.$e->getMessage());
             }
-        });
+        }
+
+        // Check if there were any errors
+        if (!empty($errorMessages)) {
+            // Rollback the transaction and log all errors
+            DB::rollBack();
+            throw new \Exception('Import failed with errors: '.implode("\n", $errorMessages));
+        }
+
+        // Commit the transaction if no errors
+        DB::commit();
+    } catch (\Exception $e) {
+        // In case of any exception, rollback the transaction
+        DB::rollBack();
+        Log::error('Transaction failed: '.$e->getMessage());
+        throw $e;
     }
+}
+
 
     /**
      * Transform Excel date to a Carbon instance.
@@ -109,12 +136,58 @@ class ChecksheetImport implements ToCollection, WithHeadingRow
      */
     private function transformDate($value)
     {
-        // Check if the value is a valid Excel date
+        // Check if the value is numeric (Excel date)
         if (is_numeric($value)) {
+            \Log::info('Transforming Excel date: ' . $value);
             return Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value));
         }
 
-        // If not, assume the date is in d/m/Y format
-        return Carbon::createFromFormat('d/m/Y', $value);
+        // If the value is null or empty, return null
+        if (empty($value)) {
+            \Log::info('Empty date value, returning null.');
+            return null;
+        }
+
+        // Map Indonesian month names to English
+        $indonesianMonths = [
+            'Januari' => 'January',
+            'Februari' => 'February',
+            'Maret' => 'March',
+            'April' => 'April',
+            'Mei' => 'May',
+            'Juni' => 'June',
+            'Juli' => 'July',
+            'Agustus' => 'August',
+            'September' => 'September',
+            'Oktober' => 'October',
+            'November' => 'November',
+            'Desember' => 'December',
+        ];
+
+        // Replace Indonesian month names with English ones
+        foreach ($indonesianMonths as $indoMonth => $engMonth) {
+            if (strpos($value, $indoMonth) !== false) {
+                $value = str_replace($indoMonth, $engMonth, $value);
+                break;
+            }
+        }
+
+        // Try different date formats
+        $formats = ['d F Y', 'd/m/Y', 'Y-m-d']; // Add as many formats as needed
+
+        foreach ($formats as $format) {
+            try {
+                \Log::info('Attempting to parse date with format ' . $format . ': ' . $value);
+                return Carbon::createFromFormat($format, $value);
+            } catch (\Exception $e) {
+                \Log::warning('Date format mismatch for format ' . $format . ': ' . $e->getMessage());
+            }
+        }
+
+        // Log an error if none of the formats worked and throw an exception
+        \Log::error('Unable to parse date: ' . $value);
+        throw new \Exception('Date format is invalid: ' . $value);
     }
+
 }
+
