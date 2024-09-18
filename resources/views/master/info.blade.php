@@ -60,9 +60,9 @@
             { data: 'material_description', name: 'material_description' },
             { data: 'plnt', name: 'plnt' },
             { data: 'sloc', name: 'sloc' },
-            { data: 'total_stock', name: 'total_stock' },
-            { data: 'repair_qty', name: 'repair_qty' },
-            { data: 'total_qty', name: 'total_qty' }
+            { data: 'total_stock', name: 'total_stock', "render": $.fn.dataTable.render.number(',', '.', 0) },
+            { data: 'repair_qty', name: 'repair_qty', "render": $.fn.dataTable.render.number(',', '.', 0) },
+            { data: 'total_qty', name: 'total_qty', "render": $.fn.dataTable.render.number(',', '.', 0) }
         ],
         responsive: true,
         lengthChange: false,
