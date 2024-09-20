@@ -202,7 +202,10 @@
             { "data": "cause", "name": "cause" },
             { "data": "start_time", "name": "start_time" },
             { "data": "finish_time", "name": "finish_time" },
-            { "data": "balance", "name": "balance" },
+            {
+            "data": "balance","name": "balance","render": function (data, type, row) {
+                return parseFloat(data).toString();
+            }},
             { "data": "pic", "name": "pic" },
             { "data": "remarks", "name": "remarks" },
             {
