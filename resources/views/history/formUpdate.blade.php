@@ -218,10 +218,9 @@
                                                                             <label for="status"><strong style="color: rgba(0, 103, 127, 1)">Status</strong></label>
                                                                             <select class="form-control" id="status" name="status" required>
                                                                                 <option value="">Select Status</option>
-                                                                                <option value="Close">OK</option>
-                                                                                <option value="Open">Not Good</option>
-                                                                                <option value="Ongoing">Temporary</option>
-                                                                                <option value="Delay">Next</option>
+                                                                                <option value="OK">OK</option>
+                                                                                <option value="Not Good">Not Good</option>
+                                                                                <option value="Temporary">Temporary</option>
                                                                             </select>
                                                                         </div>
                                                                     </div>

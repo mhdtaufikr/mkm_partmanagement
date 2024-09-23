@@ -101,26 +101,27 @@ class HistoryController extends Controller
     $machines = $machinesQuery->get();
     $lines = $linesQuery->get();
 
-    // Fetch open reports (status = 'Open')
-    $openReports = HistoricalProblem::where('status', 'Open')
-        ->where(function ($query) {
-            $query->doesntHave('children')
-                ->orWhereHas('children', function ($q) {
-                    $q->where('status', 'Open');
-                });
-        })
-        ->whereHas('machine', function ($q) use ($userPlant, $userType) {
-            if ($userPlant !== 'All' && $userType !== 'All') {
-                $q->where('plant', $userPlant);
+    // Fetch open reports (status = 'Not Good' or status = 'Temporary')
+$openReports = HistoricalProblem::whereIn('status', ['Not Good', 'Temporary'])
+->where(function ($query) {
+    $query->doesntHave('children')
+        ->orWhereHas('children', function ($q) {
+            $q->whereIn('status', ['Not Good', 'Temporary']);
+        });
+})
+->whereHas('machine', function ($q) use ($userPlant, $userType) {
+    if ($userPlant !== 'All' && $userType !== 'All') {
+        $q->where('plant', $userPlant);
 
-                if ($userType !== 'All') {
-                    $q->whereHas('historicalProblems', function ($q2) use ($userType) {
-                        $q2->where('shop', $userType);
-                    });
-                }
-            }
-        })
-        ->get();
+        if ($userType !== 'All') {
+            $q->whereHas('historicalProblems', function ($q2) use ($userType) {
+                $q2->where('shop', $userType);
+            });
+        }
+    }
+})
+->get();
+
 
     return view('history.index', compact('machines', 'lines', 'openReports'));
 }

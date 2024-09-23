@@ -214,10 +214,9 @@
                 "render": function(data) {
                     let statusClass = '';
                     switch (data) {
-                        case 'Close': statusClass = 'btn-success'; break;
-                        case 'Open': statusClass = 'btn-danger'; break;
-                        case 'Delay': statusClass = 'btn-warning'; break;
-                        case 'Ongoing': statusClass = 'btn-info'; break;
+                        case 'OK': statusClass = 'btn-success'; break;
+                        case 'Not Good': statusClass = 'btn-danger'; break;
+                        case 'Temporary': statusClass = 'btn-warning'; break;
                         default: statusClass = 'btn-primary';
                     }
                     return '<button class="btn ' + statusClass + ' btn-sm">' + data + '</button>';
