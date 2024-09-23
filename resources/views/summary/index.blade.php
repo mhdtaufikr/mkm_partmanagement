@@ -11,102 +11,111 @@
                             <div class="page-header-icon"><i data-feather="list"></i></div>
                             Summary of All Machines
                         </h1>
+                      {{--   <div class="page-header-subtitle">Manage Daily Report</div> --}}
                     </div>
                 </div>
             </div>
         </div>
     </header>
 
-    <div class="container-fluid px-4 mt-n10">
-        <div class="card mb-4">
-            <div class="card-header">
-                <i class="fas fa-table me-1"></i>
-                Combined Data for All Machines
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table id="tableSummary" class="table table-bordered table-striped">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Type</th>
-                                <th>Date</th>
-                                <th>Machine</th>
-                                <th>Category</th>
-                                <th>Problem / Maintenance</th>
-                                <th>Action Taken</th>
-                                <th>Status</th>
-                                <th>Flag</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php
-                                $no = 1;
-                            @endphp
-                            @foreach ($combinedData as $data)
-                            <tr>
-                                <td>{{ $no++ }}</td>
-                                <td>{{ $data->type }}</td>
-                                <td>{{ $data->date }}</td>
-                                <td>{{ $data->data->machine->name ?? 'N/A' }}</td> <!-- Machine name -->
-                                <td>{{ $data->Category }}</td>
-                                <td>
-                                    @if($data->type == 'Preventive Maintenance')
-                                        <a href="{{ $data->checksheet_link }}" target="_blank">
-                                            View Preventive Maintenance
-                                        </a>
-                                    @else
-                                        {{ $data->data->problem ?? '-' }}
-                                    @endif
-                                </td>
-                                <td>{{ $data->data->action ?? '-' }}</td>
-                                <td>
-                                    <span class="badge bg-{{ $data->data->status == 'Close' ? 'success' : 'danger' }}">
-                                        {{ $data->data->status }}
-                                    </span>
-                                </td>
-                                <td>
-                                    @if($data->status_logs->isNotEmpty() || $data->flag)
-                                    <i class="fas fa-flag" style="color: rgba(0, 103, 127, 1);"></i>
-                                    @endif
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-detail-{{ $data->data->id }}">Detail</button>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+     <!-- Main page content-->
+     <div class="container-fluid px-4 mt-n10">
+        <div class="content-wrapper">
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- Consolidated Card Table -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Machine History Summary Report</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="tablehistory" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Type</th> <!-- New Type column -->
+                                            <th>Date</th>
+                                            <th>Shift</th>
+                                            <th>Shop</th>
+                                            <th>Problem</th>
+                                            <th>Analysis & Cause</th>
+                                            <th>Action Taken</th>
+                                            <th>Repair Hours</th>
+                                            <th>Remarks</th>
+                                            <th>Person In Charge</th>
+                                            <th>Status</th> <!-- Added Status column -->
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @php
+                                            $no = 1;
+                                        @endphp
+                                        @foreach ($combinedData as $data)
+                                        <tr>
+                                            <td>
+                                                {{ $no++ }}
+                                                @if($data->status_logs->isNotEmpty() || $data->flag) <!-- Show flag if status logs exist or the record has a flag -->
+                                                <i class="fas fa-flag" style="color: rgba(0, 103, 127, 1); margin-left: 10px;"></i>
+                                                @endif
+                                            </td>
+                                            <td>{{ $data->Category }}</td>
+                                            <td>{{ $data->date }}</td>
+                                            <td>{{ $data->data->shift ?? '-' }}</td>
+                                            <td>{{ $data->data->shop }}</td>
+                                            <td>{{ $data->data->problem ?? 'Preventive Maintenance'}}</td>
+                                            <td>{{ $data->data->cause ?? 'Preventive Maintenance'}}</td>
+                                            <td>{{ $data->data->action ?? 'Preventive Maintenance'}}</td>
+                                            <td>
+                                                {{ $data->data->start_time ? date('H:i', strtotime($data->data->start_time)) : '-' }} -
+                                                {{ $data->data->finish_time ? date('H:i', strtotime($data->data->finish_time)) : '-' }}
+                                                @if($data->data->balance)
+                                                    (Total: {{ number_format($data->data->balance, 2) }} hours)
+                                                @endif
+                                            </td>
+                                            <td>{{ $data->data->remarks ?? 'OK' }}</td>
+                                            <td>{{ $data->data->pic ?? 'Hmd. Prod' }}</td>
+                                            <td>
+                                                <span class="badge bg-success">Close</span>
+                                            </td>
+                                            <td>
+                                                @if($data->type == 'Daily Report')
+                                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-detail-{{ $data->data->id }}">Detail</button>
+                                                @else
+                                                <a target="_blank" title="Detail" class="btn btn-sm btn-primary" href="{{ url("checksheet/detail/".encrypt($data->data->id_ch)) }}">
+                                                    Detail
+                                                </a>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End of Consolidated Card Table -->
+
+                    <!-- Modals for details -->
+                    @foreach ($combinedData as $data)
+                        @if ($data->type == 'Daily Report')
+                            @include('partials.logmachine', ['data' => $data])
+                        @endif
+                    @endforeach
                 </div>
-            </div>
+            </section>
         </div>
     </div>
 </main>
-
-<!-- Modal Structure for Detail -->
-@foreach ($combinedData as $data)
-<div class="modal fade" id="modal-detail-{{ $data->data->id }}" tabindex="-1" aria-labelledby="modal-detail-label" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modal-detail-label">Detail for {{ $data->data->machine->name ?? 'N/A' }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Type: {{ $data->type }}</p>
-                <p>Date: {{ $data->date }}</p>
-                <p>Category: {{ $data->Category }}</p>
-                <p>Problem/Maintenance: {{ $data->data->problem ?? $data->data->type }}</p>
-                <p>Action Taken: {{ $data->data->action }}</p>
-                <p>Status: {{ $data->data->status }}</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-@endforeach
-
+<!-- For Datatables -->
+<script>
+    $(document).ready(function() {
+        var table = $("#tablehistory").DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "autoWidth": false,
+        });
+    });
+</script>
 @endsection
