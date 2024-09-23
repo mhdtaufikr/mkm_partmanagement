@@ -751,7 +751,7 @@
                                                                 <tr>
                                                                     <td>
                                                                         {{ $no++ }}
-                                                                        @if($data->status_logs->isNotEmpty() || $data->flag) <!-- Show flag if status logs exist or the record is a parent/child -->
+                                                                        @if($data->status_logs->isNotEmpty() || $data->flag) <!-- Show flag if status logs exist or the record has a flag -->
                                                                         <i class="fas fa-flag" style="color: rgba(0, 103, 127, 1); margin-left: 10px;"></i>
                                                                         @endif
                                                                     </td>
@@ -759,9 +759,9 @@
                                                                     <td>{{ $data->date }}</td>
                                                                     <td>{{ $data->data->shift ?? '-' }}</td>
                                                                     <td>{{ $data->data->shop }}</td>
-                                                                    <td>{{ $data->data->problem }}</td>
-                                                                    <td>{{ $data->data->cause }}</td>
-                                                                    <td>{{ $data->data->action }}</td>
+                                                                    <td>{{ $data->data->problem ?? 'Preventive Maintenance'}}</td>
+                                                                    <td>{{ $data->data->cause ?? 'Preventive Maintenance'}}</td>
+                                                                    <td>{{ $data->data->action ?? 'Preventive Maintenance'}}</td>
                                                                     <td>
                                                                         {{ $data->data->start_time ? date('H:i', strtotime($data->data->start_time)) : '-' }} -
                                                                         {{ $data->data->finish_time ? date('H:i', strtotime($data->data->finish_time)) : '-' }}
@@ -775,7 +775,13 @@
                                                                         <span class="badge bg-success">Close</span>
                                                                     </td>
                                                                     <td>
+                                                                        @if($data->type == 'Daily Report')
                                                                         <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-detail-{{ $data->data->id }}">Detail</button>
+                                                                        @else
+                                                                        <a target="_blank" title="Detail" class=" btn btn-sm btn-primary" href="{{url("checksheet/detail/".encrypt($data->data->id_ch))}} ">
+                                                                            Detail
+                                                                        </a>
+                                                                        @endif
                                                                     </td>
                                                                 </tr>
                                                                 @endforeach
