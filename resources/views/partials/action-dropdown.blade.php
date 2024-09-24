@@ -5,7 +5,7 @@
     </button>
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $data->id }}">
         <li>
-            <a title="Detail" class="dropdown-item" href="checksheet/detail/{{ encrypt($data->id_ch) }}">
+            <a title="Detail" class="dropdown-item" href="checksheet/detail/{{ encrypt($data->id) }}">
                 <i class="fas fa-info me-2"></i>Detail
             </a>
         </li>
