@@ -131,7 +131,7 @@ public function getOpNos(Request $request)
     $opNos = PmFilterView::where('type', $request->input('type'))
         ->where('plant', $request->input('plant'))
         ->where('shop', $request->input('shop'))
-        ->select('op_no')
+        ->select('op_no', 'machine_name')
         ->distinct()
         ->get();
 

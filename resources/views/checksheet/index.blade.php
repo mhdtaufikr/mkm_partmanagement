@@ -97,7 +97,7 @@
                                                 success: function(data) {
                                                     $('#opNoSelect').empty().append('<option value="">Select OP. No</option>');
                                                     $.each(data, function(index, value) {
-                                                        $('#opNoSelect').append('<option value="'+value.op_no+'">'+value.op_no+'</option>');
+                                                        $('#opNoSelect').append('<option value="'+value.op_no+'">'+value.op_no+' - '+value.machine_name+'</option>');
                                                     });
                                                 }
                                             });
