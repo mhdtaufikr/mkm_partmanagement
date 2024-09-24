@@ -298,90 +298,98 @@ public function storeHeadForm(Request $request)
 
 
     public function storeDetailForm(Request $request)
-    {
-        // Validate the incoming request data
-        $request->validate([
-            'pic' => 'required|string|max:45',
-            'remarks' => 'nullable|string|max:255',
-            'file_upload' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'status' => 'required|string|in:Open,Close',
-            'id_header' => 'required|exists:checksheet_form_heads,id',
-            'items' => 'required|array',
-            'items.*.checksheet_category' => 'required|string',
-            'items.*.checksheet_type' => 'required|string',
+{
+    $request->validate([
+        'pic' => 'required|string|max:45',
+        'remarks' => 'nullable|string|max:255',
+        'file_upload' => 'nullable|array',
+        'file_upload.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        'status' => 'required|string|in:Open,Close',
+        'id_header' => 'required|exists:checksheet_form_heads,id',
+        'items' => 'required|array',
+        'items.*.checksheet_category' => 'required|string',
+        'items.*.checksheet_type' => 'required|string',
+    ]);
+
+    DB::beginTransaction();
+
+    try {
+        // Handle multiple image uploads if they exist
+        $imgPaths = $this->handleMultipleFileUploads($request->file('file_upload'));
+
+        // Get the id header and related data
+        $idHeader = $request->input('id_header');
+        $items = $request->input('items');
+        $pic = $request->input('pic');
+        $remarks = $request->input('remarks');
+        $pmStatus = $request->input('status');
+
+        // Update header
+        $checksheetHead = ChecksheetFormHead::findOrFail($idHeader);
+        $checksheetHead->update([
+            'pic' => $pic,
+            'remark' => $remarks,
+            'status' => 1,
+            'pm_status' => $pmStatus,
+            'img' => json_encode($imgPaths), // Store as JSON array
         ]);
 
-        DB::beginTransaction();
+        // Save each item detail
+        foreach ($items as $itemName => $itemData) {
+            ChecksheetFormDetail::create([
+                'id_header' => $idHeader,
+                'checksheet_category' => $itemData['checksheet_category'],
+                'item_name' => $itemName,
+                'checksheet_type' => $itemData['checksheet_type'],
+                'act' => $itemData['act'] ?? null,
+                'B' => $itemData['B'] ?? 0,
+                'R' => $itemData['R'] ?? 0,
+                'G' => $itemData['G'] ?? 0,
+                'PP' => $itemData['PP'] ?? 0,
+                'judge' => $itemData['judge'] ?? null,
+                'remarks' => $itemData['remarks'] ?? null,
+            ]);
+        }
 
-        try {
-            // Handle the image upload if it exists
-            $imgPath = null;
-            if ($request->hasFile('file_upload')) {
-                $file = $request->file('file_upload');
-                $fileName = uniqid() . '_' . $file->getClientOriginalName();
-                $destinationPath = public_path('assets/img/pm');
-                $file->move($destinationPath, $fileName);
-                $imgPath = 'assets/img/pm/' . $fileName;
-            }
+        // Send email notifications if status is 1
+        if ($checksheetHead->status == 1) {
+            $this->sendEmailNotifications($checksheetHead);
+        }
 
-            // Get the id header
-            $idHeader = $request->input('id_header');
+        DB::commit();
 
-            // Get the items to be saved
-            $items = $request->input('items');
+        return redirect()->route('machine')->with('status', 'Checksheet submitted successfully.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error($e->getMessage());
+        return redirect()->back()->with('failed', 'An error occurred while submitting the checksheet. Please try again.');
+    }
+}
 
-            // Get the values for pic and remarks from the request
-            $pic = $request->input('pic');
-            $remarks = $request->input('remarks');
-            $pmStatus = $request->input('status');
+private function handleMultipleFileUploads($files)
+{
+    $imgPaths = [];
 
-            // Update pic, remarks, pm_status, and img for the header id
-            $checksheetHead = ChecksheetFormHead::find($idHeader);
-            if ($checksheetHead) {
-                $checksheetHead->pic = $pic;
-                $checksheetHead->remark = $remarks;
-                $checksheetHead->status = 1; // Update status to 1
-                $checksheetHead->pm_status = $pmStatus; // Update pm_status
-                $checksheetHead->img = $imgPath; // Update the image path
-                $checksheetHead->save();
-            }
-
-            // Save each item to the table
-            foreach ($items as $itemName => $itemData) {
-                $checksheetDetail = new ChecksheetFormDetail();
-                $checksheetDetail->id_header = $idHeader;
-                $checksheetDetail->checksheet_category = $itemData['checksheet_category']; // Add checksheet category
-                $checksheetDetail->item_name = $itemName;
-                $checksheetDetail->checksheet_type = $itemData['checksheet_type'];
-                $checksheetDetail->act = $itemData['act'] ?? null;
-                $checksheetDetail->B = isset($itemData['B']) ? $itemData['B'] : 0;
-                $checksheetDetail->R = isset($itemData['R']) ? $itemData['R'] : 0;
-                $checksheetDetail->G = isset($itemData['G']) ? $itemData['G'] : 0;
-                $checksheetDetail->PP = isset($itemData['PP']) ? $itemData['PP'] : 0;
-                $checksheetDetail->judge = $itemData['judge'] ?? null;
-                $checksheetDetail->remarks = $itemData['remarks'] ?? null;
-                $checksheetDetail->save();
-            }
-
-            // Send email notifications if status is 1
-            $getMail = Rule::where('rule_name', 'Checker')->get();
-            foreach ($getMail as $mail) {
-                if ($checksheetHead && $checksheetHead->status == 1) {
-                    Mail::to($mail->rule_value)->send(new CheckerReminder($checksheetHead));
-                }
-            }
-
-            // Commit the transaction if everything is successful
-            DB::commit();
-
-            // Redirect with success message
-            return redirect()->route('machine')->with('status', 'Checksheet submitted successfully.');
-        } catch (\Exception $e) {
-            // Rollback the transaction on error
-            DB::rollBack();
-            return redirect()->back()->with('failed', 'An error occurred while submitting the checksheet. Please try again.');
+    if ($files) {
+        foreach ($files as $file) {
+            $fileName = Str::uuid() . '.' . $file->getClientOriginalExtension();
+            $destinationPath = public_path('assets/img/pm');
+            $file->move($destinationPath, $fileName);
+            $imgPaths[] = 'assets/img/pm/' . $fileName; // Add the path to the array
         }
     }
+
+    return $imgPaths;
+}
+
+private function sendEmailNotifications($checksheetHead)
+{
+    $getMail = Rule::where('rule_name', 'Checker')->get();
+    foreach ($getMail as $mail) {
+        Mail::to($mail->rule_value)->send(new CheckerReminder($checksheetHead));
+    }
+}
+
 
 
 
