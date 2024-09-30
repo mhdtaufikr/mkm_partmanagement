@@ -24,109 +24,134 @@ use App\Imports\HistoricalProblemImport;
 class HistoryController extends Controller
 {
     public function index(Request $request)
-{
-    $userPlant = auth()->user()->plant;
-    $userType = auth()->user()->type;
+    {
+        $userPlant = auth()->user()->plant;
+        $userType = auth()->user()->type;
 
-    if ($request->ajax()) {
-        // Modify query to fetch both parent and child records
-        $query = HistoricalProblem::with(['spareParts.part', 'machine', 'children'])
-            ->orderBy('date', 'desc')
-            ->orderBy('start_time', 'desc');
+        if ($request->ajax()) {
+            // Modify query to fetch both parent and child records
+            $query = HistoricalProblem::with(['spareParts.part', 'machine', 'children'])
+                ->orderBy('date', 'desc')
+                ->orderBy('start_time', 'desc');
 
-        // Apply user filters based on plant and type
-        if (($userPlant === 'Engine' || $userPlant === 'Stamping') && ($userType === 'Mechanic' || $userType === 'Electric')) {
-            $query->whereHas('machine', function($q) use ($userPlant) {
-                $q->where('plant', $userPlant)->where('shop', 'ME');
-            });
-        } elseif (($userPlant === 'Engine' || $userPlant === 'Stamping') && $userType === 'Power House') {
-            $query->whereHas('machine', function($q) use ($userPlant) {
-                $q->where('plant', $userPlant)->where('shop', 'PH');
-            });
-        }
-
-        // Process data for DataTables
-        return DataTables::of($query)
-        ->addIndexColumn()
-        ->editColumn('start_time', function ($row) {
-            return \Carbon\Carbon::parse($row->start_time)->format('H:i');
-        })
-        ->editColumn('finish_time', function ($row) {
-            return \Carbon\Carbon::parse($row->finish_time)->format('H:i');
-        })
-        ->editColumn('status', function ($row) {
-            // Show the latest child's status in the table (if child exists and has a status)
-            $latestChild = $row->children()->latest()->first();
-            return $latestChild ? $latestChild->status : $row->status;
-        })
-        ->editColumn('machine.op_no', function ($row) {
-            // Add hyperlink to OP No., opening in a new tab
-            return '<a href="/mst/machine/detail/' . encrypt($row->machine->id) . '" target="_blank">' . $row->machine->op_no . '</a>';
-        })
-        ->addColumn('flag', function ($row) {
-            // Check if the row is a child (has a parent_id)
-            $isChild = !is_null($row->parent_id);
-            // Check if the row is a parent (has children)
-            $hasChildren = $row->children()->exists();
-
-            // Return flag if it's either a parent or a child
-            if ($isChild || $hasChildren) {
-                return '<i class="fas fa-flag" style="color: rgba(0, 103, 127, 1);"></i>';
+            // Apply user filters based on plant and type
+            if (($userPlant === 'Engine' || $userPlant === 'Stamping') && ($userType === 'Mechanic' || $userType === 'Electric')) {
+                $query->whereHas('machine', function($q) use ($userPlant) {
+                    $q->where('plant', $userPlant)->where('shop', 'ME');
+                });
+            } elseif (($userPlant === 'Engine' || $userPlant === 'Stamping') && $userType === 'Power House') {
+                $query->whereHas('machine', function($q) use ($userPlant) {
+                    $q->where('plant', $userPlant)->where('shop', 'PH');
+                });
             }
 
-            return ''; // Return empty if neither a parent nor child
-        })
+            // Process data for DataTables
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->editColumn('start_time', function ($row) {
+                    return \Carbon\Carbon::parse($row->start_time)->format('H:i');
+                })
+                ->editColumn('finish_time', function ($row) {
+                    return \Carbon\Carbon::parse($row->finish_time)->format('H:i');
+                })
+                ->editColumn('status', function ($row) {
+                    // Traverse up to the root parent and get the latest status of the entire chain
+                    $latestStatus = $row;
 
+                    // Traverse up to the root (if parent exists)
+                    while ($latestStatus->parent_id !== null) {
+                        $latestStatus = $latestStatus->parent()->first();
+                    }
 
+                    // Traverse down to find the latest status in the chain
+                    while ($latestStatus->children()->exists()) {
+                        $latestStatus = $latestStatus->children()->latest('id')->first();
+                    }
 
-        ->addColumn('action', function($row){
-            return '<button class="btn btn-sm btn-primary btn-detail" data-id="'.$row->id.'" data-bs-toggle="modal" data-bs-target="#modal-detail">Detail</button>';
-        })
-        ->rawColumns(['action', 'flag', 'machine.op_no']) // Include 'machine.op_no' in rawColumns to render HTML
-        ->make(true);
-    }
+                    // Return the status of the latest record in the chain
+                    return $latestStatus->status;
+                })
+                ->editColumn('machine.op_no', function ($row) {
+                    // Add hyperlink to OP No., opening in a new tab
+                    return '<a href="/mst/machine/detail/' . encrypt($row->machine->id) . '" target="_blank">' . $row->machine->op_no . '</a>';
+                })
+                ->addColumn('flag', function ($row) {
+                    // Check if the row is a child (has a parent_id)
+                    $isChild = !is_null($row->parent_id);
+                    // Check if the row is a parent (has children)
+                    $hasChildren = $row->children()->exists();
 
-    // Additional queries for machines and lines based on user plant and type
-    $machinesQuery = Machine::query();
-    $linesQuery = Machine::select('line')->distinct();
+                    // Return flag if it's either a parent or a child
+                    if ($isChild || $hasChildren) {
+                        return '<i class="fas fa-flag" style="color: rgba(0, 103, 127, 1);"></i>';
+                    }
 
-    if (($userPlant === 'Engine' || $userPlant === 'Stamping') && ($userType === 'Mechanic' || $userType === 'Electric')) {
-        $machinesQuery->where('plant', $userPlant)->where('shop', 'ME');
-        $linesQuery->where('plant', $userPlant)->where('shop', 'ME');
-    } elseif (($userPlant === 'Engine' || $userPlant === 'Stamping') && $userType === 'Power House') {
-        $machinesQuery->where('plant', $userPlant)->where('shop', 'PH');
-        $linesQuery->where('plant', $userPlant)->where('shop', 'PH');
-    }
-
-    $machines = $machinesQuery->get();
-    $lines = $linesQuery->get();
-
-    // Fetch open reports (status = 'Not Good' or status = 'Temporary')
-$openReports = HistoricalProblem::whereIn('status', ['Not Good', 'Temporary'])
-->where(function ($query) {
-    $query->doesntHave('children')
-        ->orWhereHas('children', function ($q) {
-            $q->whereIn('status', ['Not Good', 'Temporary']);
-        });
-})
-->whereHas('machine', function ($q) use ($userPlant, $userType) {
-    if ($userPlant !== 'All' && $userType !== 'All') {
-        $q->where('plant', $userPlant);
-
-        if ($userType !== 'All') {
-            $q->whereHas('historicalProblems', function ($q2) use ($userType) {
-                $q2->where('shop', $userType);
-            });
+                    return ''; // Return empty if neither a parent nor child
+                })
+                ->addColumn('action', function($row){
+                    return '<button class="btn btn-sm btn-primary btn-detail" data-id="'.$row->id.'" data-bs-toggle="modal" data-bs-target="#modal-detail">Detail</button>';
+                })
+                ->rawColumns(['action', 'flag', 'machine.op_no']) // Include 'machine.op_no' in rawColumns to render HTML
+                ->make(true);
         }
+
+        // Additional queries for machines and lines based on user plant and type
+        $machinesQuery = Machine::query();
+        $linesQuery = Machine::select('line')->distinct();
+
+        if (($userPlant === 'Engine' || $userPlant === 'Stamping') && ($userType === 'Mechanic' || $userType === 'Electric')) {
+            $machinesQuery->where('plant', $userPlant)->where('shop', 'ME');
+            $linesQuery->where('plant', $userPlant)->where('shop', 'ME');
+        } elseif (($userPlant === 'Engine' || $userPlant === 'Stamping') && $userType === 'Power House') {
+            $machinesQuery->where('plant', $userPlant)->where('shop', 'PH');
+            $linesQuery->where('plant', $userPlant)->where('shop', 'PH');
+        }
+
+        $machines = $machinesQuery->get();
+        $lines = $linesQuery->get();
+
+        // Step 1: Fetch all parents (root-level entries)
+        $openReports = HistoricalProblem::whereNull('parent_id')
+            ->whereIn('status', ['Not Good', 'Temporary'])  // Parent itself must still be open
+            ->with('children')  // Load immediate children
+            ->whereHas('machine', function ($q) use ($userPlant, $userType) {
+                if ($userPlant !== 'All' && $userType !== 'All') {
+                    $q->where('plant', $userPlant);
+
+                    if ($userType !== 'All') {
+                        $q->whereHas('historicalProblems', function ($q2) use ($userType) {
+                            $q2->where('shop', $userType);
+                        });
+                    }
+                }
+            })
+            ->get();
+
+        // Step 2: Filter out chains where any descendant has "OK" status
+        $openReports = $openReports->filter(function ($report) {
+            return !$this->hasOkInDescendants($report);  // Use 'this' to call a controller method
+        });
+
+        // Pass the filtered reports to the view
+        return view('history.index', compact('machines', 'lines', 'openReports'));
     }
-})
-->get();
 
+    private function hasOkInDescendants($report) {
+        // If this report has a status of "OK", exclude the chain
+        if ($report->status == 'OK') {
+            return true;
+        }
 
-    return view('history.index', compact('machines', 'lines', 'openReports'));
-}
+        // Recursively check each child
+        foreach ($report->children as $child) {
+            if ($this->hasOkInDescendants($child)) {
+                return true;
+            }
+        }
 
-
+        // If no descendants have "OK", include the chain
+        return false;
+    }
 
 
 
@@ -982,6 +1007,24 @@ public function formUpdate($id)
 {
 
     $parent_id = decrypt($id);
+
+
+    // Keep iterating through the parent-child chain until no more children are found
+    while (true) {
+        // Find the first child where 'parent_id' matches the current parent_id
+        $data_id = HistoricalProblem::where('parent_id', $parent_id)->first();
+
+        // If no child is found, break out of the loop
+        if (!$data_id) {
+            break;
+        }
+
+        // Update the parent_id to the child's id and continue the loop to check for further children
+        $parent_id = $data_id->id;
+    }
+
+    // Now $parent_id holds the latest child's id or the original parent_id if no children exist
+
     $data = HistoricalProblem::with('machine')->where('id', $parent_id)->first(); // Include machine relation
 
     // Fetch the dropdown data

@@ -13,7 +13,7 @@ use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\PreventiveController;
 use App\Http\Controllers\ChecksheetController;
 use App\Http\Controllers\SummaryController;
-
+use App\Http\Controllers\KPIDailyReport;
 
 
 
@@ -172,6 +172,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/summary', [SummaryController::class, 'index']);
 
 
+
+    //Master Checksheet form/checksheet/scan
+    Route::get('/kpi/daily', [KPIDailyReport::class, 'index'])->name('machine');
+    Route::get('kpi/daily/data', [KPIDailyReport::class, 'getData'])->name('kpi.daily.data');
 
 
     });
