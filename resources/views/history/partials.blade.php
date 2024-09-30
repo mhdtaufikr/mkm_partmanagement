@@ -1,7 +1,7 @@
 <div class="row mb-3">
     <div class="col-md-6">
         <h6><strong>Machine No:</strong> {{ $data->machine->op_no }}</h6>
-        <h6><strong>Date:</strong> {{ $data->date }}</h6>
+        <h6><strong>Date:</strong> {{ \Carbon\Carbon::parse($data->date)->format('d/m/Y') }}</h6>
         <h6><strong>Shift:</strong> {{ $data->shift }}</h6>
         <h6><strong>Shop:</strong> {{ $data->shop }}</h6>
         <h6><strong>Problem:</strong> {{ $data->problem }}</h6>
@@ -60,7 +60,7 @@
     <div class="row mb-3">
         <div class="col-md-6">
             <h6><strong>Machine No:</strong> {{ $parent->machine->op_no }}</h6>
-            <h6><strong>Date:</strong> {{ $parent->date }}</h6>
+            <h6><strong>Date:</strong> {{ \Carbon\Carbon::parse($parent->date)->format('d/m/Y') }}</h6>
             <h6><strong>Shift:</strong> {{ $parent->shift }}</h6>
             <h6><strong>Shop:</strong> {{ $parent->shop }}</h6>
             <h6><strong>Problem:</strong> {{ $parent->problem }}</h6>
@@ -120,7 +120,7 @@
     <div class="row mb-3">
         <div class="col-md-6">
             <h6><strong>Machine No:</strong> {{ $latestChild->machine->op_no }}</h6>
-            <h6><strong>Date:</strong> {{ $latestChild->date }}</h6>
+           <h6><strong>Date:</strong> {{ \Carbon\Carbon::parse($latestChild->date)->format('d/m/Y') }}</h6>
             <h6><strong>Shift:</strong> {{ $latestChild->shift }}</h6>
             <h6><strong>Shop:</strong> {{ $latestChild->shop }}</h6>
             <h6><strong>Problem:</strong> {{ $latestChild->problem }}</h6>
