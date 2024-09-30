@@ -71,8 +71,28 @@
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
             { data: 'id_machine', name: 'id_machine' },  // Display machine (op_no - machine_name)
             { data: 'report', name: 'report' },
-            { data: 'start_date', name: 'start_date' },
-            { data: 'end_date', name: 'end_date' },
+            {
+                "data": "start_date",
+                "name": "start_date",
+                "render": function(data, type, row) {
+                    if (data) {
+                        var dateParts = data.split("-");
+                        return dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0];
+                    }
+                    return data;
+                }
+            },
+            {
+                "data": "end_date",
+                "name": "end_date",
+                "render": function(data, type, row) {
+                    if (data) {
+                        var dateParts = data.split("-");
+                        return dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0];
+                    }
+                    return data;
+                }
+            },
             {
                 data: 'kpi',
                 name: 'kpi',

@@ -185,94 +185,104 @@
 </main>
 
 <script>
-   $(document).ready(function() {
-    var table = $("#tablehistory").DataTable({
-        "processing": true,
-        "serverSide": true,
-        "responsive": true,
-        "autoWidth": false,
-        "ajax": "{{ route('history') }}",
-        "columns": [
-            { "data": "DT_RowIndex", "name": "DT_RowIndex", "orderable": false, "searchable": false },
-            { "data": "machine.op_no", "name": "machine.op_no" },
-            { "data": "date", "name": "date" },
-            { "data": "shift", "name": "shift" },
-            { "data": "shop", "name": "shop" },
-            { "data": "problem", "name": "problem" },
-            { "data": "cause", "name": "cause" },
-            { "data": "start_time", "name": "start_time" },
-            { "data": "finish_time", "name": "finish_time" },
-            {
-            "data": "balance","name": "balance","render": function (data, type, row) {
-                return parseFloat(data).toString();
-            }},
-            { "data": "pic", "name": "pic" },
-            { "data": "remarks", "name": "remarks" },
-            {
-                "data": "status",
-                "name": "status",
-                "render": function(data) {
-                    let statusClass = '';
-                    switch (data) {
-                        case 'OK': statusClass = 'btn-success'; break;
-                        case 'Not Good': statusClass = 'btn-danger'; break;
-                        case 'Temporary': statusClass = 'btn-warning'; break;
-                        default: statusClass = 'btn-primary';
-                    }
-                    return '<button class="btn ' + statusClass + ' btn-sm">' + data + '</button>';
-                }
-            },
-            {
-                "data": "flag",
-                "name": "flag",
-                "orderable": false, // No sorting on this column
-                "searchable": false // Disable searching on this column
-            },
-            {
-                "data": "action",
-                "name": "action",
-                "orderable": false,
-                "searchable": false
-            }
-        ],
-        "dom": 'Blfrtip', // Enable buttons and length menu
-        "buttons": [
-            {
-                title: 'History Data Export',
-                text: '<i class="fas fa-file-excel"></i> Export to Excel',
-                extend: 'excel',
-                className: 'btn btn-success btn-sm mb-2',
-                exportOptions: {
-                    columns: ':visible',
-                    modifier: {
-                        search: 'applied',
-                        order: 'applied',
-                        page: 'all'
-                    }
-                }
-            }
-        ],
-        "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
-        "pageLength": 10
-    });
+    $(document).ready(function() {
+     var table = $("#tablehistory").DataTable({
+         "processing": true,
+         "serverSide": true,
+         "responsive": true,
+         "autoWidth": false,
+         "ajax": "{{ route('history') }}",
+         "columns": [
+             { "data": "DT_RowIndex", "name": "DT_RowIndex", "orderable": false, "searchable": false },
+             { "data": "machine.op_no", "name": "machine.op_no" },
+             {
+                 "data": "date",
+                 "name": "date",
+                 "render": function(data, type, row) {
+                     if (data) {
+                         // Assuming date format is yyyy-mm-dd
+                         var dateParts = data.split("-");
+                         return dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0];
+                     }
+                     return data;
+                 }
+             },
+             { "data": "shift", "name": "shift" },
+             { "data": "shop", "name": "shop" },
+             { "data": "problem", "name": "problem" },
+             { "data": "cause", "name": "cause" },
+             { "data": "start_time", "name": "start_time" },
+             { "data": "finish_time", "name": "finish_time" },
+             {
+             "data": "balance","name": "balance","render": function (data, type, row) {
+                 return parseFloat(data).toString();
+             }},
+             { "data": "pic", "name": "pic" },
+             { "data": "remarks", "name": "remarks" },
+             {
+                 "data": "status",
+                 "name": "status",
+                 "render": function(data) {
+                     let statusClass = '';
+                     switch (data) {
+                         case 'OK': statusClass = 'btn-success'; break;
+                         case 'Not Good': statusClass = 'btn-danger'; break;
+                         case 'Temporary': statusClass = 'btn-warning'; break;
+                         default: statusClass = 'btn-primary';
+                     }
+                     return '<button class="btn ' + statusClass + ' btn-sm">' + data + '</button>';
+                 }
+             },
+             {
+                 "data": "flag",
+                 "name": "flag",
+                 "orderable": false, // No sorting on this column
+                 "searchable": false // Disable searching on this column
+             },
+             {
+                 "data": "action",
+                 "name": "action",
+                 "orderable": false,
+                 "searchable": false
+             }
+         ],
+         "dom": 'Blfrtip', // Enable buttons and length menu
+         "buttons": [
+             {
+                 title: 'History Data Export',
+                 text: '<i class="fas fa-file-excel"></i> Export to Excel',
+                 extend: 'excel',
+                 className: 'btn btn-success btn-sm mb-2',
+                 exportOptions: {
+                     columns: ':visible',
+                     modifier: {
+                         search: 'applied',
+                         order: 'applied',
+                         page: 'all'
+                     }
+                 }
+             }
+         ],
+         "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+         "pageLength": 10
+     });
 
-    // Load modal content dynamically when the detail button is clicked
-    $('#tablehistory').on('click', '.btn-detail', function() {
-        var id = $(this).data('id');
-        $.ajax({
-            url: "{{ url('/history/detail') }}/" + id,
-            method: 'GET',
-            success: function(data) {
-                $('#modal-body-content').html(data);
-                $('#modal-detail').modal('show');
-            },
-            error: function(xhr, status, error) {
-                alert('An error occurred while fetching details: ' + error);
-            }
-        });
-    });
-});
-
-</script>
+     // Load modal content dynamically when the detail button is clicked
+     $('#tablehistory').on('click', '.btn-detail', function() {
+         var id = $(this).data('id');
+         $.ajax({
+             url: "{{ url('/history/detail') }}/" + id,
+             method: 'GET',
+             success: function(data) {
+                 $('#modal-body-content').html(data);
+                 $('#modal-detail').modal('show');
+             },
+             error: function(xhr, status, error) {
+                 alert('An error occurred while fetching details: ' + error);
+             }
+         });
+     });
+ });
+ </script>
 
 @endsection
