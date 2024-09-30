@@ -215,7 +215,7 @@
              { "data": "finish_time", "name": "finish_time" },
              {
              "data": "balance","name": "balance","render": function (data, type, row) {
-                 return parseFloat(data).toString();
+                 return parseFloat(data).toString() + ' Hour';
              }},
              { "data": "pic", "name": "pic" },
              { "data": "remarks", "name": "remarks" },
