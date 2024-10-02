@@ -30,6 +30,16 @@
                                 </div>
 
                                 <div class="card-body">
+                                    <div class="form-group mb-4">
+                                        <label for="filter-month">Filter by Month:</label>
+                                        <select id="filter-month" class="form-control" style="width: 200px;">
+                                            <option value="">Select Month</option>
+                                            @for ($i = 1; $i <= 12; $i++)
+                                                <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ date('F', mktime(0, 0, 0, $i, 1)) }}</option>
+                                            @endfor
+                                        </select>
+                                    </div>
+
                                     <div class="table-responsive">
                                         <table id="tablehistory" class="table table-bordered table-striped">
                                             <thead>
@@ -62,19 +72,26 @@
 </main>
 
 <script>
-   $(document).ready(function() {
+$(document).ready(function() {
     var table = $("#tablehistory").DataTable({
         processing: true,
         serverSide: true,
-        ajax: "{{ route('kpi.daily.data') }}", // Route for fetching data
+        ajax: {
+            url: "{{ route('kpi.daily.data') }}",
+            data: function (d) {
+                d.month = $('#filter-month').val(); // Pass the selected month to the server
+            }
+        },
+        // Extend the lengthMenu to include "All" option
+        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-            { data: 'id_machine', name: 'id_machine' },  // Display machine (op_no - machine_name)
+            { data: 'id_machine', name: 'id_machine' },
             { data: 'report', name: 'report' },
             {
-                "data": "start_date",
-                "name": "start_date",
-                "render": function(data, type, row) {
+                data: "start_date",
+                name: "start_date",
+                render: function(data) {
                     if (data) {
                         var dateParts = data.split("-");
                         return dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0];
@@ -83,9 +100,9 @@
                 }
             },
             {
-                "data": "end_date",
-                "name": "end_date",
-                "render": function(data, type, row) {
+                data: "end_date",
+                name: "end_date",
+                render: function(data) {
                     if (data) {
                         var dateParts = data.split("-");
                         return dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0];
@@ -97,11 +114,11 @@
                 data: 'kpi',
                 name: 'kpi',
                 render: function (data, type, row) {
-                    // If KPI value is 1, show the icon, otherwise show the raw value
+                    // If KPI value is 'A', show the icon, otherwise show the raw value
                     if (data == 'A') {
                         return '<i class="far fa-check-square" style="color: #109e12;"></i>';
                     } else {
-                        return data;  // You can adjust what is returned for non-1 values if needed
+                        return data;
                     }
                 }
             },
@@ -109,8 +126,7 @@
             {
                 data: 'total_balance',
                 name: 'total_balance',
-                render: function (data, type, row) {
-                    // If the value has no decimals, show as integer, otherwise as float, then append " Hour"
+                render: function (data) {
                     var formattedBalance = (data % 1 === 0) ? parseInt(data) : parseFloat(data).toString().replace('.', ',');
                     return formattedBalance + ' Hour';
                 }
@@ -119,21 +135,26 @@
             {
                 data: 'latest_status',
                 name: 'latest_status',
-                render: function(data, type, row) {
-                    // Apply Bootstrap classes based on the status
+                render: function(data) {
                     var statusClass;
                     switch (data) {
                         case 'OK': statusClass = 'btn-success'; break;
                         case 'Not Good': statusClass = 'btn-danger'; break;
                         case 'Temporary': statusClass = 'btn-warning'; break;
-                        default: statusClass = 'btn-primary'; // Default class for unknown statuses
+                        default: statusClass = 'btn-primary';
                     }
                     return '<button class="btn ' + statusClass + '">' + data + '</button>';
                 }
             }
         ]
     });
+
+    // Handle month filter change
+    $('#filter-month').change(function() {
+        table.draw(); // Redraw the table with the selected month filter
+    });
 });
+
 
 </script>
 @endsection

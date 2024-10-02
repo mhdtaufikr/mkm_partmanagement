@@ -106,21 +106,23 @@
                                     <!-- Card Body -->
                                     <div class="card-body">
                                         <div class="modal-body">
-                                            <input type="hidden" name="id_header" value="{{$id}}">
+                                            <input type="hidden" name="id_header" value="{{ $id }}">
                                             <ul class="nav nav-tabs" id="checksheetTabs" role="tablist">
                                                 <!-- Tab for each checksheet category -->
                                                 @foreach ($groupedResults as $checksheetId => $items)
                                                     @php
+                                                        // Generate a valid ID for the tab
                                                         $checksheetCategory = $items[0]['checksheet_category'];
-                                                        $tabId = str_replace(' ', '_', $checksheetCategory);
+                                                        $tabId = Str::slug($checksheetCategory, '_'); // Use Str::slug() to generate safe IDs
                                                     @endphp
                                                     <li class="nav-item">
-                                                        <a style="color: black;"
-                                                            class="nav-link{{ $loop->first ? ' active' : '' }}"
-                                                            id="{{ $tabId }}-tab" data-bs-toggle="tab"
-                                                            href="#{{ $tabId }}" role="tab"
-                                                            aria-controls="{{ $tabId }}"
-                                                            aria-selected="{{ $loop->first ? 'true' : 'false' }}">
+                                                        <a class="nav-link{{ $loop->first ? ' active' : '' }}"
+                                                           id="{{ $tabId }}-tab"
+                                                           data-bs-toggle="tab"
+                                                           href="#{{ $tabId }}"
+                                                           role="tab"
+                                                           aria-controls="{{ $tabId }}"
+                                                           aria-selected="{{ $loop->first ? 'true' : 'false' }}">
                                                             {{ $checksheetCategory }}
                                                         </a>
                                                     </li>
@@ -130,13 +132,15 @@
                                                 <!-- Tab panel for each checksheet category -->
                                                 @foreach ($groupedResults as $checksheetId => $items)
                                                     @php
+                                                        // Ensure the same ID for the tab pane
                                                         $checksheetCategory = $items[0]['checksheet_category'];
-                                                        $tabId = str_replace(' ', '_', $checksheetCategory);
+                                                        $tabId = Str::slug($checksheetCategory, '_');
                                                         $checksheetType = $items[0]['checksheet_type'];
                                                     @endphp
                                                     <div class="tab-pane fade{{ $loop->first ? ' show active' : '' }}"
-                                                        id="{{ $tabId }}" role="tabpanel"
-                                                        aria-labelledby="{{ $tabId }}-tab">
+                                                         id="{{ $tabId }}"
+                                                         role="tabpanel"
+                                                         aria-labelledby="{{ $tabId }}-tab">
                                                         <br>
                                                         <h1>{{ $checksheetType }}</h1> <!-- Display the category type -->
                                                         <div class="table-responsive">
@@ -158,34 +162,31 @@
                                                                     @foreach ($items as $item)
                                                                         <tr>
                                                                             <input type="hidden"
-                                                                                name="items[{{ $item['item_name'] }}][checksheet_type]"
-                                                                                value="{{ $item['checksheet_type'] }}">
+                                                                                   name="items[{{ $item['item_name'] }}][checksheet_type]"
+                                                                                   value="{{ $item['checksheet_type'] }}">
                                                                             <input type="hidden"
-                                                                                name="items[{{ $item['item_name'] }}][checksheet_category]"
-                                                                                value="{{ $item['checksheet_category'] }}">
+                                                                                   name="items[{{ $item['item_name'] }}][checksheet_category]"
+                                                                                   value="{{ $item['checksheet_category'] }}">
                                                                             <td>{{ $item['item_name'] }}</td>
                                                                             <td>{{ $item['spec'] }}</td>
                                                                             <td><input type="text"
-                                                                                    name="items[{{ $item['item_name'] }}][act]">
-                                                                            </td>
+                                                                                       name="items[{{ $item['item_name'] }}][act]"></td>
                                                                             <td><input type="checkbox" class="checkbox"
-                                                                                    name="items[{{ $item['item_name'] }}][B]"
-                                                                                    value="1"></td>
+                                                                                       name="items[{{ $item['item_name'] }}][B]"
+                                                                                       value="1"></td>
                                                                             <td><input type="checkbox" class="checkbox"
-                                                                                    name="items[{{ $item['item_name'] }}][R]"
-                                                                                    value="1"></td>
+                                                                                       name="items[{{ $item['item_name'] }}][R]"
+                                                                                       value="1"></td>
                                                                             <td><input type="checkbox" class="checkbox"
-                                                                                    name="items[{{ $item['item_name'] }}][G]"
-                                                                                    value="1"></td>
+                                                                                       name="items[{{ $item['item_name'] }}][G]"
+                                                                                       value="1"></td>
                                                                             <td><input type="checkbox" class="checkbox"
-                                                                                    name="items[{{ $item['item_name'] }}][PP]"
-                                                                                    value="1"></td>
+                                                                                       name="items[{{ $item['item_name'] }}][PP]"
+                                                                                       value="1"></td>
                                                                             <td><input type="text"
-                                                                                    name="items[{{ $item['item_name'] }}][judge]">
-                                                                            </td>
+                                                                                       name="items[{{ $item['item_name'] }}][judge]"></td>
                                                                             <td><input type="text"
-                                                                                    name="items[{{ $item['item_name'] }}][remarks]">
-                                                                            </td>
+                                                                                       name="items[{{ $item['item_name'] }}][remarks]"></td>
                                                                         </tr>
                                                                     @endforeach
                                                                 </tbody>
@@ -198,6 +199,7 @@
                                         <div class="modal-footer">
                                         </div>
                                     </div>
+
                                 </div>
                             </form>
                         </div>

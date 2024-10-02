@@ -20,6 +20,7 @@ class ChecksheetImport implements ToCollection, WithHeadingRow
 
     public function collection(Collection $rows)
 {
+    set_time_limit(300);
     // Start a transaction
     DB::beginTransaction();
 
