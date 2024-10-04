@@ -68,7 +68,7 @@
 
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="mb-3 col-sm-12">
+                                        <div class="mb-3 col-sm-6">
                                             <a href="{{ route('form') }}" class="btn btn-dark btn-sm mb-2">
                                                 <i class="fas fa-plus-square"></i> Input Daily Report
                                             </a>
@@ -76,7 +76,17 @@
                                                 <i class="fas fa-plus-square"></i> Update Daily Report
                                             </button>
                                         </div>
+                                        <div class="col-sm-6 d-flex justify-content-end align-items-center">
+                                            <!-- Legend section aligned to the right -->
+                                            <div class="legend">
+                                                <strong>Legend:</strong>
+                                                <span style='font-size: 20px; color: #FFDF00;'>&#9651;</span> Temporary |
+                                                <i class="fas fa-times" style='font-size: 20px; color: red;'></i> Not Good |
+                                                <i class="fas fa-check" style='font-size: 20px; color: green;'></i> OK
+                                            </div>
+                                        </div>
                                     </div>
+
 
                                     <!-- Modal for selecting the open daily report -->
                                     <div class="modal fade" id="openReportModal" tabindex="-1" aria-labelledby="openReportModalLabel" aria-hidden="true">
@@ -162,7 +172,7 @@
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody class="text-center">
                                                 <!-- DataTables will populate the rows here -->
                                             </tbody>
                                         </table>
@@ -242,7 +252,7 @@
                         let icon = '';
                         switch (data) {
                             case 'Temporary':
-                                icon = "<span style='font-size: 30px; color: #FFDF00;'>&#9651;</span>"; // Yellow triangle
+                                icon = "<span style='font-size: 30px; color: #FFDF00; font-weight: bold; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000;'>&#9651;</span>"; // Yellow triangle with bold effect
                                 break;
                             case 'Not Good':
                                 icon = "<i class='fas fa-times' style='font-size: 30px; color: red;'></i>"; // Red times icon
