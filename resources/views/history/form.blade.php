@@ -92,8 +92,6 @@
                                                                         <div class="form-group">
                                                                             <label for="shop"><strong style="color: rgba(0, 103, 127, 1)">Shop</strong> </label>
                                                                             <select class="form-control" id="shop" name="shop" required>
-
-
                                                                                 <!-- If user->type is 'All', show all shop options -->
                                                                                 @if($user->type == 'All')
                                                                                     <option value="">Select Shop</option> <!-- Default option -->

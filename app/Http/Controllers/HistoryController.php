@@ -986,9 +986,9 @@ public function formStatus($no_machine, $date, $shift, $pm_id, $checksheet_head_
 
     // Fetch all unique parts directly from the 'parts' table
     $spareParts = Part::select('id', 'material', 'material_description')->distinct()->get();
-
+    $user = auth()->user();
     // Return the view with the necessary data
-    return view('history.formStatus', compact('dropdown', 'pm_item', 'machine', 'no_machine', 'date', 'shift', 'spareParts', 'pm_id', 'checksheet_head_id'));
+    return view('history.formStatus', compact('dropdown', 'pm_item', 'machine', 'no_machine', 'date', 'shift', 'spareParts', 'pm_id', 'checksheet_head_id','user'));
 }
 
 
