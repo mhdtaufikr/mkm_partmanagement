@@ -100,26 +100,28 @@ class HistoryController extends Controller
     $machines = $machinesQuery->get();
     $lines = $linesQuery->get();
 
-    // Fetch open reports logic remains unchanged
+   // Fetch open reports logic remains unchanged
     $openReports = HistoricalProblem::whereNull('parent_id')
-        ->whereIn('status', ['Not Good', 'Temporary'])
-        ->with('children')
-        ->whereHas('machine', function ($q) use ($userPlant, $userType) {
-            if ($userPlant !== 'All' && $userType !== 'All') {
-                $q->where('plant', $userPlant);
-                if ($userType !== 'All') {
-                    $q->whereHas('historicalProblems', function ($q2) use ($userType) {
-                        $q2->where('shop', $userType);
-                    });
-                }
+    ->whereIn('status', ['Not Good', 'Temporary'])
+    ->with('children')
+    ->whereHas('machine', function ($q) use ($userPlant, $userType) {
+        if ($userPlant !== 'All' && $userType !== 'All') {
+            $q->where('plant', $userPlant);
+            if ($userType !== 'All') {
+                $q->whereHas('historicalProblems', function ($q2) use ($userType) {
+                    $q2->where('shop', $userType);
+                });
             }
-        })
-        ->get();
+        }
+    })
+    ->orderBy('date', 'asc') // Ensure FIFO ordering by date
+    ->get();
 
     // Filter out chains where any descendant has "OK" status
     $openReports = $openReports->filter(function ($report) {
-        return !$this->hasOkInDescendants($report);
+    return !$this->hasOkInDescendants($report);
     });
+
 
     return view('history.index', compact('machines', 'lines', 'openReports'));
 }
