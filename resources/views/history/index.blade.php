@@ -80,7 +80,7 @@
                                             <!-- Legend section aligned to the right -->
                                             <div class="legend">
                                                 <strong>Legend:</strong>
-                                                <span style='font-size: 20px; color: #FFDF00;'>&#9651;</span> Temporary |
+                                                <span style='font-size: 20px; color: #FFDF00; font-weight: bold; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000;'>&#9651;</span> Temporary |
                                                 <i class="fas fa-times" style='font-size: 20px; color: red;'></i> Not Good |
                                                 <i class="fas fa-check" style='font-size: 20px; color: green;'></i> OK
                                             </div>
