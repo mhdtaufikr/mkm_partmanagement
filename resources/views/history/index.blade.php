@@ -90,7 +90,7 @@
 
                                     <!-- Modal for selecting the open daily report -->
                                     <div class="modal fade" id="openReportModal" tabindex="-1" aria-labelledby="openReportModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog modal-lg">
+                                        <div class="modal-dialog modal-lg-x">
                                             <div class="modal-content">
                                                 <div class="modal-header">
                                                     <h5 class="modal-title" id="openReportModalLabel">Select Open Daily Report</h5>
@@ -302,7 +302,7 @@
 
 
 <style>
-    .modal-lg {
+    .modal-lg-x {
     max-width: 90%;
 }
 </style>
