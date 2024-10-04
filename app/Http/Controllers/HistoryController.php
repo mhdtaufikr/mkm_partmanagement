@@ -75,7 +75,7 @@ class HistoryController extends Controller
                 $isChild = !is_null($row->parent_id);
                 $hasChildren = $row->children()->exists();
                 if ($isChild || $hasChildren) {
-                    return '<i class="fas fa-flag" style="color: rgba(0, 103, 127, 1);"></i>';
+                    return '<i class="fas fa-flag text-info"></i>';
                 }
                 return '';
             })
