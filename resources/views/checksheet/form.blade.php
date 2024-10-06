@@ -60,71 +60,69 @@
                                         <div class="mb-3 col-sm-12">
                                             <form action="{{ url('/checksheet/store') }}" method="POST">
                                                 @csrf
-                                                <input name="id" value="{{$item->id}}" type="text" hidden>
+                                                <input name="id" value="{{ $item->id }}" type="text" hidden>
                                                 <div class="modal-body">
                                                     <div class="row">
+                                                        <!-- Row 1: OP No and Machine Name -->
                                                         <div class="col-md-4 mb-2">
                                                             <div class="form-group">
-                                                                <label for="">No. Document</label>
-                                                                <input type="text" class="form-control" id="no_document" name="no_document" placeholder="Enter No. Document" value="{{$item->no_document}}" readonly required>
+                                                                <label for="op_number"><strong>OP No.</strong></label>
+                                                                <input type="text" class="form-control" id="op_number" name="op_number" value="{{ $item->op_no }}" readonly>
                                                             </div>
                                                         </div>
-                                                        @if($item->type == 'Mechanic')
-                                                        <div class="col-md-4">
+                                                        <div class="col-md-4 mb-2">
                                                             <div class="form-group">
-                                                                <label for="department">Department</label>
-                                                                <input type="text" class="form-control" id="department" name="department" placeholder="Enter Department" value="{{$item->dept}}" readonly required>
+                                                                <label for="machine_name"><strong>Machine Name</strong></label>
+                                                                <input readonly value="{{ $item->machine_name }}" type="text" class="form-control" id="machine_name" name="machine_name">
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <label for="shop">Shop</label>
-                                                                <input type="text" class="form-control" id="shop" name="shop" placeholder="Enter Shop" value="{{$item->shop}}" readonly required>
-                                                            </div>
-                                                        </div>
-                                                        @else
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <label for="department">Department</label>
-                                                                <input type="text" class="form-control" id="department" name="department" placeholder="Enter Department" value="{{$item->dept}}" readonly required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <label for="shop">Shop</label>
-                                                                <input type="text" class="form-control" id="shop" name="shop" placeholder="Enter Shop" value="{{$item->shop}}" readonly required>
-                                                            </div>
-                                                        </div>
-                                                        @endif
 
-                                                        <div class="col-md-6 mb-4">
+                                                        <!-- Row 2: PIC and No Document -->
+                                                        <div class="col-md-2 mb-2">
                                                             <div class="form-group">
-                                                                <label for="">Effective Date</label>
-                                                                <input type="date" class="form-control" id="effective_date" name="effective_date" placeholder="Enter Effective Date" value="{{$item->effective_date}}" readonly required>
+                                                                <label for="pic"><strong>PIC</strong></label>
+                                                                <input type="text" class="form-control" id="pic" name="pic" value="{{ $item->pic }}" readonly>
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-6">
+                                                        <div class="col-md-2 mb-2">
                                                             <div class="form-group">
-                                                                <label for="">Revision</label>
-                                                                <input type="text" class="form-control" id="revision" name="revision" placeholder="Enter Revision" value="{{$item->revision}}" readonly required>
+                                                                <label for="no_document"><strong>No. Document</strong></label>
+                                                                <input type="text" class="form-control" id="no_document" name="no_document" value="{{ $item->no_document }}" readonly>
                                                             </div>
                                                         </div>
-                                                        <hr>
+
+                                                        <!-- Row 3: Process and Mfg Date -->
                                                         <div class="col-md-4 mb-2">
                                                             <div class="form-group">
-                                                                <label for="">OP No.</label>
-                                                                <input type="text" class="form-control" id="op_number" name="op_number" placeholder="Enter OP No." value="{{$item->op_name}}" readonly required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-4 mb-2">
-                                                            <div class="form-group">
-                                                                <label for="">Mfg Date</label>
-                                                                <input value="{{$item->mfg_date}}" type="date" class="form-control" id="mfg_date" name="mfg_date" placeholder="Enter MFG Date" readonly required>
+                                                                <label for="process"><strong>Process</strong></label>
+                                                                <input type="text" class="form-control" id="process" name="process" value="{{ $item->process }}" readonly>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-4 mb-2">
                                                             <div class="form-group">
-                                                                <label for="">Planning Date</label>
+                                                                <label for="mfg_date"><strong>Mfg Date</strong></label>
+                                                                <input readonly value="{{ $item->mfg_date }}" type="date" class="form-control" id="mfg_date" name="mfg_date">
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Row 4: Department and Effective Date -->
+                                                        <div class="col-md-2 mb-2">
+                                                            <div class="form-group">
+                                                                <label for="dept"><strong>Dept</strong></label>
+                                                                <input type="text" class="form-control" id="dept" name="dept" value="{{ $item->dept }}" readonly>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2 mb-2">
+                                                            <div class="form-group">
+                                                                <label for="effective_date"><strong>Effective Date</strong></label>
+                                                                <input type="date" class="form-control" id="effective_date" name="effective_date" value="{{ $item->effective_date }}" readonly>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Row 5: Plan Date and Actual Date -->
+                                                        <div class="col-md-4 mb-2">
+                                                            <div class="form-group">
+                                                                <label for="planning_date"><strong>Plan Date</strong></label>
                                                                 <select class="form-control" id="planning_date" name="planning_date" required>
                                                                     <option value="">-- Select Planning Date --</option>
                                                                     @foreach($plannedDates as $date)
@@ -135,34 +133,35 @@
                                                         </div>
                                                         <div class="col-md-4 mb-2">
                                                             <div class="form-group">
-                                                                <label for="">Machine Name</label>
-                                                                <input readonly value="{{$item->machine_name}}" type="text" class="form-control" id="machine_name" name="machine_name" required>
+                                                                <label for="actual_date"><strong>Actual Date</strong></label>
+                                                                <input value="{{ date('Y-m-d') }}" type="date" class="form-control" id="actual_date" name="actual_date" required>
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-4 mb-2">
+
+                                                        <!-- Row 6: Shop and Revision -->
+                                                        <div class="col-md-2 mb-2">
                                                             <div class="form-group">
-                                                                <label for="">Process</label>
-                                                                <input type="text" class="form-control" id="process" name="process" value="{{$item->process}}" readonly placeholder="Enter Process" required>
+                                                                <label for="shop"><strong>Shop</strong></label>
+                                                                <input type="text" class="form-control" id="shop" name="shop" value="{{ $item->shop }}" readonly>
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-4 mb-2">
+                                                        <div class="col-md-2 mb-2">
                                                             <div class="form-group">
-                                                                <label for="">Actual Date</label>
-                                                                <input value="{{ date('Y-m-d') }}" type="date" class="form-control" id="actual_date" name="actual_date" placeholder="Enter Actual Date" required>
+                                                                <label for="rev"><strong>Revision</strong></label>
+                                                                <input type="text" class="form-control" id="rev" name="rev" value="{{ $item->revision }}" readonly>
                                                             </div>
+                                                        </div>
+
+                                                        <div class="modal-footer">
+                                                            <button type="submit" class="btn btn-primary" id="oneClickButton">Submit</button>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="modal-footer">
-                                                    <button type="submit" class="btn btn-primary" id="oneClickButton">Submit</button>
-                                                </div>
                                             </form>
-
                                         </div>
-
                                     </div>
-                                    <!-- /.card-body -->
                                 </div>
+
                                 <!-- /.card -->
                             </div>
                             <!-- /.col -->

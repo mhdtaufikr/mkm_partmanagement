@@ -34,95 +34,95 @@
                                             @csrf
                                             <div class="modal-body">
                                                 <div class="row">
-                                                    <!-- Machine Information Section -->
+                                                    <!-- Row 1: OP No and Machine Name -->
                                                     <div class="col-md-4 mb-2">
                                                         <div class="form-group">
-                                                            <label for="">No. Document</label>
-                                                            <input type="text" class="form-control" id="no_document" name="no_document" value="{{$itemHead->no_document}}" readonly required>
+                                                            <label for="op_number"><strong>OP No.</strong></label>
+                                                            <input type="text" class="form-control" id="op_number" name="op_number" value="{{$itemHead->preventiveMaintenance->machine->op_no}}" readonly>
                                                         </div>
                                                     </div>
-                                                    @if($itemHead->type == 'Mechanic')
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <label for="department">Department</label>
-                                                                <input type="text" class="form-control" id="department" name="department" value="Maintenance" readonly required>
-                                                            </div>
+                                                    <div class="col-md-4 mb-2">
+                                                        <div class="form-group">
+                                                            <label for="machine_name"><strong>Machine Name</strong></label>
+                                                            <input readonly value="{{$itemHead->machine_name}}" type="text" class="form-control" id="machine_name" name="machine_name">
                                                         </div>
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <label for="shop">Shop</label>
-                                                                <input type="text" class="form-control" id="shop" name="shop" value="Mechanic Stamping" readonly required>
-                                                            </div>
-                                                        </div>
-                                                    @else
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <label for="department">Department</label>
-                                                                <input type="text" class="form-control" id="department" name="department" value="Manufacturing Engineering Stamping" readonly required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <label for="shop">Shop</label>
-                                                                <input type="text" class="form-control" id="shop" name="shop" value="MTC Electric" readonly required>
-                                                            </div>
-                                                        </div>
-                                                    @endif
+                                                    </div>
 
+                                                    <!-- Row 2: PIC and No Document -->
+                                                    <div class="col-md-2 mb-2">
+                                                        <div class="form-group">
+                                                            <label for="pic"><strong>PIC</strong></label>
+                                                            <input type="text" class="form-control" id="pic" name="pic" value="{{$itemHead->pic}}" readonly>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2 mb-2">
+                                                        <div class="form-group">
+                                                            <label for="no_document"><strong>No. Document</strong></label>
+                                                            <input type="text" class="form-control" id="no_document" name="no_document" value="{{$itemHead->preventiveMaintenance->no_document}}" readonly>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Row 3: Process and Mfg Date -->
+                                                    <div class="col-md-4 mb-2">
+                                                        <div class="form-group">
+                                                            <label for="process"><strong>Process</strong></label>
+                                                            <input type="text" class="form-control" id="process" name="process" value="{{$itemHead->preventiveMaintenance->machine->process}}" readonly>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4 mb-2">
+                                                        <div class="form-group">
+                                                            <label for="mfg_date"><strong>Mfg Date</strong></label>
+                                                            <input readonly value="{{$itemHead->preventiveMaintenance->mfg_date}}" type="date" class="form-control" id="mfg_date" name="mfg_date">
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Row 4: Department and Effective Date -->
+                                                    <div class="col-md-2 mb-2">
+                                                        <div class="form-group">
+                                                            <label for="dept"><strong>Dept</strong></label>
+                                                            <input type="text" class="form-control" id="dept" name="dept" value="{{$itemHead->preventiveMaintenance->dept}}" readonly>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2 mb-2">
+                                                        <div class="form-group">
+                                                            <label for="effective_date"><strong>Effective Date</strong></label>
+                                                            <input type="date" class="form-control" id="effective_date" name="effective_date" value="{{$itemHead->preventiveMaintenance->effective_date}}" readonly>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Row 5: Plan Date, Actual Date, Shop, Revision -->
+                                                    <div class="col-md-4 mb-2">
+                                                        <div class="form-group">
+                                                            <label for="planning_date"><strong>Plan Date</strong></label>
+                                                            <input readonly value="{{$itemHead->planning_date}}" type="date" class="form-control" id="planning_date" name="planning_date">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4 mb-2">
+                                                        <div class="form-group">
+                                                            <label for="actual_date"><strong>Actual Date</strong></label>
+                                                            <input readonly value="{{$itemHead->actual_date}}" type="date" class="form-control" id="actual_date" name="actual_date">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2 mb-2">
+                                                        <div class="form-group">
+                                                            <label for="shop"><strong>Shop</strong></label>
+                                                            <input type="text" class="form-control" id="shop" name="shop" value="{{$itemHead->preventiveMaintenance->machine->shop}}" readonly>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2 mb-2">
+                                                        <div class="form-group">
+                                                            <label for="rev"><strong>Revision</strong></label>
+                                                            <input type="text" class="form-control" id="rev" name="rev" value="{{$itemHead->preventiveMaintenance->revision}}" readonly>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Row 6: Image Carousel (Gambar) and Remarks -->
                                                     <div class="col-md-6 mb-4">
                                                         <div class="form-group">
-                                                            <label for="">Effective Date</label>
-                                                            <input type="date" class="form-control" id="effective_date" name="effective_date" value="{{$itemHead->effective_date}}" readonly required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="">Revision</label>
-                                                            <input type="text" class="form-control" id="revision" name="revision" value="{{$itemHead->revision}}" readonly required>
-                                                        </div>
-                                                    </div>
-                                                    <hr>
-                                                    <div class="col-md-4 mb-2">
-                                                        <div class="form-group">
-                                                            <label for="">OP No.</label>
-                                                            <input type="text" class="form-control" id="op_number" name="op_number" value="{{$itemHead->preventiveMaintenance->machine->op_no}}" readonly required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4 mb-2">
-                                                        <div class="form-group">
-                                                            <label for="">Mfg Date</label>
-                                                            <input readonly value="{{$itemHead->preventiveMaintenance->machine->mfg_date}}" type="date" class="form-control" id="mfg_date" name="mfg_date" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4 mb-2">
-                                                        <div class="form-group">
-                                                            <label for="">Planning Date</label>
-                                                            <input readonly value="{{$itemHead->planning_date}}" type="date" class="form-control" id="planning_date" name="planning_date" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4 mb-2">
-                                                        <div class="form-group">
-                                                            <label for="">Machine Name</label>
-                                                            <input readonly value="{{$itemHead->machine_name}}" type="text" class="form-control" id="machine_name" name="machine_name" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4 mb-2">
-                                                        <div class="form-group">
-                                                            <label for="">Process</label>
-                                                            <input type="text" class="form-control" id="process" name="process" value="{{$itemHead->preventiveMaintenance->machine->process}}" readonly required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4 mb-2">
-                                                        <div class="form-group">
-                                                            <label for="">Actual Date</label>
-                                                            <input readonly value="{{$itemHead->actual_date}}" type="date" class="form-control" id="actual_date" name="actual_date" required>
-                                                        </div>
-                                                    </div>
-                                                    <hr>
-                                                    <div class="col-md-12">
-                                                        @php
-                                                            $imagePaths = json_decode($itemHead->img);
-                                                        @endphp
+                                                            <label for="gambar"><strong>Image</strong></label>
+                                                            @php
+                                                                $imagePaths = json_decode($itemHead->img);
+                                                            @endphp
                                                             @if(!empty($imagePaths))
                                                                 <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
                                                                     <div class="carousel-indicators">
@@ -149,10 +149,15 @@
                                                             @else
                                                                 <p>No images available.</p>
                                                             @endif
-
-
-                                                        {{-- crousell image --}}
+                                                        </div>
                                                     </div>
+                                                    <div class="col-md-6 mb-4">
+                                                        <div class="form-group">
+                                                            <label for="remark"><strong>Remark</strong></label>
+                                                            <textarea class="form-control" id="remark" name="remark" readonly>{{$itemHead->remark}}</textarea>
+                                                        </div>
+                                                    </div>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -161,6 +166,7 @@
                                 <!-- /.card-body -->
                             </div>
                         </div>
+
 
 
 
@@ -206,10 +212,40 @@
                                                                     <td>{{ $item->item_name }}</td>
                                                                     <td>{{ $item->spec }}</td>
                                                                     <td>{{ $item->act }}</td>
-                                                                    <td><input type="checkbox" {{ $item->B ? 'checked' : '' }} disabled></td>
-                                                                    <td><input type="checkbox" {{ $item->R ? 'checked' : '' }} disabled></td>
-                                                                    <td><input type="checkbox" {{ $item->G ? 'checked' : '' }} disabled></td>
-                                                                    <td><input type="checkbox" {{ $item->PP ? 'checked' : '' }} disabled></td>
+
+                                                                    <!-- Check icons for B, R, G, PP columns -->
+                                                                    <td>
+                                                                        @if($item->B)
+                                                                            <i class="fas fa-check-square" style="color: #30a138; font-size: 20px;"></i> <!-- Green check icon -->
+                                                                        @else
+                                                                            <span style="width: 20px; height: 20px; display: inline-block; background-color: #ccc; border: 2px solid #999; border-radius: 3px;"></span> <!-- Empty box -->
+                                                                        @endif
+                                                                    </td>
+
+                                                                    <td>
+                                                                        @if($item->R)
+                                                                            <i class="fas fa-check-square" style="color: #30a138; font-size: 20px;"></i>
+                                                                        @else
+                                                                            <span style="width: 20px; height: 20px; display: inline-block; background-color: #ccc; border: 2px solid #999; border-radius: 3px;"></span>
+                                                                        @endif
+                                                                    </td>
+
+                                                                    <td>
+                                                                        @if($item->G)
+                                                                            <i class="fas fa-check-square" style="color: #30a138; font-size: 20px;"></i>
+                                                                        @else
+                                                                            <span style="width: 20px; height: 20px; display: inline-block; background-color: #ccc; border: 2px solid #999; border-radius: 3px;"></span>
+                                                                        @endif
+                                                                    </td>
+
+                                                                    <td>
+                                                                        @if($item->PP)
+                                                                            <i class="fas fa-check-square" style="color: #30a138; font-size: 20px;"></i>
+                                                                        @else
+                                                                            <span style="width: 20px; height: 20px; display: inline-block; background-color: #ccc; border: 2px solid #999; border-radius: 3px;"></span>
+                                                                        @endif
+                                                                    </td>
+
                                                                     <td>{{ $item->judge }}</td>
                                                                     <td>{{ $item->remarks }}</td>
                                                                 </tr>
@@ -221,6 +257,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <!-- /.card-body -->
                             </div>
                         <!-- /.col -->

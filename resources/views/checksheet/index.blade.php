@@ -42,9 +42,9 @@
                                             </select>
                                         </div>
                                         <div class="col-md-3">
-                                            <label for="shopSelect">Select Shop</label>
+                                            <label for="shopSelect">Select Line</label>
                                             <select name="shop" id="shopSelect" class="form-control">
-                                                <option value="">Select Shop</option>
+                                                <option value="">Select Line</option>
                                             </select>
                                         </div>
                                         <div class="col-md-3">
@@ -80,7 +80,7 @@
                                                 success: function(data) {
                                                     $('#shopSelect').empty().append('<option value="">Select Shop</option>');
                                                     $.each(data, function(index, value) {
-                                                        $('#shopSelect').append('<option value="'+value.shop+'">'+value.shop+'</option>');
+                                                        $('#lineSelect').append('<option value="'+value.line+'">'+value.line+'</option>');
                                                     });
                                                 }
                                             });
@@ -124,6 +124,15 @@
                                 <div class="card-header">
                                     <h3 class="card-title">List Preventive Maintenance</h3>
                                 </div>
+                                <!-- Legend Section -->
+                                <div class="top-0 end-0 bg-white p-3 border rounded shadow">
+                                    <div class="legend">
+                                        <strong>Legend:</strong>
+                                        <span style='font-size: 20px; color: #FFDF00; font-weight: bold; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000;'>&#9651;</span> Temporary |
+                                        <i class="fas fa-times" style='font-size: 20px; color: red;'></i> Not Good |
+                                        <i class="fas fa-check" style='font-size: 20px; color: green;'></i> OK
+                                    </div>
+                                </div>
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-sm-12">
@@ -132,6 +141,7 @@
                                                     <thead>
                                                         <tr>
                                                             <th>No</th>
+                                                            <th>Plant</th> <!-- Add Plant column here -->
                                                             <th>OP No. (Machine Name)</th>
                                                             <th>Type</th>
                                                             <th>Planning Date</th>
@@ -146,20 +156,9 @@
                                                         @php $no = 1; @endphp
                                                         @foreach ($items as $data)
                                                         <tr>
-                                                            <td>
-                                                                <div class="row align-items-center">
-                                                                    <div class="col-md-2">
-                                                                        {{ $no++ }}
-                                                                    </div>
-                                                                    <div class="col-md-4">
-                                                                        @if($data->status_logs->isNotEmpty())
-                                                                        <span class="badge bg-primary ms-2" style="padding: 0.35rem 0.75rem; margin-left: 10px; font-size: 0.85rem;">Log</span>
-
-                                                                    @endif
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                            <td>{{ $data->op_name ?? '' }}({{ $data->machine_name ?? '' }}) </td>
+                                                            <td>{{ $no++ }}</td>
+                                                            <td>{{ $data->plant ?? 'Unknown' }}</td> <!-- Display the plant here -->
+                                                            <td>{{ $data->op_name ?? '' }} ({{ $data->machine_name ?? '' }})</td>
                                                             <td>{{ $data->type ?? 'Unknown' }}</td>
                                                             <td>{{ $data->planning_date ? date('d/m/Y', strtotime($data->planning_date)) : '' }}</td>
                                                             <td>{{ $data->actual_date ? date('d/m/Y', strtotime($data->actual_date)) : '' }}</td>
@@ -179,13 +178,19 @@
                                                                     <span class="badge bg-secondary">Unknown Status</span>
                                                                 @endif
                                                             </td>
-                                                            <td>
-                                                                @if($data->pm_status == 'Open')
-                                                                    <span class="badge bg-warning">Open</span>
-                                                                @elseif($data->pm_status == 'Close')
-                                                                    <span class="badge bg-success">Close</span>
+                                                            <td class="text-center">
+                                                                @if($data->pm_status == 'OK')
+                                                                    <span class="text-success">
+                                                                        <i class='fas fa-check' style='font-size: 30px; color: green;'></i>
+                                                                    </span>
+                                                                @elseif($data->pm_status == 'Not Good')
+                                                                    <span class="text-danger">
+                                                                        <i class='fas fa-times' style='font-size: 30px; color: red;'></i>
+                                                                    </span>
+                                                                @elseif($data->pm_status == 'Temporary')
+                                                                    <span style='font-size: 30px; color: #FFDF00; font-weight: bold; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000;'>&#9651;</span>
                                                                 @else
-                                                                    <span class="badge bg-secondary">Unknown Status</span>
+                                                                    <span>Unknown Status</span>
                                                                 @endif
                                                             </td>
                                                             <td>
@@ -195,6 +200,7 @@
                                                         @endforeach
                                                     </tbody>
                                                 </table>
+
                                             </div>
                                         </div>
                                     </div>

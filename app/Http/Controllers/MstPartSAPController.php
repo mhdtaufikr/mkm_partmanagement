@@ -12,6 +12,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\PartsSAPImport;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -224,30 +225,41 @@ class MstPartSAPController extends Controller
     }
 
     public function partInfo(Request $request)
-    {
-        if ($request->ajax()) {
-            // Fetch parts and their repair quantities
-            $parts = Part::select('parts.*')
-                ->leftJoin('repair_parts', 'repair_parts.part_id', '=', 'parts.id')
-                ->selectRaw('SUM(repair_parts.repaired_qty) as repair_qty')
-                ->groupBy('parts.id')
-                ->get();
+{
+    if ($request->ajax()) {
+        // Fetch the authenticated user's plant
+        $userPlant = Auth::user()->plant;
 
-            return DataTables::of($parts)
-                ->addIndexColumn()
-                ->editColumn('total_stock', function($part) {
-                    return number_format($part->total_stock, 2);
-                })
-                ->addColumn('repair_qty', function($part) {
-                    return number_format($part->repair_qty ?? 0, 2);
-                })
-                ->addColumn('total_qty', function($part) {
-                    return number_format($part->total_stock + ($part->repair_qty ?? 0), 2);
-                })
-                ->make(true);
+        // Fetch parts and their repair quantities
+        $parts = Part::select('parts.*')
+            ->leftJoin('repair_parts', 'repair_parts.part_id', '=', 'parts.id')
+            ->selectRaw('SUM(repair_parts.repaired_qty) as repair_qty');
+
+        // Apply plant filtering based on the user's plant
+        if ($userPlant == 'Stamping') {
+            $parts->where('parts.plant', 'P300');
+        } elseif ($userPlant == 'Engine') {
+            $parts->where('parts.plant', 'P400');
         }
 
-        return view('master.info');
+        // Group by part ID and retrieve the results
+        $parts = $parts->groupBy('parts.id')->get();
+
+        return DataTables::of($parts)
+            ->addIndexColumn()
+            ->editColumn('total_stock', function($part) {
+                return number_format($part->total_stock, 2);
+            })
+            ->addColumn('repair_qty', function($part) {
+                return number_format($part->repair_qty ?? 0, 2);
+            })
+            ->addColumn('total_qty', function($part) {
+                return number_format($part->total_stock + ($part->repair_qty ?? 0), 2);
+            })
+            ->make(true);
     }
+
+    return view('master.info');
+}
 
 }

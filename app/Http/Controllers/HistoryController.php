@@ -639,7 +639,7 @@ public function storehp(Request $request)
             ]);
 
             ChecksheetFormHead::where('id', $request->checksheet_head_id)
-                ->update(['pm_status' => 'Close']);
+                ->update(['pm_status' => 'OK']);
         }
 
         // Commit the transaction
@@ -953,7 +953,7 @@ public function storehpStatus(Request $request)
             ]);
 
             ChecksheetFormHead::where('id', $request->checksheet_head_id)
-                ->update(['pm_status' => 'Close']);
+                ->update(['pm_status' => 'OK']);
         }
 
         // Commit the transaction

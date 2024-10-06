@@ -119,7 +119,7 @@ public function getShops(Request $request)
 {
     $shops = PmFilterView::where('type', $request->input('type'))
         ->where('plant', $request->input('plant'))
-        ->select('shop')
+        ->select('line')
         ->distinct()
         ->get();
 
@@ -130,7 +130,7 @@ public function getOpNos(Request $request)
 {
     $opNos = PmFilterView::where('type', $request->input('type'))
         ->where('plant', $request->input('plant'))
-        ->where('shop', $request->input('shop'))
+        ->where('line', $request->input('shop'))
         ->select('op_no', 'machine_name')
         ->distinct()
         ->get();
@@ -152,34 +152,33 @@ public function getMachineNames(Request $request)
 }
 
 
-public function checksheetScan(Request $request){
+public function checksheetScan(Request $request)
+{
     if (empty($request->no_mechine)) {
         // Join PreventiveMaintenance with Machine to filter by plant and op_no
         $item = PreventiveMaintenance::join('machines', 'preventive_maintenances.machine_id', '=', 'machines.id')
-            ->select('preventive_maintenances.*', 'machines.plant', 'machines.op_no', 'machines.machine_no')
+            ->select('preventive_maintenances.*', 'machines.plant', 'machines.op_no', 'machines.machine_no', 'machines.machine_name', 'machines.process', 'machines.mfg_date', 'machines.shop')
             ->where('machines.plant', $request->plant)
             ->where('machines.op_no', $request->op_no)
             ->first();
     } else {
         // Join PreventiveMaintenance with Machine to filter by machine_no
         $item = PreventiveMaintenance::join('machines', 'preventive_maintenances.machine_id', '=', 'machines.id')
-            ->select('preventive_maintenances.*', 'machines.plant', 'machines.op_no', 'machines.machine_no')
+            ->select('preventive_maintenances.*', 'machines.plant', 'machines.op_no', 'machines.machine_no', 'machines.machine_name', 'machines.process', 'machines.mfg_date', 'machines.shop')
             ->where('machines.machine_no', $request->no_mechine)
             ->first();
     }
 
     $plannedDates = DB::table('pm_schedule_details')
-    ->join('pm_schedule_masters', 'pm_schedule_details.pm_schedule_master_id', '=', 'pm_schedule_masters.id')
-    ->where('pm_schedule_masters.machine_id', $item->machine_id) // Use machine_id here
-    ->whereNull('pm_schedule_details.actual_date') // Ensure we are only looking for schedules without an actual date
-    ->select('pm_schedule_details.id', 'pm_schedule_details.annual_date')
-    ->get();
-
-
-
+        ->join('pm_schedule_masters', 'pm_schedule_details.pm_schedule_master_id', '=', 'pm_schedule_masters.id')
+        ->where('pm_schedule_masters.machine_id', $item->machine_id)
+        ->whereNull('pm_schedule_details.actual_date')
+        ->select('pm_schedule_details.id', 'pm_schedule_details.annual_date')
+        ->get();
 
     return view('checksheet.form', compact('item', 'plannedDates'));
 }
+
 
 
 
@@ -292,7 +291,7 @@ public function storeHeadForm(Request $request)
         'remarks' => 'nullable|string|max:255',
         'file_upload' => 'nullable|array',
         'file_upload.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        'status' => 'required|string|in:Open,Close',
+        'status' => 'required|string|in:Not Good,OK,Temporary',
         'id_header' => 'required|exists:checksheet_form_heads,id',
         'items' => 'required|array',
         'items.*.checksheet_category' => 'required|string',
@@ -378,15 +377,27 @@ private function sendEmailNotifications($checksheetHead)
     }
 }
 
-
-
-
-
     public function checksheetDetail($id) {
         $id = decrypt($id);
 
-        // Retrieve the ChecksheetFormHead along with related PreventiveMaintenance and Machine in one query
-        $itemHead = ChecksheetFormHead::with('preventiveMaintenance.machine')->where('id', $id)->first();
+       // Retrieve the ChecksheetFormHead along with related PreventiveMaintenance and Machine in one query
+$itemHead = ChecksheetFormHead::with(['preventiveMaintenance.machine'])->where('id', $id)->first();
+
+if ($itemHead) {
+    // Add the necessary data directly into the ChecksheetFormHead attributes
+    $itemHead->setAttribute('op_no', $itemHead->preventiveMaintenance->machine->op_no ?? null);                // From machine
+    $itemHead->setAttribute('machine_name', $itemHead->preventiveMaintenance->machine->machine_name ?? null);  // From machine
+    $itemHead->setAttribute('no_doc', $itemHead->preventiveMaintenance->no_document ?? null);                  // From PreventiveMaintenance
+    $itemHead->setAttribute('process', $itemHead->preventiveMaintenance->machine->process ?? null);            // From machine
+    $itemHead->setAttribute('mfg_date', $itemHead->preventiveMaintenance->mfg_date ?? null);                   // From PreventiveMaintenance
+    $itemHead->setAttribute('dept', $itemHead->preventiveMaintenance->dept ?? null);                           // From PreventiveMaintenance
+    $itemHead->setAttribute('efc_date', $itemHead->preventiveMaintenance->effective_date ?? null);             // From PreventiveMaintenance
+    $itemHead->setAttribute('shop', $itemHead->preventiveMaintenance->machine->shop ?? null);                  // From machine
+    $itemHead->setAttribute('rev', $itemHead->preventiveMaintenance->revision ?? null);                        // From PreventiveMaintenance
+
+    // No need to reassign already existing attributes like pic, remark, etc.
+}
+
 
         // Check if itemHead is found
         if (!$itemHead) {
@@ -417,7 +428,6 @@ private function sendEmailNotifications($checksheetHead)
                 ->where('id', $logStatus->historical_id)
                 ->first();
         }
-
         return view('checksheet.detail', compact('itemHead', 'groupedResults', 'logStatus', 'id'));
     }
 
@@ -479,8 +489,25 @@ private function sendEmailNotifications($checksheetHead)
 
     public function checksheetChecker($id){
         $id = decrypt($id);
-       // Retrieve the ChecksheetFormHead along with related PreventiveMaintenance and Machine in one query
-       $itemHead = ChecksheetFormHead::with('preventiveMaintenance.machine')->where('id', $id)->first();
+      // Retrieve the ChecksheetFormHead along with related PreventiveMaintenance and Machine in one query
+        $itemHead = ChecksheetFormHead::with(['preventiveMaintenance.machine'])->where('id', $id)->first();
+
+        if ($itemHead) {
+            // Add the necessary data directly into the ChecksheetFormHead attributes
+            $itemHead->setAttribute('op_no', $itemHead->preventiveMaintenance->machine->op_no ?? null);                // From machine
+            $itemHead->setAttribute('machine_name', $itemHead->preventiveMaintenance->machine->machine_name ?? null);  // From machine
+            $itemHead->setAttribute('no_doc', $itemHead->preventiveMaintenance->no_document ?? null);                  // From PreventiveMaintenance
+            $itemHead->setAttribute('process', $itemHead->preventiveMaintenance->machine->process ?? null);            // From machine
+            $itemHead->setAttribute('mfg_date', $itemHead->preventiveMaintenance->mfg_date ?? null);                   // From PreventiveMaintenance
+            $itemHead->setAttribute('dept', $itemHead->preventiveMaintenance->dept ?? null);                           // From PreventiveMaintenance
+            $itemHead->setAttribute('efc_date', $itemHead->preventiveMaintenance->effective_date ?? null);             // From PreventiveMaintenance
+            $itemHead->setAttribute('shop', $itemHead->preventiveMaintenance->machine->shop ?? null);                  // From machine
+            $itemHead->setAttribute('rev', $itemHead->preventiveMaintenance->revision ?? null);                        // From PreventiveMaintenance
+
+            // No need to reassign already existing attributes like pic, remark, etc.
+        }
+
+
 
        // Check if itemHead is found
        if (!$itemHead) {
@@ -714,7 +741,8 @@ public function generatePdf($id)
 
 public function changeStatus(Request $request)
 {
-    $get_pm = PreventiveMaintenance::where('id', $request->id_pm)->first();
+    $get_pm = ChecksheetFormHead::where('id', $request->id_pm)->first();
+    $get_pm = PreventiveMaintenance::where('id', $get_pm->preventive_maintenances_id)->first();
 
     $noMachine = Machine::where('id', $get_pm->machine_id)->first();
     $line = $noMachine->line;
@@ -725,7 +753,7 @@ public function changeStatus(Request $request)
    // Get the necessary parameters from the request
    $noMachine = $no_machine;
    // Redirect to the specified URL with the parameters
-   return redirect()->route('formStatus', ['no_machine' => encrypt($noMachine), 'date' => $date, 'shift' => $shift, 'id_pm' => $request->id_pm, 'id_checksheet_head' => $request->checksheet_id]);
+   return redirect()->route('formStatus', ['no_machine' => encrypt($noMachine), 'date' => $date, 'shift' => $shift, 'id_pm' => $get_pm->id, 'id_checksheet_head' =>$request->id_pm]);
 }
 
 

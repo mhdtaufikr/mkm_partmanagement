@@ -174,7 +174,7 @@ Route::middleware(['auth'])->group(function () {
 
 
     //Master Checksheet form/checksheet/scan
-    Route::get('/kpi/daily', [KPIDailyReport::class, 'index'])->name('machine');
+    Route::get('/kpi/daily', [KPIDailyReport::class, 'index']);
     Route::get('kpi/daily/data', [KPIDailyReport::class, 'getData'])->name('kpi.daily.data');
 
 

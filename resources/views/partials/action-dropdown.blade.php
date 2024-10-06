@@ -46,14 +46,15 @@
             </li>
         @endif
 
-        @if($data->pm_status == 'Open')
-            <li><hr class="dropdown-divider"></li>
-            <li>
-                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changeStatusModal{{ $data->id }}" title="Change Status">
-                    <i class="fas fa-exchange-alt me-2"></i>Change Status to Close
-                </button>
-            </li>
-        @endif
+        @if($data->pm_status == 'Not Good' || $data->pm_status == 'Temporary')
+        <li><hr class="dropdown-divider"></li>
+        <li>
+            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changeStatusModal{{ $data->id }}" title="Change Status">
+                <i class="fas fa-exchange-alt me-2"></i>Change Status to OK
+            </button>
+        </li>
+    @endif
+
 
         <li><hr class="dropdown-divider"></li>
         <li>
