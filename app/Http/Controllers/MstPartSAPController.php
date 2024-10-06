@@ -237,9 +237,9 @@ class MstPartSAPController extends Controller
 
         // Apply plant filtering based on the user's plant
         if ($userPlant == 'Stamping') {
-            $parts->where('parts.plant', 'P300');
+            $parts->where('parts.plnt', 'P300');
         } elseif ($userPlant == 'Engine') {
-            $parts->where('parts.plant', 'P400');
+            $parts->where('parts.plnt', 'P400');
         }
 
         // Group by part ID and retrieve the results
