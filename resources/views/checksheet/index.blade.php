@@ -78,9 +78,9 @@
                                                 method: 'GET',
                                                 data: { type: type, plant: plant },
                                                 success: function(data) {
-                                                    $('#shopSelect').empty().append('<option value="">Select Shop</option>');
+                                                    $('#shopSelect').empty().append('<option value="">Select Line</option>');
                                                     $.each(data, function(index, value) {
-                                                        $('#lineSelect').append('<option value="'+value.line+'">'+value.line+'</option>');
+                                                        $('#shopSelect').append('<option value="'+value.line+'">'+value.line+'</option>');
                                                     });
                                                 }
                                             });
