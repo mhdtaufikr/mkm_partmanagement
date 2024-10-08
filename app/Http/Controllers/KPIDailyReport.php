@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use DB;
+use App\Models\HistoricalProblem;
 
 class KPIDailyReport extends Controller
 {
@@ -65,7 +66,7 @@ class KPIDailyReport extends Controller
                 return \Carbon\Carbon::parse($row->end_date)->format('Y-m-d');
             })
             ->editColumn('total_balance', function ($row) {
-                return number_format($row->total_balance, 2) . ' Hour';
+                return number_format($row->total_balance, 2) ;
             })
             ->editColumn('latest_status', function ($row) {
                 return ucfirst($row->latest_status);
@@ -75,10 +76,72 @@ class KPIDailyReport extends Controller
             })
             ->make(true);
     }
+
 }
 
+public function update(Request $request)
+{
+    foreach ($request->rows as $row) {
+        // Find the parent record first
+        $parent = HistoricalProblem::find($row['id']);
+
+        // Update Start Date (parent)
+        if (isset($row['start_date'])) {
+            $parent->date = $row['start_date'];
+            $parent->save();
+        }
+
+        // Update End Date (latest child)
+        if (isset($row['end_date'])) {
+            $latestChild = HistoricalProblem::where('parent_id', $row['id'])
+                ->orderBy('date', 'desc')
+                ->first();
+            if ($latestChild) {
+                $latestChild->date = $row['end_date'];
+                $latestChild->save();
+            }
+        }
+
+        // Update KPI for parent and all children
+        if (isset($row['kpi'])) {
+            $parent->kpi = $row['kpi'];
+            $parent->save();
+
+            // Update all children with the same KPI
+            HistoricalProblem::where('parent_id', $row['id'])->update(['kpi' => $row['kpi']]);
+        }
+
+        // Update Balance by Accumulation
+        if (isset($row['total_balance'])) {
+            // Fetch the entire chain: parent, children, grandchildren, etc.
+            $historicalChain = HistoricalProblem::where('id', $row['id']) // parent
+                ->orWhere('parent_id', $row['id']) // first-level children
+                ->orWhereIn('parent_id', function($query) use ($row) {
+                    $query->select('id')
+                        ->from('historical_problems')
+                        ->where('parent_id', $row['id']); // second-level children and beyond
+                })
+                ->orderBy('id') // Ensure proper order
+                ->get();
+
+            // Total number of records (including parent and all descendants)
+            $totalItems = $historicalChain->count();
+
+            // Calculate the balance to assign to each record
+            $newBalancePerItem = $row['total_balance'] / $totalItems;
+
+            // Update the balance for each item in the chain
+            foreach ($historicalChain as $problem) {
+                $problem->balance = $newBalancePerItem;
+                $problem->save();
+            }
+        }
 
 
+    }
+
+    return redirect()->back()->with('status', 'Records updated successfully.');
+}
 
 
 }
