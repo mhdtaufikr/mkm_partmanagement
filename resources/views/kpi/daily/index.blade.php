@@ -31,13 +31,46 @@
 
                                 <div class="card-body">
                                     <div class="form-group mb-4">
-                                        <label for="filter-month">Filter by Month:</label>
-                                        <select id="filter-month" class="form-control" style="width: 200px;">
-                                            <option value="">Select Month</option>
-                                            @for ($i = 1; $i <= 12; $i++)
-                                                <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ date('F', mktime(0, 0, 0, $i, 1)) }}</option>
-                                            @endfor
-                                        </select>
+                                        <div class="row">
+                                            <div class="col-sm-12 d-flex justify-content-end align-items-center">
+                                                <!-- Legend section aligned to the right -->
+                                                <div class="legend">
+                                                    <strong>Legend:</strong>
+                                                    <span style='font-size: 20px; color: #FFDF00; font-weight: bold; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000;'>&#9651;</span> Temporary |
+                                                    <i class="fas fa-times" style='font-size: 20px; color: red;'></i> Not Good |
+                                                    <i class="fas fa-check" style='font-size: 20px; color: green;'></i> OK
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="filter-month">Filter by Month:</label>
+                                                <select id="filter-month" class="form-control">
+                                                    <option value="">Select Month</option>
+                                                    @for ($i = 1; $i <= 12; $i++)
+                                                        <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ date('F', mktime(0, 0, 0, $i, 1)) }}</option>
+                                                    @endfor
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <label for="filter-year">Filter by Year:</label>
+                                                <select id="filter-year" class="form-control">
+                                                    <option value="">Select Year</option>
+                                                    @for ($i = date('Y'); $i >= 2000; $i--)
+                                                        <option value="{{ $i }}">{{ $i }}</option>
+                                                    @endfor
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <label for="filter-report">Filter by Report:</label>
+                                                <select id="filter-report" class="form-control">
+                                                    <option value="">Select Report</option>
+                                                    @foreach($reports as $report)
+                                                        <option value="{{ $report }}">{{ $report }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div class="table-responsive">
@@ -45,14 +78,15 @@
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
-                                                    <th>Machine</th>  <!-- Change header to "Machine" -->
-                                                    <th>Report</th>
+                                                    <th>Machine</th>
                                                     <th>Start Date</th>
                                                     <th>End Date</th>
                                                     <th>KPI</th>
-                                                    <th>Category</th>
                                                     <th>Total Balance</th>
                                                     <th>PIC</th>
+                                                    <th>Problem</th>
+                                                    <th>Cause</th>
+                                                    <th>Action</th>
                                                     <th>Status</th>
                                                 </tr>
                                             </thead>
@@ -76,18 +110,20 @@ $(document).ready(function() {
     var table = $("#tablehistory").DataTable({
         processing: true,
         serverSide: true,
+        responsive: true, // Enable responsive mode
+        autoWidth: false, // Prevent the table from stretching out
         ajax: {
             url: "{{ route('kpi.daily.data') }}",
             data: function (d) {
-                d.month = $('#filter-month').val(); // Pass the selected month to the server
+                d.month = $('#filter-month').val();
+                d.year = $('#filter-year').val();
+                d.report = $('#filter-report').val(); // Add report filter to the request
             }
         },
-        // Extend the lengthMenu to include "All" option
         lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
             { data: 'id_machine', name: 'id_machine' },
-            { data: 'report', name: 'report' },
             {
                 data: "start_date",
                 name: "start_date",
@@ -110,19 +146,7 @@ $(document).ready(function() {
                     return data;
                 }
             },
-            {
-                data: 'kpi',
-                name: 'kpi',
-                render: function (data, type, row) {
-                    // If KPI value is 'A', show the icon, otherwise show the raw value
-                    if (data == 'A') {
-                        return '<i class="far fa-check-square" style="color: #109e12;"></i>';
-                    } else {
-                        return data;
-                    }
-                }
-            },
-            { data: 'category', name: 'category' },
+            { data: 'kpi', name: 'kpi' },
             {
                 data: 'total_balance',
                 name: 'total_balance',
@@ -132,29 +156,39 @@ $(document).ready(function() {
                 }
             },
             { data: 'pic', name: 'pic' },
+            { data: 'problem', name: 'problem' },
+            { data: 'cause', name: 'cause' },
+            { data: 'action', name: 'action' },
             {
                 data: 'latest_status',
                 name: 'latest_status',
                 render: function(data) {
-                    var statusClass;
+                    var icon = ''; // Placeholder for icon
+
                     switch (data) {
-                        case 'OK': statusClass = 'btn-success'; break;
-                        case 'Not Good': statusClass = 'btn-danger'; break;
-                        case 'Temporary': statusClass = 'btn-warning'; break;
-                        default: statusClass = 'btn-primary';
+                        case 'Temporary':
+                            icon = "<span style='font-size: 35px; color: #FFDF00; font-weight: bold; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000;'>&#9651;</span>";
+                            break;
+                        case 'Not Good':
+                            icon = "<i class='fas fa-times' style='font-size: 35px; color: red;'></i>";
+                            break;
+                        case 'OK':
+                            icon = "<i class='fas fa-check' style='font-size: 35px; color: green;'></i>";
+                            break;
+                        default:
+                            icon = "<span>Unknown Status</span>";
                     }
-                    return '<button class="btn ' + statusClass + '">' + data + '</button>';
+                    return icon;
                 }
             }
         ]
     });
 
-    // Handle month filter change
-    $('#filter-month').change(function() {
-        table.draw(); // Redraw the table with the selected month filter
+    // Handle month, year, and report filter changes
+    $('#filter-month, #filter-year, #filter-report').change(function() {
+        table.draw(); // Redraw the table with the selected filters
     });
 });
-
 
 </script>
 @endsection
