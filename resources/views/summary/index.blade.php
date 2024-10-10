@@ -40,12 +40,19 @@
                             <!-- Filter by Line -->
                             <div class="row">
                                 <div class="col-sm-12 d-flex align-items-center mb-3">
-                                    <a href="{{ route('form') }}" class="btn btn-dark btn-sm me-2">
+                                   {{--  <a href="{{ route('form') }}" class="btn btn-dark btn-sm me-2">
                                         <i class="fas fa-plus-square"></i> Input Daily Report
-                                    </a>
-                                    <button class="btn btn-info btn-sm me-2" data-bs-toggle="modal" data-bs-target="#openReportModal">
-                                        <i class="fas fa-plus-square"></i> Update Daily Report
-                                    </button>
+                                    </a> --}}
+                                  <!-- Button for Update Daily Report -->
+                                <button class="btn btn-info btn-sm me-2" data-bs-toggle="modal" data-bs-target="#openReportModal">
+                                    <i class="fas fa-plus-square"></i> Update Daily Report
+                                </button>
+
+                                <!-- Button for Update Preventive Maintenance -->
+                                <button class="btn btn-warning btn-sm me-2" data-bs-toggle="modal" data-bs-target="#openPMReportModal">
+                                    <i class="fas fa-tools"></i> Update Preventive Maintenance
+                                </button>
+
 
                                   {{--   <div class="form-group mb-0 me-2" style="width: 200px;">
                                         <select id="lineFilter" class="form-control form-control-sm">
@@ -120,6 +127,121 @@
         </div>
     </div>
 </main>
+   <!-- Modal for selecting the open daily report -->
+   <div class="modal fade" id="openReportModal" tabindex="-1" aria-labelledby="openReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg-x">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="openReportModalLabel">Select Open Daily Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered" id="openReportsTable">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Shift</th>
+                            <th>Plant</th>
+                            <th>Line</th>
+                            <th>OP No.</th>
+                            <th>Shop</th>
+                            <th>Problem</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Loop through open reports and display them -->
+                        @foreach ($openReports as $report)
+                            <tr>
+                                <td class="text-center">
+                                    @if($report->status == 'Temporary')
+                                    <span style='font-size:50px;color:#FFDF00;'>&#9651;</span> <!-- CSS-based triangle -->
+                                    @elseif($report->status == 'Not Good')
+                                        <i class="fas fa-times" style='font-size:50px;color: red;'></i> <!-- Times icon -->
+                                    @elseif($report->status == 'OK')
+                                        <i class="fas fa-check" style="color: green;"></i> <!-- Check icon -->
+                                    @else
+                                        <i class="fas fa-question" style="color: gray;"></i> <!-- Default icon for unknown status -->
+                                    @endif
+                                </td>
+                                <td>{{ $report->date }}</td>
+                                <td>{{ $report->shift }}</td>
+                                <td>{{ $report->machine->plant ?? 'N/A' }}</td> <!-- Display the plant -->
+                                <td>{{ $report->machine->line ?? 'N/A' }}</td>  <!-- Display the line -->
+                                <td>{{ $report->machine->op_no ?? 'N/A' }}</td> <!-- Display the OP No -->
+                                <td>{{ $report->shop }}</td>
+                                <td>{{ $report->problem }}</td>
+                                <td>
+                                    <!-- Form for selecting the report -->
+                                    <form action="{{ url('form/update/' . encrypt($report->id)) }}" method="GET">
+                                        @csrf
+                                        <button type="submit" class="btn btn-primary">Select</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal for selecting the open preventive maintenance report -->
+<div class="modal fade" id="openPMReportModal" tabindex="-1" aria-labelledby="openPMReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg-x">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="openPMReportModalLabel">Select Open Preventive Maintenance Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered" id="openPMReportsTable">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Planning Date</th>
+                            <th>Actual Date</th>
+                            <th>OP No.</th>
+                            <th>Machine</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Loop through open PM reports and display them -->
+                        @foreach ($openPMReports as $report)
+                            <tr>
+                                <td class="text-center">
+                                    @if($report->pm_status == 'Temporary')
+                                        <span style='font-size:50px;color:#FFDF00;'>&#9651;</span> <!-- CSS-based triangle -->
+                                    @elseif($report->pm_status == 'Not Good')
+                                        <i class="fas fa-times" style='font-size:50px;color: red;'></i> <!-- Times icon -->
+                                    @elseif($report->pm_status == 'OK')
+                                        <i class="fas fa-check" style="color: green;"></i> <!-- Check icon -->
+                                    @else
+                                        <i class="fas fa-question" style="color: gray;"></i> <!-- Default icon for unknown status -->
+                                    @endif
+                                </td>
+                                <td>{{ $report->planning_date }}</td>
+                                <td>{{ $report->actual_date ?? '--/--/----' }}</td> <!-- Show actual date if exists -->
+                                <td>{{ $report->preventiveMaintenance->machine->op_no ?? 'N/A' }}</td>
+                                <td>{{ $report->preventiveMaintenance->machine->machine_name ?? 'N/A' }}</td>
+
+                                <td>
+                                    <!-- Form for selecting the report -->
+                                    <form action="{{ url('form/updatePM/' . encrypt($report->id)) }}" method="GET">
+                                        @csrf
+                                        <button type="submit" class="btn btn-primary">Select</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
 $(document).ready(function() {

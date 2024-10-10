@@ -7,11 +7,14 @@ use App\Models\ChecksheetFormHead;
 use App\Models\ChecksheetStatusLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Models\Machine;
 
 class SummaryController extends Controller
 {
     public function index(Request $request)
 {
+    $userPlant = auth()->user()->plant;
+    $userType = auth()->user()->type;
     // Handle AJAX request for DataTables
     if ($request->ajax()) {
         $combinedData = collect();
@@ -49,26 +52,29 @@ class SummaryController extends Controller
             $preventiveMaintenances = $query->get();
         }
 
-        // 3. Add historical problems to the combined data
-        foreach ($historicalProblems as $problem) {
-            $hasChildren = $problem->children()->exists();
-            $isChild = !is_null($problem->parent_id);
+       // 3. Add historical problems to the combined data
+foreach ($historicalProblems as $problem) {
+    $hasChildren = $problem->children()->exists();
+    $isChild = !is_null($problem->parent_id);
 
-            $combinedData->push((object) [
-                'date' => $problem->date, // Use date from historical problems
-                'type' => "Daily Report",
-                'data' => $problem,
-                'Category' => $problem->report,
-                'status' => $problem->status, // Get status from historical_problems table
-                'status_logs' => collect(),
-                'flag' => $isChild || $hasChildren,
-                'balance' => $problem->balance,
-                'op_no' => $problem->machine->op_no,
-                'line' => $problem->machine->line,
-                'start_time' => $problem->start_time ?? '--:--', // Ensure start_time is provided
-                'finish_time' => $problem->finish_time ?? '--:--', // Ensure finish_time is provided
-            ]);
-        }
+    // Get the latest status from the hierarchy of parent-child relationships
+    $latestStatus = $this->getLatestStatus($problem);
+
+    $combinedData->push((object) [
+        'date' => $problem->date, // Use date from historical problems
+        'type' => "Daily Report",
+        'data' => $problem,
+        'Category' => $problem->report,
+        'status' => $latestStatus, // Use the latest status
+        'status_logs' => collect(),
+        'flag' => $isChild || $hasChildren,
+        'balance' => $problem->balance,
+        'op_no' => $problem->machine->op_no,
+        'line' => $problem->machine->line,
+        'start_time' => $problem->start_time ?? '--:--', // Ensure start_time is provided
+        'finish_time' => $problem->finish_time ?? '--:--', // Ensure finish_time is provided
+    ]);
+}
 
         // 4. Add preventive maintenance records to the combined data
         foreach ($preventiveMaintenances as $pm) {
@@ -151,12 +157,74 @@ class SummaryController extends Controller
             "data" => $data,
         ]);
     }
+    $machinesQuery = Machine::query();
+    $linesQuery = Machine::select('line')->distinct();
 
-    return view('summary.index');
+    if (($userPlant === 'Engine' || $userPlant === 'Stamping') && ($userType === 'Mechanic' || $userType === 'Electric')) {
+        $machinesQuery->where('plant', $userPlant)->where('shop', 'ME');
+        $linesQuery->where('plant', $userPlant)->where('shop', 'ME');
+    } elseif (($userPlant === 'Engine' || $userPlant === 'Stamping') && $userType === 'Power House') {
+        $machinesQuery->where('plant', $userPlant)->where('shop', 'PH');
+        $linesQuery->where('plant', $userPlant)->where('shop', 'PH');
+    }
+
+    $machines = $machinesQuery->get();
+    $lines = $linesQuery->get();
+        // Fetch open reports logic remains unchanged
+        $openReports = HistoricalProblem::whereNull('parent_id')
+        ->whereIn('status', ['Not Good', 'Temporary'])
+        ->with('children')
+        ->whereHas('machine', function ($q) use ($userPlant, $userType) {
+            if ($userPlant !== 'All' && $userType !== 'All') {
+                $q->where('plant', $userPlant);
+                if ($userType !== 'All') {
+                    $q->whereHas('historicalProblems', function ($q2) use ($userType) {
+                        $q2->where('shop', $userType);
+                    });
+                }
+            }
+        })
+        ->orderBy('date', 'asc') // Ensure FIFO ordering by date
+        ->get();
+
+        // Filter out chains where any descendant has "OK" status
+        $openReports = $openReports->filter(function ($report) {
+        return !$this->hasOkInDescendants($report);
+        });
+
+        $openPMReports = ChecksheetFormHead::whereIn('pm_status', ['Not Good', 'Temporary'])
+        ->with([
+            'preventiveMaintenance' => function ($query) {
+                $query->with('machine:id,op_no,machine_name'); // Only select necessary fields
+            }
+        ])
+        ->orderBy('planning_date', 'asc') // FIFO ordering by planning date
+        ->get();
+
+
+    return view('summary.index',compact('openReports','openPMReports'));
 }
 
 
 
+private function getLatestStatus($row)
+{
+    // Start with the current row
+    $latestStatus = $row;
+
+    // Traverse up to the parent if exists
+    while ($latestStatus->parent_id !== null) {
+        $latestStatus = HistoricalProblem::find($latestStatus->parent_id); // Find the parent
+    }
+
+    // Traverse down to the latest child, if any children exist
+    while ($latestStatus->children()->exists()) {
+        $latestStatus = $latestStatus->children()->latest('id')->first(); // Get the latest child
+    }
+
+    // Return the status of the latest in the chain
+    return $latestStatus->status;
+}
 
 
 public function showDetail($id)
@@ -175,6 +243,22 @@ public function showDetail($id)
 
     // Return the view with the current, parent, and latest child data
     return view('history.partials', compact('data', 'parent', 'latestChild'));
+}
+private function hasOkInDescendants($report) {
+    // If this report has a status of "OK", exclude the chain
+    if ($report->status == 'OK') {
+        return true;
+    }
+
+    // Recursively check each child
+    foreach ($report->children as $child) {
+        if ($this->hasOkInDescendants($child)) {
+            return true;
+        }
+    }
+
+    // If no descendants have "OK", include the chain
+    return false;
 }
 
 
