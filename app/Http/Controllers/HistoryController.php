@@ -29,22 +29,15 @@ class HistoryController extends Controller
     $userType = auth()->user()->type;
 
     if ($request->ajax()) {
-        // Modify query to fetch both parent and child records, and join the machines table
         $query = HistoricalProblem::with(['spareParts.part', 'machine', 'children'])
-            ->join('machines', 'historical_problems.id_machine', '=', 'machines.id')  // Join machines table
-            ->select('historical_problems.*', 'machines.plant')  // Select historical_problems fields and plant from machines
+            ->join('machines', 'historical_problems.id_machine', '=', 'machines.id')
+            ->select('historical_problems.*', 'machines.plant', 'machines.line')
             ->orderBy('date', 'desc')
             ->orderBy('start_time', 'desc');
 
-        // Apply user filters based on plant and type
-        if (($userPlant === 'Engine' || $userPlant === 'Stamping') && ($userType === 'Mechanic' || $userType === 'Electric')) {
-            $query->whereHas('machine', function($q) use ($userPlant) {
-                $q->where('plant', $userPlant)->where('shop', 'ME');
-            });
-        } elseif (($userPlant === 'Engine' || $userPlant === 'Stamping') && $userType === 'Power House') {
-            $query->whereHas('machine', function($q) use ($userPlant) {
-                $q->where('plant', $userPlant)->where('shop', 'PH');
-            });
+        // Filter by line if provided
+        if ($request->line) {
+            $query->where('machines.line', $request->line);
         }
 
         // Process data for DataTables
@@ -67,10 +60,8 @@ class HistoryController extends Controller
                 return $latestStatus->status;
             })
             ->editColumn('machine.op_no', function ($row) {
-                // Combine op_no and machine_name with a line break
                 return '<a href="/mst/machine/detail/' . encrypt($row->machine->id) . '" target="_blank">' . $row->machine->op_no . '<br>' . $row->machine->machine_name . '</a>';
             })
-
             ->addColumn('flag', function ($row) {
                 $isChild = !is_null($row->parent_id);
                 $hasChildren = $row->children()->exists();
@@ -85,6 +76,7 @@ class HistoryController extends Controller
             ->rawColumns(['action', 'flag', 'machine.op_no'])
             ->make(true);
     }
+
 
     $machinesQuery = Machine::query();
     $linesQuery = Machine::select('line')->distinct();

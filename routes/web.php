@@ -169,7 +169,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('checksheet/change-status', [ChecksheetController::class, 'changeStatus']);
 
 
-    Route::get('/summary', [SummaryController::class, 'index']);
+    Route::get('/summary', [SummaryController::class, 'index'])->name('summary.data');
+    Route::get('/summary/detail/{id}', [SummaryController::class, 'showDetail']);
+
 
 
 

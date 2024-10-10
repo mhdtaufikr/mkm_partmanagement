@@ -157,6 +157,7 @@
                                                     <th>No</th>
                                                     <th>OP No.</th>
                                                     <th>Plant</th>
+                                                    <th>Line</th>
                                                     <th>Date</th>
                                                     <th>Shift</th>
                                                     <th>Shop</th>
@@ -208,95 +209,115 @@
 </main>
 
 <script>
-    $(document).ready(function() {
-        var table = $("#tablehistory").DataTable({
-            "processing": true,
-            "serverSide": true,
-            "responsive": true,
-            "autoWidth": false,
-            "ajax": "{{ route('history') }}",
-            "columns": [
-                { "data": "DT_RowIndex", "name": "DT_RowIndex", "orderable": false, "searchable": false },
-                { "data": "machine.op_no", "name": "machine.op_no" },
-                { "data": "machine.plant", "name": "machine.plant" }, // Plant
-                {
-                    "data": "date",
-                    "name": "date",
-                    "render": function(data, type, row) {
-                        if (data) {
-                            var dateParts = data.split("-");
-                            return dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0];
-                        }
-                        return data;
+   $(document).ready(function() {
+    var table = $("#tablehistory").DataTable({
+        "processing": true,
+        "serverSide": true,
+        "responsive": true,
+        "autoWidth": false,
+        "ajax": "{{ route('history') }}",
+        "columns": [
+            { "data": "DT_RowIndex", "name": "DT_RowIndex", "orderable": false, "searchable": false },
+            { "data": "machine.op_no", "name": "machine.op_no" },
+            { "data": "machine.plant", "name": "machine.plant" }, // Plant
+            { "data": "machine.line", "name": "machine.line" },   // Line column
+            {
+                "data": "date",
+                "name": "date",
+                "render": function(data, type, row) {
+                    if (data) {
+                        var dateParts = data.split("-");
+                        return dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0];
                     }
-                },
-                { "data": "shift", "name": "shift" },
-                { "data": "shop", "name": "shop" },
-                { "data": "problem", "name": "problem" },
-                { "data": "cause", "name": "cause" },
-                { "data": "start_time", "name": "start_time" },
-                { "data": "finish_time", "name": "finish_time" },
-                {
-                    "data": "balance",
-                    "name": "balance",
-                    "render": function(data, type, row) {
-                        return parseFloat(data).toString() + ' Hour';
-                    }
-                },
-                { "data": "pic", "name": "pic" },
-                { "data": "remarks", "name": "remarks" },
-                {
-                    "data": "status",
-                    "name": "status",
-                    "render": function(data, type, row) {
-                        let icon = '';
-                        switch (data) {
-                            case 'Temporary':
-                                icon = "<span style='font-size: 30px; color: #FFDF00; font-weight: bold; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000;'>&#9651;</span>"; // Yellow triangle with bold effect
-                                break;
-                            case 'Not Good':
-                                icon = "<i class='fas fa-times' style='font-size: 30px; color: red;'></i>"; // Red times icon
-                                break;
-                            case 'OK':
-                                icon = "<i class='fas fa-check' style='font-size: 30px; color: green;'></i>"; // Green check icon
-                                break;
-                            default:
-                                icon = "<i class='fas fa-question' style='font-size: 30px; color: gray;'></i>"; // Gray question mark icon for unknown status
-                        }
-                        return '<td class="text-center">' + icon + '</td>';
-                    }
-                },
-                {
-                    "data": "flag",
-                    "name": "flag",
-                    "orderable": false, // No sorting on this column
-                    "searchable": false // Disable searching on this column
-                },
-                {
-                    "data": "action",
-                    "name": "action",
-                    "orderable": false,
-                    "searchable": false
+                    return data;
                 }
-            ]
-        });
+            },
+            { "data": "shift", "name": "shift" },
+            { "data": "shop", "name": "shop" },
+            {
+                "data": "problem",
+                "name": "problem",
+                "render": function(data, type, row) {
+                    return data.length > 8 ? data.substring(0, 8) + '...' : data;
+                }
+            },
+            {
+                "data": "cause",
+                "name": "cause",
+                "render": function(data, type, row) {
+                    return data.length > 8 ? data.substring(0, 8) + '...' : data;
+                }
+            },
+            { "data": "start_time", "name": "start_time" },
+            { "data": "finish_time", "name": "finish_time" },
+            {
+                "data": "balance",
+                "name": "balance",
+                "render": function(data, type, row) {
+                    return parseFloat(data).toString() + ' Hour';
+                }
+            },
+            { "data": "pic", "name": "pic" },
+            {
+                "data": "remarks",
+                "name": "remarks",
+                "render": function(data, type, row) {
+                    return data.length > 8 ? data.substring(0, 8) + '...' : data;
+                }
+            },
+            {
+                "data": "status",
+                "name": "status",
+                "render": function(data, type, row) {
+                    let icon = '';
+                    switch (data) {
+                        case 'Temporary':
+                            icon = "<span style='font-size: 30px; color: #FFDF00; font-weight: bold; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000;'>&#9651;</span>"; // Yellow triangle with bold effect
+                            break;
+                        case 'Not Good':
+                            icon = "<i class='fas fa-times' style='font-size: 30px; color: red;'></i>"; // Red times icon
+                            break;
+                        case 'OK':
+                            icon = "<i class='fas fa-check' style='font-size: 30px; color: green;'></i>"; // Green check icon
+                            break;
+                        default:
+                            icon = "<i class='fas fa-question' style='font-size: 30px; color: gray;'></i>"; // Gray question mark icon for unknown status
+                    }
+                    return '<td class="text-center">' + icon + '</td>';
+                }
+            },
+            {
+                "data": "flag",
+                "name": "flag",
+                "orderable": false, // No sorting on this column
+                "searchable": false // Disable searching on this column
+            },
+            {
+                "data": "action",
+                "name": "action",
+                "orderable": false,
+                "searchable": false
+            }
+        ]
+    });
 
-        // Load modal content dynamically when the detail button is clicked
-        $('#tablehistory').on('click', '.btn-detail', function() {
-            var id = $(this).data('id');
-            $.ajax({
-                url: "{{ url('/history/detail') }}/" + id,
-                method: 'GET',
-                success: function(data) {
-                    $('#modal-body-content').html(data);
-                    $('#modal-detail').modal('show');
-                },
-                error: function(xhr, status, error) {
-                    alert('An error occurred while fetching details: ' + error);
-                }
-            });
+    // Load modal content dynamically when the detail button is clicked
+    $('#tablehistory').on('click', '.btn-detail', function() {
+        var id = $(this).data('id');
+        $.ajax({
+            url: "{{ url('/history/detail') }}/" + id,
+            method: 'GET',
+            success: function(data) {
+                $('#modal-body-content').html(data);
+                $('#modal-detail').modal('show');
+            },
+            error: function(xhr, status, error) {
+                alert('An error occurred while fetching details: ' + error);
+            }
         });
     });
+});
+
 </script>
 
 
@@ -304,6 +325,9 @@
 <style>
     .modal-lg-x {
     max-width: 90%;
+}
+.modal-lg {
+    max-width: 70%;
 }
 </style>
 <script>

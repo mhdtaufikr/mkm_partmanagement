@@ -4,27 +4,34 @@
         <h6><strong>Date:</strong> {{ \Carbon\Carbon::parse($data->date)->format('d/m/Y') }}</h6>
         <h6><strong>Shift:</strong> {{ $data->shift }}</h6>
         <h6><strong>Shop:</strong> {{ $data->shop }}</h6>
-        <h6><strong>Problem:</strong> {{ $data->problem }}</h6>
-        <h6><strong>Cause:</strong> {{ $data->cause }}</h6>
-        <h6><strong>Action:</strong> {{ $data->action }}</h6>
+        <h6><strong>Problem:</strong></h6>
+        <textarea name="problem" class="form-control" rows="6" readonly>{{ $data->problem }}</textarea>
+
+        <h6><strong>Cause:</strong></h6>
+        <textarea name="cause" class="form-control" rows="6" readonly>{{ $data->cause }}</textarea>
+
+        <h6><strong>Action:</strong></h6>
+        <textarea name="action" class="form-control" rows="6" readonly>{{ $data->action }}</textarea>
     </div>
     <div class="col-md-6">
         <h6><strong>Start Time:</strong> {{ $data->start_time }}</h6>
         <h6><strong>Finish Time:</strong> {{ $data->finish_time }}</h6>
         <h6><strong>Balance:</strong> {{ $data->balance }} Hour</h6>
         <h6><strong>PIC:</strong> {{ $data->pic }}</h6>
-        <h6><strong>Remarks:</strong> {{ $data->remarks }}</h6>
+        <h6><strong>Remarks:</strong></h6>
+        <textarea name="remarks" class="form-control mb-2" rows="6" readonly>{{ $data->remarks }}</textarea>
         <h6><strong>Status:</strong> {{ $data->status }}</h6>
-    </div>
-</div>
-
-@if($data->img)
+        @if($data->img)
     <div class="row mb-3">
         <div class="col-md-12 text-center">
             <img src="{{ asset($data->img) }}" class="img-fluid" alt="Problem Image" style="max-width: 400px; max-height: 300px;">
         </div>
     </div>
 @endif
+    </div>
+</div>
+
+
 
 <hr>
 <h5 class="mb-3">Spare Parts Used</h5>
@@ -63,27 +70,34 @@
             <h6><strong>Date:</strong> {{ \Carbon\Carbon::parse($parent->date)->format('d/m/Y') }}</h6>
             <h6><strong>Shift:</strong> {{ $parent->shift }}</h6>
             <h6><strong>Shop:</strong> {{ $parent->shop }}</h6>
-            <h6><strong>Problem:</strong> {{ $parent->problem }}</h6>
-            <h6><strong>Cause:</strong> {{ $parent->cause }}</h6>
-            <h6><strong>Action:</strong> {{ $parent->action }}</h6>
+            <h6><strong>Problem:</strong></h6>
+            <textarea name="problem" class="form-control" rows="6" readonly>{{ $parent->problem }}</textarea>
+
+            <h6><strong>Cause:</strong></h6>
+            <textarea name="cause" class="form-control" rows="6" readonly>{{ $parent->cause }}</textarea>
+
+            <h6><strong>Action:</strong></h6>
+            <textarea name="action" class="form-control" rows="6" readonly>{{ $parent->action }}</textarea>
         </div>
         <div class="col-md-6">
             <h6><strong>Start Time:</strong> {{ $parent->start_time }}</h6>
             <h6><strong>Finish Time:</strong> {{ $parent->finish_time }}</h6>
             <h6><strong>Balance:</strong> {{ $parent->balance }} Hour</h6>
             <h6><strong>PIC:</strong> {{ $parent->pic }}</h6>
-            <h6><strong>Remarks:</strong> {{ $parent->remarks }}</h6>
+            <h6><strong>Remarks:</strong></h6>
+            <textarea name="remarks" class="form-control mb-2" rows="3" readonly>{{ $parent->remarks }}</textarea>
             <h6><strong>Status:</strong> {{ $parent->status }}</h6>
+            @if($parent->img)
+            <div class="row mb-3">
+                <div class="col-md-12 text-center">
+                    <img src="{{ asset($parent->img) }}" class="img-fluid" alt="Parent Problem Image" style="max-width: 400px; max-height: 300px;">
+                </div>
+            </div>
+    @endif
         </div>
     </div>
 
-    @if($parent->img)
-        <div class="row mb-3">
-            <div class="col-md-12 text-center">
-                <img src="{{ asset($parent->img) }}" class="img-fluid" alt="Parent Problem Image" style="max-width: 400px; max-height: 300px;">
-            </div>
-        </div>
-    @endif
+
 
     <hr>
     <h5 class="mb-3">Spare Parts Used (Parent)</h5>
@@ -123,27 +137,33 @@
            <h6><strong>Date:</strong> {{ \Carbon\Carbon::parse($latestChild->date)->format('d/m/Y') }}</h6>
             <h6><strong>Shift:</strong> {{ $latestChild->shift }}</h6>
             <h6><strong>Shop:</strong> {{ $latestChild->shop }}</h6>
-            <h6><strong>Problem:</strong> {{ $latestChild->problem }}</h6>
-            <h6><strong>Cause:</strong> {{ $latestChild->cause }}</h6>
-            <h6><strong>Action:</strong> {{ $latestChild->action }}</h6>
+            <h6><strong>Problem:</strong></h6>
+            <textarea name="problem" class="form-control" rows="6" readonly>{{ $latestChild->problem }}</textarea>
+
+            <h6><strong>Cause:</strong></h6>
+            <textarea name="cause" class="form-control" rows="6" readonly>{{ $latestChild->cause }}</textarea>
+
+            <h6><strong>Action:</strong></h6>
+            <textarea name="action" class="form-control" rows="6" readonly>{{ $latestChild->action }}</textarea>
+
         </div>
         <div class="col-md-6">
             <h6><strong>Start Time:</strong> {{ $latestChild->start_time }}</h6>
             <h6><strong>Finish Time:</strong> {{ $latestChild->finish_time }}</h6>
             <h6><strong>Balance:</strong> {{ $latestChild->balance }} Hour</h6>
             <h6><strong>PIC:</strong> {{ $latestChild->pic }}</h6>
-            <h6><strong>Remarks:</strong> {{ $latestChild->remarks }}</h6>
+            <h6><strong>Remarks:</strong></h6>
+            <textarea name="action" class="form-control mb-2" rows="3" readonly>{{ $latestChild->remarks }}</textarea>
             <h6><strong>Status:</strong> {{ $latestChild->status }}</h6>
+            @if($latestChild->img)
+            <div class="row mb-3">
+                <div class="col-md-12 text-center">
+                    <img src="{{ asset($latestChild->img) }}" class="img-fluid" alt="Child Problem Image" style="max-width: 400px; max-height: 300px;">
+                </div>
+            </div>
+        @endif
         </div>
     </div>
-
-    @if($latestChild->img)
-        <div class="row mb-3">
-            <div class="col-md-12 text-center">
-                <img src="{{ asset($latestChild->img) }}" class="img-fluid" alt="Child Problem Image" style="max-width: 400px; max-height: 300px;">
-            </div>
-        </div>
-    @endif
 
     <hr>
     <h5 class="mb-3">Spare Parts Used (Child)</h5>
