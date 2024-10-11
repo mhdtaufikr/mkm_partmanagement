@@ -74,8 +74,8 @@ class ChecksheetImport implements ToCollection, WithHeadingRow
                     $checksheet = Checksheet::updateOrCreate(
                         [
                             'preventive_maintenances_id' => $this->currentPreventiveMaintenanceId,
-                            'checksheet_category' => $row['checksheet_category'],
-                            'checksheet_type' => $row['checksheet_type'],
+                            'checksheet_category' => $row['checksheet_type'],
+                            'checksheet_type' => $row['checksheet_category'],
                         ],
                         [
                             'created_at' => now(),
@@ -102,8 +102,8 @@ class ChecksheetImport implements ToCollection, WithHeadingRow
 
                 // Set previous values for the next iteration
                 $previousMachineId = $machine->id;
-                $previousChecksheetCategory = $row['checksheet_category'];
-                $previousChecksheetType = $row['checksheet_type'];
+                $previousChecksheetCategory = $row['checksheet_type'];
+                $previousChecksheetType = $row['checksheet_category'];
             } catch (\Exception $e) {
                 // Collect the error message but continue processing the next row
                 $errorMessages[] = $e->getMessage();
