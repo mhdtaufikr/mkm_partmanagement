@@ -136,59 +136,68 @@ class ChecksheetImport implements ToCollection, WithHeadingRow
      * @return \Carbon\Carbon
      */
     private function transformDate($value)
-    {
-        // Check if the value is numeric (Excel date)
-        if (is_numeric($value)) {
-            \Log::info('Transforming Excel date: ' . $value);
-            return Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value));
-        }
-
-        // If the value is null or empty, return null
-        if (empty($value)) {
-            \Log::info('Empty date value, returning null.');
-            return null;
-        }
-
-        // Map Indonesian month names to English
-        $indonesianMonths = [
-            'Januari' => 'January',
-            'Februari' => 'February',
-            'Maret' => 'March',
-            'April' => 'April',
-            'Mei' => 'May',
-            'Juni' => 'June',
-            'Juli' => 'July',
-            'Agustus' => 'August',
-            'September' => 'September',
-            'Oktober' => 'October',
-            'November' => 'November',
-            'Desember' => 'December',
-        ];
-
-        // Replace Indonesian month names with English ones
-        foreach ($indonesianMonths as $indoMonth => $engMonth) {
-            if (strpos($value, $indoMonth) !== false) {
-                $value = str_replace($indoMonth, $engMonth, $value);
-                break;
-            }
-        }
-
-        // Try different date formats
-        $formats = ['d F Y', 'd/m/Y', 'Y-m-d']; // Add as many formats as needed
-
-        foreach ($formats as $format) {
-            try {
-                \Log::info('Attempting to parse date with format ' . $format . ': ' . $value);
-                return Carbon::createFromFormat($format, $value);
-            } catch (\Exception $e) {
-                \Log::warning('Date format mismatch for format ' . $format . ': ' . $e->getMessage());
-            }
-        }
-
-        // Log an error if none of the formats worked and throw an exception
-        \Log::error('Unable to parse date: ' . $value);
-        throw new \Exception('Date format is invalid: ' . $value);
+{
+    // If the value is null, empty, or invalid like '-', return null
+    if (empty($value) || $value === '-') {
+        \Log::info('Empty or invalid date value, returning null.');
+        return null;
     }
+
+    // Check if the value is numeric (Excel date)
+    if (is_numeric($value)) {
+        \Log::info('Transforming Excel date: ' . $value);
+        return Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value));
+    }
+
+    // Check if the value is a four-digit year
+    if (preg_match('/^\d{4}$/', $value)) {
+        // If it's only a year, append '-01-01' to make it a full date
+        \Log::info('Year detected, converting to full date: ' . $value);
+        return Carbon::createFromFormat('Y-m-d', $value . '-01-01');
+    }
+
+    // Map Indonesian month names to English
+    $indonesianMonths = [
+        'Januari' => 'January',
+        'Februari' => 'February',
+        'Maret' => 'March',
+        'April' => 'April',
+        'Mei' => 'May',
+        'Juni' => 'June',
+        'Juli' => 'July',
+        'Agustus' => 'August',
+        'September' => 'September',
+        'Oktober' => 'October',
+        'November' => 'November',
+        'Desember' => 'December',
+    ];
+
+    // Replace Indonesian month names with English ones
+    foreach ($indonesianMonths as $indoMonth => $engMonth) {
+        if (strpos($value, $indoMonth) !== false) {
+            $value = str_replace($indoMonth, $engMonth, $value);
+            break;
+        }
+    }
+
+    // Try different date formats
+    $formats = ['d F Y', 'd/m/Y', 'Y-m-d']; // Add as many formats as needed
+
+    foreach ($formats as $format) {
+        try {
+            \Log::info('Attempting to parse date with format ' . $format . ': ' . $value);
+            return Carbon::createFromFormat($format, $value);
+        } catch (\Exception $e) {
+            \Log::warning('Date format mismatch for format ' . $format . ': ' . $e->getMessage());
+        }
+    }
+
+    // Log an error if none of the formats worked and throw an exception
+    \Log::error('Unable to parse date: ' . $value);
+    throw new \Exception('Date format is invalid: ' . $value);
+}
+
+
 
 }
 
