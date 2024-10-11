@@ -19,114 +19,121 @@ class ChecksheetImport implements ToCollection, WithHeadingRow
     private $currentChecksheetId = null;
 
     public function collection(Collection $rows)
-{
-    set_time_limit(300);
-    // Start a transaction
-    DB::beginTransaction();
+    {
+        set_time_limit(300);
+        // Start a transaction
+        DB::beginTransaction();
 
-    $errorMessages = []; // Array to collect error messages
+        $errorMessages = []; // Array to collect error messages
 
-    try {
-        foreach ($rows as $row) {
-            try {
-                // Log the row data for debugging purposes
-                Log::info('Processing row: ', $row->toArray());
+        try {
+            foreach ($rows as $row) {
+                try {
+                    // Log the row data for debugging purposes
+                    Log::info('Processing row: ', $row->toArray());
 
-                // Handle dates from the row
-                $effectiveDate = $this->transformDate($row['effective_date']);
-                $mfgDate = $this->transformDate($row['manufacture_date']);
+                    // Skip the row if essential fields are null
+                    if (empty($row['no_op_no']) || empty($row['plant']) || empty($row['line'])) {
+                        Log::warning('Skipping row due to missing essential data: ', $row->toArray());
+                        continue; // Skip this row
+                    }
 
-                // Check if the op_no exists in the machine table on the specified plant and line
-                $machine = Machine::where('op_no', $row['no_op_no'])
-                    ->where('plant', $row['plant'])
-                    ->where('line', $row['line'])
-                    ->first();
+                    // Handle dates from the row
+                    $effectiveDate = $this->transformDate($row['effective_date']);
+                    $mfgDate = $this->transformDate($row['manufacture_date']);
 
-                if (!$machine) {
-                    throw new \Exception('Operation number '.$row['no_op_no'].' does not exist in the machine table for the given plant and line.');
-                }
+                    // Check if the op_no exists in the machine table on the specified plant and line
+                    $machine = Machine::where('op_no', $row['no_op_no'])
+                        ->where('plant', $row['plant'])
+                        ->where('line', $row['line'])
+                        ->first();
 
-                // Preventive Maintenance record creation
-                if ($this->currentPreventiveMaintenanceId === null || $machine->id !== $previousMachineId) {
-                    $preventiveMaintenance = PreventiveMaintenance::updateOrCreate(
+                    if (!$machine) {
+                        throw new \Exception('Operation number '.$row['no_op_no'].' does not exist in the machine table for the given plant and line.');
+                    }
+
+                    // Preventive Maintenance record creation
+                    if ($this->currentPreventiveMaintenanceId === null || $machine->id !== $previousMachineId) {
+                        $preventiveMaintenance = PreventiveMaintenance::updateOrCreate(
+                            [
+                                'machine_id' => $machine->id,
+                                'no_document' => $row['document_no'],
+                                'type' => $row['type'],
+                                'dept' => $row['department'],
+                                'shop' => $row['shop'],
+                                'effective_date' => $effectiveDate,
+                                'mfg_date' => $mfgDate,
+                                'revision' => $row['revision'],
+                                'no_procedure' => $row['procedure_no'],
+                            ],
+                            [
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]
+                        );
+
+                        $this->currentPreventiveMaintenanceId = $preventiveMaintenance->id;
+                    }
+
+                    // Checksheet record creation
+                    if ($this->currentChecksheetId === null || $row['checksheet_category'] !== $previousChecksheetCategory || $row['checksheet_type'] !== $previousChecksheetType) {
+                        $checksheet = Checksheet::updateOrCreate(
+                            [
+                                'preventive_maintenances_id' => $this->currentPreventiveMaintenanceId,
+                                'checksheet_category' => $row['checksheet_type'],
+                                'checksheet_type' => $row['checksheet_category'],
+                            ],
+                            [
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]
+                        );
+
+                        $this->currentChecksheetId = $checksheet->checksheet_id;
+                    }
+
+                    // Insert or update checksheet items
+                    ChecksheetItem::updateOrCreate(
                         [
-                            'machine_id' => $machine->id,
-                            'no_document' => $row['document_no'],
-                            'type' => $row['type'],
-                            'dept' => $row['department'],
-                            'shop' => $row['shop'],
-                            'effective_date' => $effectiveDate,
-                            'mfg_date' => $mfgDate,
-                            'revision' => $row['revision'],
-                            'no_procedure' => $row['procedure_no'],
+                            'checksheet_id' => $this->currentChecksheetId,
+                            'item_name' => $row['item_name'],
                         ],
-                        [
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]
-                    );
-
-                    $this->currentPreventiveMaintenanceId = $preventiveMaintenance->id;
-                }
-
-                // Checksheet record creation
-                if ($this->currentChecksheetId === null || $row['checksheet_category'] !== $previousChecksheetCategory || $row['checksheet_type'] !== $previousChecksheetType) {
-                    $checksheet = Checksheet::updateOrCreate(
                         [
                             'preventive_maintenances_id' => $this->currentPreventiveMaintenanceId,
-                            'checksheet_category' => $row['checksheet_type'],
-                            'checksheet_type' => $row['checksheet_category'],
-                        ],
-                        [
+                            'spec' => $row['item_spec'],
                             'created_at' => now(),
                             'updated_at' => now(),
                         ]
                     );
 
-                    $this->currentChecksheetId = $checksheet->checksheet_id;
+                    // Set previous values for the next iteration
+                    $previousMachineId = $machine->id;
+                    $previousChecksheetCategory = $row['checksheet_type'];
+                    $previousChecksheetType = $row['checksheet_category'];
+                } catch (\Exception $e) {
+                    // Collect the error message but continue processing the next row
+                    $errorMessages[] = $e->getMessage();
+                    Log::error('Error in row: '.$e->getMessage());
                 }
-
-                // Insert or update checksheet items
-                ChecksheetItem::updateOrCreate(
-                    [
-                        'checksheet_id' => $this->currentChecksheetId,
-                        'item_name' => $row['item_name'],
-                    ],
-                    [
-                        'preventive_maintenances_id' => $this->currentPreventiveMaintenanceId,
-                        'spec' => $row['item_spec'],
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]
-                );
-
-                // Set previous values for the next iteration
-                $previousMachineId = $machine->id;
-                $previousChecksheetCategory = $row['checksheet_type'];
-                $previousChecksheetType = $row['checksheet_category'];
-            } catch (\Exception $e) {
-                // Collect the error message but continue processing the next row
-                $errorMessages[] = $e->getMessage();
-                Log::error('Error in row: '.$e->getMessage());
             }
-        }
 
-        // Check if there were any errors
-        if (!empty($errorMessages)) {
-            // Rollback the transaction and log all errors
+            // Check if there were any errors
+            if (!empty($errorMessages)) {
+                // Rollback the transaction and log all errors
+                DB::rollBack();
+                throw new \Exception('Import failed with errors: '.implode("\n", $errorMessages));
+            }
+
+            // Commit the transaction if no errors
+            DB::commit();
+        } catch (\Exception $e) {
+            // In case of any exception, rollback the transaction
             DB::rollBack();
-            throw new \Exception('Import failed with errors: '.implode("\n", $errorMessages));
+            Log::error('Transaction failed: '.$e->getMessage());
+            throw $e;
         }
-
-        // Commit the transaction if no errors
-        DB::commit();
-    } catch (\Exception $e) {
-        // In case of any exception, rollback the transaction
-        DB::rollBack();
-        Log::error('Transaction failed: '.$e->getMessage());
-        throw $e;
     }
-}
+
 
 
     /**
