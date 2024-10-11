@@ -50,20 +50,20 @@ class ChecksheetImport implements ToCollection, WithHeadingRow
                         throw new \Exception('Operation number '.$row['no_op_no'].' does not exist in the machine table for the given plant and line.');
                     }
 
-                    // Update or create Preventive Maintenance record
+                    // Preventive Maintenance record creation or update
                     $preventiveMaintenance = PreventiveMaintenance::updateOrCreate(
                         [
                             'machine_id' => $machine->id,
+                            'type' => $row['type'], // Ensure unique type for the machine
+                        ],
+                        [
                             'no_document' => $row['document_no'],
-                            'type' => $row['type'],
                             'dept' => $row['department'],
                             'shop' => $row['shop'],
                             'effective_date' => $effectiveDate,
                             'mfg_date' => $mfgDate,
                             'revision' => $row['revision'],
                             'no_procedure' => $row['procedure_no'],
-                        ],
-                        [
                             'updated_at' => now(),
                         ]
                     );
