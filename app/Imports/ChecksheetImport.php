@@ -23,6 +23,50 @@ class ChecksheetImport implements ToCollection, WithHeadingRow
         set_time_limit(300);
         DB::beginTransaction(); // Start a transaction
 
+        $dataArray = $rows->toArray();
+
+        // Use Laravel's collection methods to filter and remove duplicates
+        $filteredRows = collect($dataArray)
+            ->where('barcode_no', null) // Filter for rows with barcode_no being null
+            ->unique(function ($item) {
+                // Ensure uniqueness based on core columns like no_op_no, name, plant, etc.
+                return $item['no_op_no'] . $item['name'] . $item['plant'] . $item['location'] . $item['line'];
+            });
+
+            foreach ($filteredRows as $row) {
+                // Transform dates
+                $effectiveDate = $this->transformDate($row['effective_date']);
+                $mfgDate = $this->transformDate($row['manufacture_date']);
+
+                // Check if the machine exists
+                $machine = Machine::where('op_no', $row['no_op_no'])
+                ->where('plant', $row['plant'])
+                ->where('line', $row['line'])
+                ->first();
+                  // Query the preventive_maintenances table to check if the record exists
+                  $preventiveMaintenance = PreventiveMaintenance::where('machine_id', $machine->id)
+                  ->where('type', $row['type'])
+                  ->first();
+                if ($preventiveMaintenance) {
+                    // If found, delete the related data in checksheet and checksheet_item
+                    Checksheet::where('preventive_maintenances_id', $preventiveMaintenance->id)->delete();
+                    ChecksheetItem::where('preventive_maintenances_id', $preventiveMaintenance->id)->delete();
+
+                    // Update preventive_maintenance with new data, keeping the same ID
+                    $preventiveMaintenance->update([
+                        'no_document' => $row['document_no'],
+                        'dept' => $row['department'],
+                        'shop' => $row['shop'],
+                        'effective_date' => $effectiveDate,
+                        'mfg_date' => $mfgDate,
+                        'revision' => $row['revision'],
+                        'no_procedure' => $row['procedure_no'],
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+
+
         $errorMessages = [];
 
         try {
