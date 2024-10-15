@@ -10,158 +10,121 @@ use App\Models\HistoricalProblem;
 class KPIDailyReport extends Controller
 {
     public function index()
-{
-    // Fetch distinct report values
-    $reports = DB::table('combined_problem_view')
-        ->select('report')
-        ->distinct()
-        ->get()
-        ->pluck('report'); // Get the 'report' values as a simple array
+    {
+        // Fetch distinct report values from the combined_problem_view
+        $reports = DB::table('historical_problems') // Make sure the table name is correct
+            ->select('report')
+            ->distinct()
+            ->get()
+            ->pluck('report'); // Get the 'report' values as a simple array
 
-    return view('kpi.daily.index', compact('reports'));
-}
+        return view('kpi.daily.index', compact('reports')); // Pass reports to the view
+    }
 
-
-public function getData(Request $request)
+    public function getData(Request $request)
 {
     if ($request->ajax()) {
-        // Modify the query to include a left join with the historical_problems table to check for children
-        $query = DB::table('combined_problem_view')
-            ->join('machines', 'combined_problem_view.id_machine', '=', 'machines.id')
-            ->leftJoin('historical_problems as children', 'combined_problem_view.id', '=', 'children.parent_id')  // Left join to check for children
-            ->select([
-                'combined_problem_view.id',
-                'machines.op_no',
-                'machines.machine_name',
-                'combined_problem_view.start_date',
-                'combined_problem_view.end_date',
-                'combined_problem_view.kpi',
-                'combined_problem_view.balance',
-                'combined_problem_view.pic',
-                'combined_problem_view.latest_status',
-                'combined_problem_view.problem',
-                'combined_problem_view.cause',
-                'combined_problem_view.action',
-                'combined_problem_view.created_at',
-                'combined_problem_view.updated_at',
-                DB::raw('COUNT(children.id) as has_children')  // Check if it has children
-            ])
-            ->groupBy(
-                'combined_problem_view.id',
-                'machines.op_no',
-                'machines.machine_name',
-                'combined_problem_view.start_date',
-                'combined_problem_view.end_date',
-                'combined_problem_view.kpi',
-                'combined_problem_view.balance',
-                'combined_problem_view.pic',
-                'combined_problem_view.latest_status',
-                'combined_problem_view.problem',
-                'combined_problem_view.cause',
-                'combined_problem_view.action',
-                'combined_problem_view.created_at',
-                'combined_problem_view.updated_at'
-            );
+        // Query to fetch data from the historical_problems table and join with machines table
+        $query = HistoricalProblem::join('machines', 'historical_problems.id_machine', '=', 'machines.id')
+            ->select(
+                'historical_problems.id',
+                DB::raw('CONCAT(machines.op_no, " - ", machines.machine_name) as machine'), // Concatenate op_no and machine_name
+                'historical_problems.date',
+                'historical_problems.kpi',
+                'historical_problems.balance',
+                'historical_problems.pic',
+                'historical_problems.problem',
+                'historical_problems.cause',
+                'historical_problems.action',
+                'historical_problems.status'
+            )
+            // Apply sorting by date and start_time in descending order (latest problems first)
+            ->orderBy('historical_problems.date', 'desc')
+            ->orderBy('historical_problems.start_time', 'desc');
 
         // Filter by month and year if selected
         if ($request->month) {
-            $query->whereMonth('combined_problem_view.start_date', $request->month);
+            $query->whereMonth('historical_problems.date', $request->month);
         }
         if ($request->year) {
-            $query->whereYear('combined_problem_view.start_date', $request->year);
+            $query->whereYear('historical_problems.date', $request->year);
         }
 
         // Filter by report if selected
         if ($request->report) {
-            $query->where('combined_problem_view.report', $request->report);
+            $query->where('historical_problems.report', $request->report);
         }
 
         return DataTables::of($query)
             ->addIndexColumn()
-            ->editColumn('start_date', function ($row) {
-                return \Carbon\Carbon::parse($row->start_date)->format('Y-m-d');
+            ->editColumn('problem', function ($row) {
+                // Truncate the 'problem' field to a max of 18 characters
+                $maxLength = 18;
+                if (strlen($row->problem) > $maxLength) {
+                    return substr($row->problem, 0, $maxLength) . '...';
+                }
+                return $row->problem;
             })
-            ->editColumn('end_date', function ($row) {
-                return \Carbon\Carbon::parse($row->end_date)->format('Y-m-d');
+            ->editColumn('cause', function ($row) {
+                // Truncate the 'cause' field to a max of 18 characters
+                $maxLength = 18;
+                if (strlen($row->cause) > $maxLength) {
+                    return substr($row->cause, 0, $maxLength) . '...';
+                }
+                return $row->cause;
+            })
+            ->editColumn('action', function ($row) {
+                // Truncate the 'action' field to a max of 18 characters
+                $maxLength = 18;
+                if (strlen($row->action) > $maxLength) {
+                    return substr($row->action, 0, $maxLength) . '...';
+                }
+                return $row->action;
             })
             ->editColumn('balance', function ($row) {
                 return number_format($row->balance, 2);
             })
-            ->editColumn('latest_status', function ($row) {
-                return ucfirst($row->latest_status);
+            ->editColumn('status', function ($row) {
+                return ucfirst($row->status);
             })
-            ->editColumn('id_machine', function ($row) {
-                return $row->op_no . ' - ' . $row->machine_name;
-            })
+            ->rawColumns(['problem', 'cause', 'action']) // Ensure the columns render the truncated text correctly
             ->make(true);
     }
 }
 
 
+
+
+
 public function update(Request $request)
 {
-    dd($request->all());
+    // Loop through each row from the request
     foreach ($request->rows as $row) {
-        // Find the parent record first
-        $parent = HistoricalProblem::find($row['id']);
+        // Check if the record exists in the historical_problems table
+        $historicalProblem = HistoricalProblem::find($row['id']);
 
-        // Update Start Date (parent)
-        if (isset($row['start_date'])) {
-            $parent->date = $row['start_date'];
-            $parent->save();
-        }
+        if ($historicalProblem) {
+            // Update the relevant fields
+            $historicalProblem->date = $row['date'];
+            $historicalProblem->balance = $row['balance'];
 
-        // Update End Date (latest child)
-        if (isset($row['end_date'])) {
-            $latestChild = HistoricalProblem::where('parent_id', $row['id'])
-                ->orderBy('date', 'desc')
-                ->first();
-            if ($latestChild) {
-                $latestChild->date = $row['end_date'];
-                $latestChild->save();
+            // If the 'kpi' field is present, update it, otherwise set it to null
+            if (isset($row['kpi'])) {
+                $historicalProblem->kpi = $row['kpi'];
+            } else {
+                $historicalProblem->kpi = null;
             }
+
+            // Save the changes to the database
+            $historicalProblem->save();
         }
-
-        // Update KPI for parent and all children
-        if (isset($row['kpi'])) {
-            $parent->kpi = $row['kpi'];
-            $parent->save();
-
-            // Update all children with the same KPI
-            HistoricalProblem::where('parent_id', $row['id'])->update(['kpi' => $row['kpi']]);
-        }
-
-        // Update Balance by Accumulation
-        if (isset($row['total_balance'])) {
-            // Fetch the entire chain: parent, children, grandchildren, etc.
-            $historicalChain = HistoricalProblem::where('id', $row['id']) // parent
-                ->orWhere('parent_id', $row['id']) // first-level children
-                ->orWhereIn('parent_id', function($query) use ($row) {
-                    $query->select('id')
-                        ->from('historical_problems')
-                        ->where('parent_id', $row['id']); // second-level children and beyond
-                })
-                ->orderBy('id') // Ensure proper order
-                ->get();
-
-            // Total number of records (including parent and all descendants)
-            $totalItems = $historicalChain->count();
-
-            // Calculate the balance to assign to each record
-            $newBalancePerItem = $row['total_balance'] / $totalItems;
-
-            // Update the balance for each item in the chain
-            foreach ($historicalChain as $problem) {
-                $problem->balance = $newBalancePerItem;
-                $problem->save();
-            }
-        }
-
-
     }
 
+    // Redirect back with a success message
     return redirect()->back()->with('status', 'Records updated successfully.');
 }
+
+
 public function getChildData($id)
 {
     // Recursive function to get all descendants
