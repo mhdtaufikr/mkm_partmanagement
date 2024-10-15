@@ -1,6 +1,8 @@
+<h5 class="modal-title" id="modal-detail-label">Detail of Historical Problem - <strong>{{ $data->machine->op_no }}</strong> </h5>
+<hr>
 <div class="row mb-3">
     <div class="col-md-6">
-        <h6><strong>Machine No:</strong> {{ $data->machine->op_no }}</h6>
+        <h6><strong>Machine Name:</strong> {{ $data->machine->machine_name }}</h6>
         <h6><strong>Date:</strong> {{ \Carbon\Carbon::parse($data->date)->format('d/m/Y') }}</h6>
         <h6><strong>Shift:</strong> {{ $data->shift }}</h6>
         <h6><strong>Shop:</strong> {{ $data->shop }}</h6>
@@ -63,10 +65,10 @@
 <!-- Parent Record -->
 @if($parent)
     <hr>
-    <h5 class="mb-3">Parent Report (Open)</h5>
+    <h5 class="mb-3">Parent Report (Open) - <strong>{{ $parent->machine->op_no }}</strong> </h5>
     <div class="row mb-3">
         <div class="col-md-6">
-            <h6><strong>Machine No:</strong> {{ $parent->machine->op_no }}</h6>
+            <h6><strong>Machine Name:</strong>  {{ $parent->machine->machine_name }}</h6>
             <h6><strong>Date:</strong> {{ \Carbon\Carbon::parse($parent->date)->format('d/m/Y') }}</h6>
             <h6><strong>Shift:</strong> {{ $parent->shift }}</h6>
             <h6><strong>Shop:</strong> {{ $parent->shop }}</h6>
@@ -130,10 +132,10 @@
 <!-- Child Record -->
 @if($latestChild)
     <hr>
-    <h5 class="mb-3">Child Report (Latest)</h5>
+    <h5 class="mb-3">Child Report (Latest) - <strong>{{ $latestChild->machine->op_no }}</strong> </h5>
     <div class="row mb-3">
         <div class="col-md-6">
-            <h6><strong>Machine No:</strong> {{ $latestChild->machine->op_no }}</h6>
+            <h6><strong>Machine Name:</strong> {{ $latestChild->machine->machine_name }}</h6>
            <h6><strong>Date:</strong> {{ \Carbon\Carbon::parse($latestChild->date)->format('d/m/Y') }}</h6>
             <h6><strong>Shift:</strong> {{ $latestChild->shift }}</h6>
             <h6><strong>Shop:</strong> {{ $latestChild->shop }}</h6>

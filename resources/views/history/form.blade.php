@@ -736,7 +736,7 @@
                 data.forEach(machine => {
                     const option = document.createElement('option');
                     option.value = machine.id;
-                    option.textContent = machine.op_no;
+                    option.textContent = machine.op_no + ' - (  ' + machine.machine_name + ' )' ;
                     noMachineSelect.appendChild(option);
                 });
             })

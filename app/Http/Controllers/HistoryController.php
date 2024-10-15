@@ -32,6 +32,7 @@ class HistoryController extends Controller
         $query = HistoricalProblem::with(['spareParts.part', 'machine', 'children'])
             ->join('machines', 'historical_problems.id_machine', '=', 'machines.id')
             ->select('historical_problems.*', 'machines.plant', 'machines.line')
+            ->where('machines.plant',$userPlant)
             ->orderBy('date', 'desc')
             ->orderBy('start_time', 'desc');
 
@@ -60,7 +61,7 @@ class HistoryController extends Controller
                 return $latestStatus->status;
             })
             ->editColumn('machine.op_no', function ($row) {
-                return '<a href="/mst/machine/detail/' . encrypt($row->machine->id) . '" target="_blank">' . $row->machine->op_no . '<br>' . $row->machine->machine_name . '</a>';
+                return '<a href="/mst/machine/detail/' . encrypt($row->machine->id) . '" target="_blank">' . $row->machine->op_no .'</a>';
             })
             ->addColumn('flag', function ($row) {
                 $isChild = !is_null($row->parent_id);
@@ -106,7 +107,7 @@ class HistoryController extends Controller
             }
         }
     })
-    ->orderBy('date', 'asc') // Ensure FIFO ordering by date
+    ->orderBy('date', 'desc') // Ensure FIFO ordering by date
     ->get();
 
     // Filter out chains where any descendant has "OK" status
@@ -163,9 +164,12 @@ class HistoryController extends Controller
 
     public function getOpNos($line)
     {
+        $userPlant = auth()->user()->plant;
         try {
             \Log::info('Fetching op_no for line: ' . $line);
-            $machines = Machine::where('line', $line)->select('id', 'op_no')->get();
+            $machines = Machine::where('line', $line)
+            ->where('plant',$userPlant)
+            ->select('id', 'op_no','machine_name')->get();
             \Log::info('Machines found: ' . $machines->count());
             if ($machines->isEmpty()) {
                 return response()->json(['error' => 'No machines found for the specified line'], 404);
@@ -364,7 +368,7 @@ public function storehp(Request $request)
 {
     // Begin a database transaction
     DB::beginTransaction();
-
+dd($request->all());
     try {
         // Validate the request data
         $validatedData = $request->validate([

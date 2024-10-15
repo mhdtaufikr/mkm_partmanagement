@@ -155,6 +155,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
+                                                    <th>Status</th> <!-- Show the latest status here -->
                                                     <th>OP No.</th>
                                                     <th>Plant</th>
                                                     <th>Line</th>
@@ -168,9 +169,6 @@
                                                     <th>Balance</th>
                                                     <th>PIC</th>
                                                     <th>Remarks</th>
-                                                    <th>Status</th> <!-- Show the latest status here -->
-                                                    <th>Flag</th> <!-- Show flag if the record has a child or is a child -->
-                                                    <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="text-center">
@@ -193,7 +191,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modal-detail-label">Detail of Historical Problem</h5>
+
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="modal-body-content">
@@ -208,61 +206,32 @@
 
 </main>
 
+<style>
+    table td {
+        white-space: nowrap;  /* Prevent text wrapping */
+        overflow: hidden;     /* Hide overflow text */
+        text-overflow: ellipsis; /* Show ellipsis for overflow */
+    }
+</style>
+
+
 <script>
    $(document).ready(function() {
     var table = $("#tablehistory").DataTable({
         "processing": true,
         "serverSide": true,
-        "responsive": true,
-        "autoWidth": false,
+        "responsive": false,
+        "autoWidth": true,
         "ajax": "{{ route('history') }}",
         "columns": [
-            { "data": "DT_RowIndex", "name": "DT_RowIndex", "orderable": false, "searchable": false },
-            { "data": "machine.op_no", "name": "machine.op_no" },
-            { "data": "machine.plant", "name": "machine.plant" }, // Plant
-            { "data": "machine.line", "name": "machine.line" },   // Line column
             {
-                "data": "date",
-                "name": "date",
-                "render": function(data, type, row) {
-                    if (data) {
-                        var dateParts = data.split("-");
-                        return dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0];
-                    }
-                    return data;
-                }
-            },
-            { "data": "shift", "name": "shift" },
-            { "data": "shop", "name": "shop" },
-            {
-                "data": "problem",
-                "name": "problem",
-                "render": function(data, type, row) {
-                    return data.length > 8 ? data.substring(0, 8) + '...' : data;
-                }
-            },
-            {
-                "data": "cause",
-                "name": "cause",
-                "render": function(data, type, row) {
-                    return data.length > 8 ? data.substring(0, 8) + '...' : data;
-                }
-            },
-            { "data": "start_time", "name": "start_time" },
-            { "data": "finish_time", "name": "finish_time" },
-            {
-                "data": "balance",
-                "name": "balance",
-                "render": function(data, type, row) {
-                    return parseFloat(data).toString() + ' Hour';
-                }
-            },
-            { "data": "pic", "name": "pic" },
-            {
-                "data": "remarks",
-                "name": "remarks",
-                "render": function(data, type, row) {
-                    return data.length > 8 ? data.substring(0, 8) + '...' : data;
+                data: null, // Set data to null so we can customize what to display
+                name: 'DT_RowIndex_flag',
+                orderable: false, // Disable sorting
+                searchable: false, // Disable searching
+                render: function(data, type, row, meta) {
+                    // Combine the row index and the flag column
+                    return `${meta.row + 1} ${row.flag}`;
                 }
             },
             {
@@ -287,29 +256,85 @@
                 }
             },
             {
-                "data": "flag",
-                "name": "flag",
-                "orderable": false, // No sorting on this column
-                "searchable": false // Disable searching on this column
+                "data": "machine.op_no",
+                "name": "machine.op_no",
+                "render": function(data, type, row) {
+                    return `<span style="white-space: nowrap;">${data}</span>`;
+                }
+            },
+            { "data": "machine.plant", "name": "machine.plant" }, // Plant
+            { "data": "machine.line", "name": "machine.line" },   // Line column
+            {
+                "data": "date",
+                "name": "date",
+                "render": function(data, type, row) {
+                    if (data) {
+                        var dateParts = data.split("-");
+                        return dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0];
+                    }
+                    return data;
+                }
+            },
+            { "data": "shift", "name": "shift" },
+            { "data": "shop", "name": "shop" },
+            {
+                "data": "problem",
+                "name": "problem",
+                "render": function(data, type, row) {
+                   if (data && data.length) { // Check if data exists and has a length property
+            return data.length > 8 ? data.substring(0, 8) + '...' : data;
+        } else {
+            return ''; // Return an empty string if data is null or undefined
+        }
+                }
             },
             {
-                "data": "action",
-                "name": "action",
-                "orderable": false,
-                "searchable": false
+                "data": "cause",
+                "name": "cause",
+                "render": function(data, type, row) {
+                   if (data && data.length) { // Check if data exists and has a length property
+            return data.length > 8 ? data.substring(0, 8) + '...' : data;
+        } else {
+            return ''; // Return an empty string if data is null or undefined
+        }
+                }
+            },
+            { "data": "start_time", "name": "start_time" },
+            { "data": "finish_time", "name": "finish_time" },
+            {
+                "data": "balance",
+                "name": "balance",
+                "render": function(data, type, row) {
+                    return parseFloat(data).toString() + ' Hour';
+                }
+            },
+            { "data": "pic", "name": "pic" },
+            {
+                "data": "remarks",
+                "name": "remarks",
+                "render": function(data, type, row) {
+                   if (data && data.length) { // Check if data exists and has a length property
+            return data.length > 8 ? data.substring(0, 8) + '...' : data;
+        } else {
+            return ''; // Return an empty string if data is null or undefined
+        }
+                }
             }
         ]
     });
 
-    // Load modal content dynamically when the detail button is clicked
-    $('#tablehistory').on('click', '.btn-detail', function() {
-        var id = $(this).data('id');
+    // Row click event to load modal with details
+    $('#tablehistory tbody').on('click', 'tr', function() {
+        var data = table.row(this).data(); // Get data for the clicked row
+        var id = data.id;
+
+        // Fetch detail using AJAX and load it into the modal
         $.ajax({
             url: "{{ url('/history/detail') }}/" + id,
             method: 'GET',
-            success: function(data) {
-                $('#modal-body-content').html(data);
-                $('#modal-detail').modal('show');
+            success: function(response) {
+                $('#modal-body-content').html(response); // Load content into modal
+                $('#modal-detail').modal('show'); // Show the modal
             },
             error: function(xhr, status, error) {
                 alert('An error occurred while fetching details: ' + error);
@@ -317,8 +342,9 @@
         });
     });
 });
-
 </script>
+
+
 
 
 

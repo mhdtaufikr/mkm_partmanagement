@@ -33,6 +33,8 @@ class ChecksheetController extends Controller
 
     public function index(Request $request)
     {
+        $userPlant = auth()->user()->plant;
+        $userType = auth()->user()->type;
         // Retrieve all distinct types
         $types = PmFilterView::select('type')->distinct()->get();
 
@@ -66,6 +68,17 @@ class ChecksheetController extends Controller
         ->join('machines', 'preventive_maintenances.machine_id', '=', 'machines.id')
         ->orderBy('checksheet_form_heads.created_at', 'desc');
 
+
+        // Apply plant filter if the user's plant is not 'all'
+        if ($userPlant != 'all') {
+            $query->where('machines.plant', $userPlant);
+        }
+
+        // Apply type filter if the user's type is not 'all'
+        if ($userType != 'all') {
+            $query->where('preventive_maintenances.type', $userType);
+        }
+
         // Apply role-based filters
         if (Auth::user()->role == "Checker" || Auth::user()->role == "Approval") {
             $items = $query->get();
@@ -74,6 +87,8 @@ class ChecksheetController extends Controller
         } else {
             $items = $query->get();
         }
+
+
 
         $logStatus = null; // Initialize the variable before the loop
 
@@ -157,14 +172,14 @@ public function checksheetScan(Request $request)
     if (empty($request->no_mechine)) {
         // Join PreventiveMaintenance with Machine to filter by plant and op_no
         $item = PreventiveMaintenance::join('machines', 'preventive_maintenances.machine_id', '=', 'machines.id')
-            ->select('preventive_maintenances.*', 'machines.plant', 'machines.op_no', 'machines.machine_no', 'machines.machine_name', 'machines.process', 'machines.mfg_date', 'machines.shop')
+            ->select('preventive_maintenances.*', 'machines.plant', 'machines.op_no', 'machines.machine_no', 'machines.machine_name', 'machines.process', 'preventive_maintenances.mfg_date', 'preventive_maintenances.shop')
             ->where('machines.plant', $request->plant)
             ->where('machines.op_no', $request->op_no)
             ->first();
     } else {
         // Join PreventiveMaintenance with Machine to filter by machine_no
         $item = PreventiveMaintenance::join('machines', 'preventive_maintenances.machine_id', '=', 'machines.id')
-            ->select('preventive_maintenances.*', 'machines.plant', 'machines.op_no', 'machines.machine_no', 'machines.machine_name', 'machines.process', 'machines.mfg_date', 'machines.shop')
+            ->select('preventive_maintenances.*', 'machines.plant', 'machines.op_no', 'machines.machine_no', 'machines.machine_name', 'machines.process', 'preventive_maintenances.mfg_date', 'preventive_maintenances.shop')
             ->where('machines.machine_no', $request->no_mechine)
             ->first();
     }
@@ -392,7 +407,7 @@ if ($itemHead) {
     $itemHead->setAttribute('mfg_date', $itemHead->preventiveMaintenance->mfg_date ?? null);                   // From PreventiveMaintenance
     $itemHead->setAttribute('dept', $itemHead->preventiveMaintenance->dept ?? null);                           // From PreventiveMaintenance
     $itemHead->setAttribute('efc_date', $itemHead->preventiveMaintenance->effective_date ?? null);             // From PreventiveMaintenance
-    $itemHead->setAttribute('shop', $itemHead->preventiveMaintenance->machine->shop ?? null);                  // From machine
+    $itemHead->setAttribute('shop', $itemHead->preventiveMaintenance->shop ?? null);                  // From machine
     $itemHead->setAttribute('rev', $itemHead->preventiveMaintenance->revision ?? null);                        // From PreventiveMaintenance
 
     // No need to reassign already existing attributes like pic, remark, etc.

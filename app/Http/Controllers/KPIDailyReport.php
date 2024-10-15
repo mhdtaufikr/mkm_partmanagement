@@ -22,11 +22,13 @@ class KPIDailyReport extends Controller
 }
 
 
-    public function getData(Request $request)
+public function getData(Request $request)
 {
     if ($request->ajax()) {
+        // Modify the query to include a left join with the historical_problems table to check for children
         $query = DB::table('combined_problem_view')
             ->join('machines', 'combined_problem_view.id_machine', '=', 'machines.id')
+            ->leftJoin('historical_problems as children', 'combined_problem_view.id', '=', 'children.parent_id')  // Left join to check for children
             ->select([
                 'combined_problem_view.id',
                 'machines.op_no',
@@ -34,15 +36,32 @@ class KPIDailyReport extends Controller
                 'combined_problem_view.start_date',
                 'combined_problem_view.end_date',
                 'combined_problem_view.kpi',
-                'combined_problem_view.total_balance',
+                'combined_problem_view.balance',
                 'combined_problem_view.pic',
                 'combined_problem_view.latest_status',
-                'combined_problem_view.problem',  // Adding problem
-                'combined_problem_view.cause',    // Adding cause
-                'combined_problem_view.action',   // Adding action
+                'combined_problem_view.problem',
+                'combined_problem_view.cause',
+                'combined_problem_view.action',
+                'combined_problem_view.created_at',
+                'combined_problem_view.updated_at',
+                DB::raw('COUNT(children.id) as has_children')  // Check if it has children
+            ])
+            ->groupBy(
+                'combined_problem_view.id',
+                'machines.op_no',
+                'machines.machine_name',
+                'combined_problem_view.start_date',
+                'combined_problem_view.end_date',
+                'combined_problem_view.kpi',
+                'combined_problem_view.balance',
+                'combined_problem_view.pic',
+                'combined_problem_view.latest_status',
+                'combined_problem_view.problem',
+                'combined_problem_view.cause',
+                'combined_problem_view.action',
                 'combined_problem_view.created_at',
                 'combined_problem_view.updated_at'
-            ]);
+            );
 
         // Filter by month and year if selected
         if ($request->month) {
@@ -65,8 +84,8 @@ class KPIDailyReport extends Controller
             ->editColumn('end_date', function ($row) {
                 return \Carbon\Carbon::parse($row->end_date)->format('Y-m-d');
             })
-            ->editColumn('total_balance', function ($row) {
-                return number_format($row->total_balance, 2) ;
+            ->editColumn('balance', function ($row) {
+                return number_format($row->balance, 2);
             })
             ->editColumn('latest_status', function ($row) {
                 return ucfirst($row->latest_status);
@@ -76,11 +95,12 @@ class KPIDailyReport extends Controller
             })
             ->make(true);
     }
-
 }
+
 
 public function update(Request $request)
 {
+    dd($request->all());
     foreach ($request->rows as $row) {
         // Find the parent record first
         $parent = HistoricalProblem::find($row['id']);
@@ -142,6 +162,28 @@ public function update(Request $request)
 
     return redirect()->back()->with('status', 'Records updated successfully.');
 }
+public function getChildData($id)
+{
+    // Recursive function to get all descendants
+    $getAllChildren = function ($parentId) use (&$getAllChildren) {
+        $children = DB::table('historical_problems')
+            ->where('parent_id', $parentId)
+            ->get();
+
+        foreach ($children as $child) {
+            $child->children = $getAllChildren($child->id); // Recursively get the children's children
+        }
+
+        return $children;
+    };
+
+    // Start by fetching all descendants of the given parent ID
+    $childData = $getAllChildren($id);
+
+    return response()->json($childData);
+}
+
+
 
 
 }

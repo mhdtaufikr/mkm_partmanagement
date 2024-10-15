@@ -106,7 +106,7 @@
                                                     <div class="col-md-2 mb-2">
                                                         <div class="form-group">
                                                             <label for="shop"><strong>Shop</strong></label>
-                                                            <input type="text" class="form-control" id="shop" name="shop" value="{{$itemHead->preventiveMaintenance->machine->shop}}" readonly>
+                                                            <input type="text" class="form-control" id="shop" name="shop" value="{{$itemHead->preventiveMaintenance->shop}}" readonly>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-2 mb-2">

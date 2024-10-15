@@ -179,6 +179,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/kpi/daily', [KPIDailyReport::class, 'index']);
     Route::get('kpi/daily/data', [KPIDailyReport::class, 'getData'])->name('kpi.daily.data');
     Route::post('kpi/daily/data/update', [KPIDailyReport::class, 'update'])->name('kpi.daily.data.update');
+    Route::get('kpi/daily/data/child/{id}', [KPIDailyReport::class, 'getChildData']);
 
 
 

@@ -79,9 +79,11 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
+                                            <th>Flag</th>
+                                            <th>Status</th>
                                             <th>Type</th>
                                             <th>Date</th>
-                                            <th>OP No. (Machine Name)</th>
+                                            <th>OP No.</th>
                                             <th>Line</th>
                                             <th>Shift</th>
                                             <th>Shop</th>
@@ -92,8 +94,7 @@
                                             <th>Balance</th>
                                             <th>PIC</th>
                                             <th>Remarks</th>
-                                            <th>Status</th>
-                                            <th>Flag</th>
+
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -114,7 +115,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modal-detail-label">Detail of Historical Problem</h5>
+
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="modal-body-content">
@@ -248,7 +249,7 @@ $(document).ready(function() {
     var table = $("#tablehistory").DataTable({
         "processing": true,
         "serverSide": true,
-        "responsive": true,
+        "responsive": false,
         "autoWidth": false,
         "ajax": {
             "url": "{{ route('summary.data') }}",
@@ -258,25 +259,7 @@ $(document).ready(function() {
         },
         "columns": [
             { "data": "DT_RowIndex", "name": "DT_RowIndex", "orderable": false, "searchable": false },
-            { "data": "type", "name": "type" },
-            { "data": "date", "name": "date" },
-            { "data": "op_no", "name": "op_no" },
-            { "data": "line", "name": "line" },
-            { "data": "shift", "name": "shift" },
-            { "data": "shop", "name": "shop" },
-            { "data": "problem", "name": "problem", "render": function(data, type, row) {
-                return data.length > 8 ? data.substring(0, 8) + '...' : data;
-            }},
-            { "data": "cause", "name": "cause", "render": function(data, type, row) {
-                return data.length > 8 ? data.substring(0, 8) + '...' : data;
-            }},
-            { "data": "start_time", "name": "start_time" },
-            { "data": "finish_time", "name": "finish_time" },
-            { "data": "balance", "name": "balance" },
-            { "data": "pic", "name": "pic" },
-            { "data": "remarks", "name": "remarks", "render": function(data, type, row) {
-                return data.length > 8 ? data.substring(0, 8) + '...' : data;
-            }},
+            { "data": "flag", "name": "flag", "orderable": false, "searchable": false },
             { "data": "status", "name": "status", "render": function(data, type, row) {
                 let icon = '';
                 switch (data) {
@@ -294,7 +277,38 @@ $(document).ready(function() {
                 }
                 return icon;
             }},
-            { "data": "flag", "name": "flag", "orderable": false, "searchable": false },
+            { "data": "type", "name": "type" },
+            { "data": "date", "name": "date" },
+            { "data": "op_no", "name": "op_no" },
+            { "data": "line", "name": "line" },
+            { "data": "shift", "name": "shift" },
+            { "data": "shop", "name": "shop" },
+            { "data": "problem", "name": "problem", "render": function(data, type, row) {
+               if (data && data.length) { // Check if data exists and has a length property
+            return data.length > 8 ? data.substring(0, 8) + '...' : data;
+        } else {
+            return ''; // Return an empty string if data is null or undefined
+        }
+            }},
+            { "data": "cause", "name": "cause", "render": function(data, type, row) {
+               if (data && data.length) { // Check if data exists and has a length property
+            return data.length > 8 ? data.substring(0, 8) + '...' : data;
+        } else {
+            return ''; // Return an empty string if data is null or undefined
+        }
+            }},
+            { "data": "start_time", "name": "start_time" },
+            { "data": "finish_time", "name": "finish_time" },
+            { "data": "balance", "name": "balance" },
+            { "data": "pic", "name": "pic" },
+            { "data": "remarks", "name": "remarks", "render": function(data, type, row) {
+               if (data && data.length) { // Check if data exists and has a length property
+            return data.length > 8 ? data.substring(0, 8) + '...' : data;
+        } else {
+            return ''; // Return an empty string if data is null or undefined
+        }
+            }},
+
             { "data": "action", "name": "action", "orderable": false, "searchable": false }
         ],
         "drawCallback": function(settings) {

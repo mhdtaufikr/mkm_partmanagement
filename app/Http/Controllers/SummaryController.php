@@ -83,7 +83,7 @@ foreach ($historicalProblems as $problem) {
                 'type' => 'Preventive Maintenance',
                 'data' => $pm,
                 'Category' => 'Preventive Maintenance',
-                'status' => $pm->status, // Get status from checksheet_form_heads table
+                'status' => $pm->pm_status, // Get status from checksheet_form_heads table
                 'status_logs' => ChecksheetStatusLog::where('checksheet_header_id', $pm->id)->orderBy('change_date', 'desc')->get(),
                 'flag' => false,
                 'balance' => false,
@@ -132,7 +132,7 @@ foreach ($historicalProblems as $problem) {
                 'DT_RowIndex' => $key + 1 + $request->start,
                 'type' => $item->Category,
                 'date' => date('d/m/Y', strtotime($item->date)), // Display the correct date format
-                'op_no' => "{$item->op_no} ({$item->data->machine_name})",
+                'op_no' => "{$item->op_no} ",
                 'line' => $item->line,
                 'shift' => $item->data->shift ?? '-',
                 'shop' => $item->data->shop,

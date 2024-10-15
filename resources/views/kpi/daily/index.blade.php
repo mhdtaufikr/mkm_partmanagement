@@ -78,10 +78,10 @@
                                             <table id="tablehistory" class="table table-bordered table-striped">
                                                 <thead>
                                                     <tr>
+                                                        <th></th> <!-- New column for + button -->
                                                         <th>No</th>
                                                         <th>Machine</th>
-                                                        <th>Start Date</th>
-                                                        <th>End Date</th>
+                                                        <th>Date</th>
                                                         <th>KPI</th>
                                                         <th>Total Balance</th>
                                                         <th>PIC</th>
@@ -129,6 +129,19 @@
             },
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
             columns: [
+                {
+                    className: 'details-control',
+                    orderable: false,
+                    data: null,
+                    render: function (data, type, row) {
+                        // Show + button only if there are children
+                        if (row.has_children > 0) {
+                            return '<button type="button" class="btn btn-sm btn-info">+</button>';
+                        } else {
+                            return '';  // No button if no children
+                        }
+                    }
+                },
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'id_machine', name: 'id_machine' },
                 {
@@ -142,13 +155,6 @@
                     }
                 },
                 {
-                    data: "end_date",
-                    name: "end_date",
-                    render: function(data, type, row, meta) {
-                        return `<input type="date" name="rows[${meta.row}][end_date]" value="${data}" class="form-control">`;
-                    }
-                },
-                {
                     data: 'kpi',
                     name: 'kpi',
                     render: function (data, type, row, meta) {
@@ -156,10 +162,10 @@
                     }
                 },
                 {
-                    data: 'total_balance',
-                    name: 'total_balance',
+                    data: 'balance',
+                    name: 'balance',
                     render: function (data, type, row, meta) {
-                        return `<input type="text" name="rows[${meta.row}][total_balance]" value="${data}" class="form-control">`;
+                        return `<input type="text" name="rows[${meta.row}][balance]" value="${data}" class="form-control">`;
                     }
                 },
                 { data: 'pic', name: 'pic' },
@@ -194,7 +200,68 @@
         $('#filter-month, #filter-year, #filter-report').change(function() {
             table.draw();
         });
+
+        // Handle row expansion (+ button)
+        $('#tablehistory tbody').on('click', 'td.details-control button', function () {
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+
+            if (row.child.isShown()) {
+                // Close the row if already open
+                row.child.hide();
+                $(this).text('+');
+            } else {
+                // Open the row and load child data
+                $(this).text('-');
+                var id = row.data().id;
+                $.ajax({
+                    url: `/kpi/daily/data/child/${id}`, // Create an endpoint for fetching child data
+                    method: 'GET',
+                    success: function(data) {
+                        // Inject child rows dynamically
+                        row.child(formatChildRow(data)).show();
+                    }
+                });
+            }
+        });
+
+        // Function to format child rows in a single table
+        function formatChildRow(children) {
+    let childRows = '<div class="child-rows-wrapper">';
+    childRows += '<table class="table table-bordered">';
+    childRows += '<thead><tr><th>KPI</th><th>Balance</th><th>Date</th><th>Problem</th><th>Cause</th><th>Action</th></tr></thead>';
+    childRows += '<tbody>';
+
+    // Recursive function to render child rows
+    function renderChildRows(children) {
+        children.forEach(function(item) {
+            childRows += `<tr>
+                            <td>
+                                <input type="checkbox" name="rows[${item.id}][kpi]" value="A" ${item.kpi == 'A' ? 'checked' : ''}> KPI
+                                <input type="hidden" name="rows[${item.id}][id]" value="${item.id}">
+                            </td>
+                            <td><input type="text" name="rows[${item.id}][balance]" value="${item.balance}" class="form-control"></td>
+                            <td><input type="date" name="rows[${item.id}][date]" value="${item.date}" class="form-control"></td>
+                            <td><p>${item.problem}</p></td>
+                            <td><p>${item.cause}</p></td>
+                            <td><p>${item.action}</p></td>
+                        </tr>`;
+
+            if (item.children && item.children.length > 0) {
+                renderChildRows(item.children);
+            }
+        });
+    }
+
+    renderChildRows(children);
+
+    childRows += '</tbody></table>';
+    childRows += '</div>';
+    return childRows;
+}
+
     });
-    </script>
+</script>
+
 
 @endsection
