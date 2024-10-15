@@ -30,16 +30,21 @@ class HistoryController extends Controller
 
     if ($request->ajax()) {
         $query = HistoricalProblem::with(['spareParts.part', 'machine', 'children'])
-            ->join('machines', 'historical_problems.id_machine', '=', 'machines.id')
-            ->select('historical_problems.*', 'machines.plant', 'machines.line')
-            ->where('machines.plant',$userPlant)
-            ->orderBy('date', 'desc')
-            ->orderBy('start_time', 'desc');
+        ->join('machines', 'historical_problems.id_machine', '=', 'machines.id')
+        ->select('historical_problems.*', 'machines.plant', 'machines.line')
+        ->orderBy('date', 'desc')
+        ->orderBy('start_time', 'desc');
 
-        // Filter by line if provided
-        if ($request->line) {
-            $query->where('machines.line', $request->line);
-        }
+    // Only apply the plant filter if the user's plant is not 'all'
+    if ($userPlant !== 'All') {
+        $query->where('machines.plant', $userPlant);
+    }
+
+    // Filter by line if provided
+    if ($request->line) {
+        $query->where('machines.line', $request->line);
+    }
+
 
         // Process data for DataTables
         return DataTables::of($query)
