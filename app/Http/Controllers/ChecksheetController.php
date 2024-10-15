@@ -112,46 +112,44 @@ class ChecksheetController extends Controller
                 $item->logStatus = null; // No logStatus if status_logs is empty
             }
         }
-
-        return view('checksheet.index', compact('types', 'plants', 'shops', 'opNos', 'machines', 'items', 'logStatus'));
+        return view('checksheet.index', compact('userPlant','userType','types', 'plants', 'shops', 'opNos', 'machines', 'items', 'logStatus'));
     }
 
 
 
 
 
-public function getPlants(Request $request)
-{
-    $plants = PmFilterView::where('type', $request->input('type'))
-        ->select('plant')
-        ->distinct()
-        ->get();
+    public function getPlants(Request $request)
+    {
+        $plants = PmFilterView::where(DB::raw('UPPER(type)'), strtoupper($request->input('type')))
+            ->select(DB::raw('DISTINCT UPPER(plant) AS plant')) // Select distinct and ensure uppercase
+            ->get();
 
-    return response()->json($plants);
-}
+        return response()->json($plants);
+    }
 
-public function getShops(Request $request)
-{
-    $shops = PmFilterView::where('type', $request->input('type'))
-        ->where('plant', $request->input('plant'))
-        ->select('line')
-        ->distinct()
-        ->get();
+    public function getShops(Request $request)
+    {
+        $shops = PmFilterView::where(DB::raw('UPPER(type)'), strtoupper($request->input('type')))
+            ->where(DB::raw('UPPER(plant)'), strtoupper($request->input('plant')))
+            ->select(DB::raw('DISTINCT UPPER(line) AS line')) // Ensure uppercase for line
+            ->get();
 
-    return response()->json($shops);
-}
+        return response()->json($shops);
+    }
 
-public function getOpNos(Request $request)
-{
-    $opNos = PmFilterView::where('type', $request->input('type'))
-        ->where('plant', $request->input('plant'))
-        ->where('line', $request->input('shop'))
-        ->select('op_no', 'machine_name')
-        ->distinct()
-        ->get();
+    public function getOpNos(Request $request)
+    {
+        $opNos = PmFilterView::where(DB::raw('UPPER(type)'), strtoupper($request->input('type')))
+            ->where(DB::raw('UPPER(plant)'), strtoupper($request->input('plant')))
+            ->where(DB::raw('UPPER(line)'), strtoupper($request->input('shop')))
+            ->select('op_no', 'machine_name')
+            ->distinct()
+            ->get();
 
-    return response()->json($opNos);
-}
+        return response()->json($opNos);
+    }
+
 
 public function getMachineNames(Request $request)
 {
