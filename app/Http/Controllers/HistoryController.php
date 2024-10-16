@@ -373,7 +373,6 @@ public function storehp(Request $request)
 {
     // Begin a database transaction
     DB::beginTransaction();
-dd($request->all());
     try {
         // Validate the request data
         $validatedData = $request->validate([
