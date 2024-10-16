@@ -172,19 +172,33 @@ class HistoryController extends Controller
         $userPlant = auth()->user()->plant;
         try {
             \Log::info('Fetching op_no for line: ' . $line);
+
+            // Start building the query
             $machines = Machine::where('line', $line)
-            ->where('plant',$userPlant)
-            ->select('id', 'op_no','machine_name')->get();
+                ->select('id', 'op_no', 'machine_name');
+
+            // Check if the userPlant is not 'All', then apply the plant filter
+            if ($userPlant !== 'All') {
+                $machines->where('plant', $userPlant);
+            }
+
+            // Fetch the results
+            $machines = $machines->get();
+
             \Log::info('Machines found: ' . $machines->count());
+
             if ($machines->isEmpty()) {
                 return response()->json(['error' => 'No machines found for the specified line'], 404);
             }
+
             return response()->json($machines);
+
         } catch (\Exception $e) {
             \Log::error('Error fetching op_no: ' . $e->getMessage());
             return response()->json(['error' => 'Internal Server Error'], 500);
         }
     }
+
 
 
  // HistoryController.php

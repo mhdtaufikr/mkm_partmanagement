@@ -28,8 +28,8 @@
                                     <div class="row mb-4">
                                         <div class="col-md-3">
                                             <label for="typeSelect">Select Type</label>
-                                            <select name="type" id="typeSelect" class="form-control" {{ $userType != 'all' ? 'readonly disabled' : '' }}>
-                                                @if($userType != 'all')
+                                            <select name="type" id="typeSelect" class="form-control" {{ $userType != 'All' ? 'readonly disabled' : '' }}>
+                                                @if($userType != 'All')
                                                     <option value="{{ $userType }}" selected>{{ $userType }}</option>
                                                 @else
                                                     <option value="">Select Type</option>
@@ -41,12 +41,12 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label for="plantSelect">Select Plant</label>
-                                            <select name="plant" id="plantSelect" class="form-control" {{ $userPlant != 'all' ? 'readonly disabled' : '' }}>
-                                                @if($userPlant != 'all')
+                                            <select name="plant" id="plantSelect" class="form-control" {{ $userPlant != 'All' ? 'readonly disabled' : '' }}>
+                                                @if($userPlant != 'All')
                                                     <option value="{{ $userPlant }}" selected>{{ $userPlant }}</option>
                                                 @else
                                                     <option value="">Select Plant</option>
-                                                    <!-- Plants will be populated by JavaScript if plant is 'all' -->
+                                                    <!-- Plants will be populated by JavaScript if plant is 'All' -->
                                                 @endif
                                             </select>
                                         </div>
@@ -69,20 +69,20 @@
                                             var userType = "{{ $userType }}"; // Pre-filled user type from profile
                                             var userPlant = "{{ $userPlant }}"; // Pre-filled user plant from profile
 
-                                            // Pre-fill the type and plant dropdowns if userType and userPlant are not 'all'
-                                            if (userType !== 'all') {
+                                            // Pre-fill the type and plant dropdowns if userType and userPlant are not 'All'
+                                            if (userType !== 'All') {
                                                 $('#typeSelect').val(userType).prop('disabled', true); // Pre-fill and disable the type dropdown
                                             }
 
-                                            if (userPlant !== 'all') {
+                                            if (userPlant !== 'All') {
                                                 $('#plantSelect').val(userPlant).prop('disabled', true); // Pre-fill and disable the plant dropdown
 
                                                 // Now, manually trigger the AJAX call to fetch the lines
                                                 fetchLines(userType, userPlant);
                                             }
 
-                                            // If userType and userPlant are 'all', allow the user to select them
-                                            if (userType === 'all') {
+                                            // If userType and userPlant are 'All', allow the user to select them
+                                            if (userType === 'All') {
                                                 $('#typeSelect').change(function() {
                                                     var type = $(this).val();
                                                     $.ajax({
@@ -153,11 +153,12 @@
                                             }
 
                                             // Manually trigger the change event to load the line if the plant is pre-filled
-                                            if (userPlant !== 'all') {
+                                            if (userPlant !== 'All') {
                                                 fetchLines(userType, userPlant);
                                             }
                                         });
                                     </script>
+
 
 
                                     <div class="d-flex justify-content-center">
