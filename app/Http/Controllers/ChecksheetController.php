@@ -69,13 +69,13 @@ class ChecksheetController extends Controller
         ->orderBy('checksheet_form_heads.created_at', 'desc');
 
 
-        // Apply plant filter if the user's plant is not 'all'
-        if ($userPlant != 'all') {
+        // Apply plant filter if the user's plant is not 'All'
+        if ($userPlant != 'All') {
             $query->where('machines.plant', $userPlant);
         }
 
-        // Apply type filter if the user's type is not 'all'
-        if ($userType != 'all') {
+        // Apply type filter if the user's type is not 'All'
+        if ($userType != 'All') {
             $query->where('preventive_maintenances.type', $userType);
         }
 
