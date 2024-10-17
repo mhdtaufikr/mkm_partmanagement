@@ -9,11 +9,19 @@
                 <i class="fas fa-info me-2"></i>Detail
             </a>
         </li>
-        <li>
-            <button title="Delete" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-delete{{ $data->id }}">
-                <i class="fas fa-trash-alt me-2"></i>Delete
-            </button>
-        </li>
+        @php
+        $userRole = auth()->user()->role; // Assuming you have 'role' field in the user model
+    @endphp
+
+    @if($userRole == 'Leader' || $userRole == 'IT')
+    <li>
+        <button title="Delete" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-delete{{ $data->id }}">
+            <i class="fas fa-trash-alt me-2"></i>Delete
+        </button>
+    </li>
+    @endif
+
+
         @if($data->status == 1)
             <li>
                 <a href="checksheet/checkher/{{ encrypt($data->id) }}" class="dropdown-item" title="Check">
@@ -71,4 +79,26 @@
         </li>
         @endif
     </ul>
+</div>
+ <!-- Delete Confirmation Modal -->
+ <div class="modal fade" id="modal-delete{{ $data->id }}" tabindex="-1" aria-labelledby="modalDeleteLabel{{ $data->id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDeleteLabel{{ $data->id }}">Confirm Deletion {{$data->op_name}} - {{$data->line}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this record {{$data->op_name}} - {{$data->line}}?
+            </div>
+            <div class="modal-footer">
+                <form action="{{ route('checksheet.delete', $data->id) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>

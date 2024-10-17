@@ -147,6 +147,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/checksheet/scan', [ChecksheetController::class, 'checksheetScan']);
     Route::post('/checksheet/store', [ChecksheetController::class, 'storeHeadForm'])->name('checksheet.store');
     Route::get('/checksheet/fill/{id}', [ChecksheetController::class, 'checksheetfill'])->name('fillForm');
+    Route::delete('/checksheet/{id}', [ChecksheetController::class, 'destroy'])->name('checksheet.delete');
 
     Route::post('/checksheet/store/detail', [ChecksheetController::class, 'storeDetailForm']);
     Route::get('/checksheet/detail/{id}', [ChecksheetController::class, 'checksheetDetail'])->name('checksheet.detail');

@@ -76,6 +76,7 @@
                                                                    <label for="shift"><strong style="color: rgba(0, 103, 127, 1)">Shift</strong> </label>
                                                                     <select class="form-control" id="shift" name="shift" required>
                                                                         <option value="Day">Day</option>
+                                                                        <option value="Afternoon">Afternoon</option>
                                                                         <option value="Night">Night</option>
                                                                     </select>
                                                                 </div>

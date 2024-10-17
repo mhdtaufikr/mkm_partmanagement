@@ -54,6 +54,9 @@
                                                                                     <option value="Electric">Electric</option>
                                                                                     <option value="Mechanic">Mechanic</option>
                                                                                     <option value="Power House">Power House</option>
+                                                                                @elseif($user->type == 'ME')
+                                                                                    <option value="Electric">Electric</option>
+                                                                                    <option value="Mechanic">Mechanic</option>
                                                                                 @else
                                                                                     <!-- If user has a specific type, only show that type -->
                                                                                     <option value="{{ $user->type }}" selected >{{ $user->type }}</option>

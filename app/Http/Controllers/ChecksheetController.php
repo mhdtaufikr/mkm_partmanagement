@@ -15,6 +15,7 @@ use App\Models\ChecksheetStatusLog;
 use App\Models\User;
 use Illuminate\Support\Str;
 use App\Models\ChecksheetJourneyLog;
+use App\Models\PmScheduleDetail;
 use App\Models\HistoricalProblem;
 use App\Models\PreventiveMaintenanceView;
 use App\Models\PreventiveMaintenance;
@@ -74,9 +75,15 @@ class ChecksheetController extends Controller
             $query->where('machines.plant', $userPlant);
         }
 
-        // Apply type filter if the user's type is not 'All'
+        // Apply type filter based on user's type
         if ($userType != 'All') {
-            $query->where('preventive_maintenances.type', $userType);
+            if ($userType == 'ME') {
+                // If user is ME, include both Mechanic and Electric
+                $query->whereIn('preventive_maintenances.type', ['Mechanic', 'Electric']);
+            } else {
+                // Otherwise, apply the userType directly
+                $query->where('preventive_maintenances.type', $userType);
+            }
         }
 
         // Apply role-based filters
@@ -114,6 +121,31 @@ class ChecksheetController extends Controller
         }
         return view('checksheet.index', compact('userPlant','userType','types', 'plants', 'shops', 'opNos', 'machines', 'items', 'logStatus'));
     }
+
+    public function destroy($id)
+{
+    try {
+        // Step 1: Update related records in pm_schedule_details
+        PmScheduleDetail::where('checksheet_form_heads_id', $id)
+            ->update([
+                'status' => 'Scheduled',
+                'actual_date' => null,
+                'checksheet_form_heads_id' => null
+            ]);
+
+        // Step 2: Delete related records in other tables
+        ChecksheetFormDetail::where('id_header', $id)->delete();
+        ChecksheetJourneyLog::where('checksheet_id', $id)->delete();
+        ChecksheetStatusLog::where('checksheet_header_id', $id)->delete();
+
+        // Step 3: Finally, delete the checksheet_form_head record
+        ChecksheetFormHead::findOrFail($id)->delete();
+
+        return redirect()->back()->with('status', 'Record deleted successfully.');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('failed', 'Failed to delete record: ' . $e->getMessage());
+    }
+}
 
 
 

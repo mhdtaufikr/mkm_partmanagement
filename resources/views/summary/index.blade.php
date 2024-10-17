@@ -227,11 +227,14 @@
                                 <td>{{ $report->actual_date ?? '--/--/----' }}</td> <!-- Show actual date if exists -->
                                 <td>{{ $report->preventiveMaintenance->machine->op_no ?? 'N/A' }}</td>
                                 <td>{{ $report->preventiveMaintenance->machine->machine_name ?? 'N/A' }}</td>
-
                                 <td>
                                     <!-- Form for selecting the report -->
-                                    <form action="{{ url('form/updatePM/' . encrypt($report->id)) }}" method="GET">
+                                    <form action="{{ url('checksheet/change-status')}}" method="POST">
                                         @csrf
+                                        <input hidden name="id_pm" value="{{ $report->id }}">
+                                        <input hidden name="checksheet_id" value="{{ $report->preventive_maintenances_id }}">
+                                        <input value="{{ date('Y-m-d') }}" type="date" class="form-control" id="date" name="date" hidden >
+                                        <input value="Day" type="text" class="form-control" id="shift" name="shift" hidden >
                                         <button type="submit" class="btn btn-primary">Select</button>
                                     </form>
                                 </td>

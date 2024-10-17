@@ -15,6 +15,7 @@
                         <label for="shift" class="form-label">Shift</label>
                         <select class="form-select" id="shift" name="shift" required>
                             <option value="Day">Day</option>
+                            <option value="Afternoon">Afternoon</option>
                             <option value="Night">Night</option>
                         </select>
                     </div>

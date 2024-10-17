@@ -28,9 +28,13 @@
                                     <div class="row mb-4">
                                         <div class="col-md-3">
                                             <label for="typeSelect">Select Type</label>
-                                            <select name="type" id="typeSelect" class="form-control" {{ $userType != 'All' ? 'readonly disabled' : '' }}>
-                                                @if($userType != 'All')
+                                            <select name="type" id="typeSelect" class="form-control">
+                                                @if($userType != 'All' && $userType != 'ME')
                                                     <option value="{{ $userType }}" selected>{{ $userType }}</option>
+                                                @elseif($userType == 'ME')
+                                                    <option value="">Select Type</option>
+                                                    <option value="Mechanic">Mechanic</option>
+                                                    <option value="Electric">Electric</option>
                                                 @else
                                                     <option value="">Select Type</option>
                                                     @foreach($types as $type)
@@ -41,15 +45,23 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label for="plantSelect">Select Plant</label>
-                                            <select name="plant" id="plantSelect" class="form-control" {{ $userPlant != 'All' ? 'readonly disabled' : '' }}>
+                                            <select name="plant" id="plantSelect" class="form-control" {{ $userPlant != 'All' ? 'readonly' : '' }}>
                                                 @if($userPlant != 'All')
                                                     <option value="{{ $userPlant }}" selected>{{ $userPlant }}</option>
                                                 @else
                                                     <option value="">Select Plant</option>
-                                                    <!-- Plants will be populated by JavaScript if plant is 'All' -->
+                                                    @foreach($plants as $plant)
+                                                        <option value="{{ $plant->plant }}">{{ $plant->plant }}</option>
+                                                    @endforeach
                                                 @endif
                                             </select>
+
+                                            @if($userPlant != 'All')
+                                                <!-- Add hidden field to submit the plant value -->
+                                                <input type="hidden" name="plant" value="{{ $userPlant }}">
+                                            @endif
                                         </div>
+
                                         <div class="col-md-3">
                                             <label for="shopSelect">Select Line</label>
                                             <select name="shop" id="shopSelect" class="form-control">
@@ -67,62 +79,65 @@
                                     <script>
                                         $(document).ready(function() {
                                             var userType = "{{ $userType }}"; // Pre-filled user type from profile
-                                            var userPlant = "{{ $userPlant }}"; // Pre-filled user plant from profile
-
-                                            // Pre-fill the type and plant dropdowns if userType and userPlant are not 'All'
-                                            if (userType !== 'All') {
-                                                $('#typeSelect').val(userType).prop('disabled', true); // Pre-fill and disable the type dropdown
-                                            }
-
+                                            var userPlant = "{{ $userPlant }}";
                                             if (userPlant !== 'All') {
-                                                $('#plantSelect').val(userPlant).prop('disabled', true); // Pre-fill and disable the plant dropdown
-
-                                                // Now, manually trigger the AJAX call to fetch the lines
-                                                fetchLines(userType, userPlant);
-                                            }
-
-                                            // If userType and userPlant are 'All', allow the user to select them
-                                            if (userType === 'All') {
-                                                $('#typeSelect').change(function() {
-                                                    var type = $(this).val();
-                                                    $.ajax({
-                                                        url: '{{ route('get.plants') }}',
-                                                        method: 'GET',
-                                                        data: { type: type },
-                                                        success: function(data) {
-                                                            $('#plantSelect').empty().append('<option value="">Select Plant</option>');
-                                                            $.each(data, function(index, value) {
-                                                                $('#plantSelect').append('<option value="'+value.plant+'">'+value.plant+'</option>');
-                                                            });
-                                                        },
-                                                        error: function(xhr, status, error) {
-                                                            console.error('Error fetching plants:', error);
-                                                        }
-                                                    });
+                                                $('#plantSelect').prop('readonly', true).on('focus', function() {
+                                                    $(this).prop('readonly', true); // Prevent changing the select field
                                                 });
                                             }
+
+
+                                            // Enable all dropdowns for users with All type and All plant
+                                            if (userType === 'All' && userPlant === 'All') {
+                                                // Enable the type and plant dropdowns to allow free selection
+                                                $('#typeSelect').prop('disabled', false);
+                                                $('#plantSelect').prop('disabled', false);
+                                            } else {
+                                                // If userType is specific and not ME, disable type select
+                                                if (userType !== 'All' && userType !== 'ME') {
+                                                    $('#typeSelect').val(userType).prop('disabled', true);
+                                                }
+
+                                                if (userPlant !== 'All') {
+                                                    $('#plantSelect').val(userPlant).prop('disabled', true);
+                                                    fetchLines(userType, userPlant); // Fetch lines automatically when plant is pre-filled
+                                                }
+                                            }
+
+                                            // Fetch lines when the type or plant changes (for users with All type and plant)
+                                            $('#typeSelect').change(function() {
+                                                var type = $(this).val();
+                                                var plant = $('#plantSelect').val();
+                                                if (type && plant) {
+                                                    fetchLines(type, plant);
+                                                }
+                                            });
 
                                             $('#plantSelect').change(function() {
                                                 var type = $('#typeSelect').val();
                                                 var plant = $(this).val();
-                                                fetchLines(type, plant); // Fetch lines based on type and plant
+                                                if (type && plant) {
+                                                    fetchLines(type, plant);
+                                                }
                                             });
 
+                                            // Fetch OP Nos when the line is selected
                                             $('#shopSelect').change(function() {
                                                 var type = $('#typeSelect').val();
                                                 var plant = $('#plantSelect').val();
                                                 var shop = $(this).val();
-                                                fetchOpNos(type, plant, shop); // Fetch OP Nos when the line is selected
+                                                if (shop) {
+                                                    fetchOpNos(type, plant, shop);
+                                                }
                                             });
 
-                                            // Manually trigger the line fetch if the plant and type are pre-filled
+                                            // Fetch lines based on type and plant
                                             function fetchLines(type, plant) {
                                                 $.ajax({
                                                     url: '{{ route('get.shops') }}',
                                                     method: 'GET',
                                                     data: { type: type, plant: plant },
                                                     success: function(data) {
-                                                        console.log('Line Data:', data); // Debugging the response for lines
                                                         $('#shopSelect').empty().append('<option value="">Select Line</option>');
                                                         $.each(data, function(index, value) {
                                                             $('#shopSelect').append('<option value="'+value.line+'">'+value.line+'</option>');
@@ -134,7 +149,7 @@
                                                 });
                                             }
 
-                                            // Function to fetch OP Nos
+                                            // Fetch OP Nos
                                             function fetchOpNos(type, plant, shop) {
                                                 $.ajax({
                                                     url: '{{ route('get.opNos') }}',
@@ -151,13 +166,9 @@
                                                     }
                                                 });
                                             }
-
-                                            // Manually trigger the change event to load the line if the plant is pre-filled
-                                            if (userPlant !== 'All') {
-                                                fetchLines(userType, userPlant);
-                                            }
                                         });
                                     </script>
+
 
 
 
