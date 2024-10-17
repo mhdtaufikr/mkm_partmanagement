@@ -57,8 +57,9 @@
                                                             <select class="form-control" id="status" name="status" required>
                                                                 <option value="">Select Status</option>
                                                                 <option style="color: green" value="OK" data-icon="&#10004;">✓ OK</option>
-                                                                <option style="color: red" value="Not Good" data-icon="&#10060;">X Not Good</option>
                                                                 <option style="color: #FCCD2A;" value="Temporary" data-icon="&#9651;">△ Temporary</option>
+                                                                <option style="color: red" value="Not Good" data-icon="&#10060;">X Not Good</option>
+
                                                             </select>
                                                         </div>
 

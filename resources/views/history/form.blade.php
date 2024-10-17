@@ -155,7 +155,7 @@
                                                                                 <div class="form-group">
                                                                                     <label for="category"><strong style="color: rgba(0, 103, 127, 1)">Class Trouble</strong></label>
                                                                                     <select name="category" id="category" class="form-control" required>
-                                                                                        <option value="">- Please Select Class Trouble -</option>
+                                                                                        <option value="-">- Please Select Class Trouble -</option>
                                                                                         @foreach ($dropdown as $Problem)
                                                                                             <option value="{{ $Problem->name_value }}">{{ $Problem->name_value }}</option>
                                                                                         @endforeach
@@ -241,8 +241,9 @@
                                                                             <select class="form-control" id="status" name="status" required>
                                                                                 <option value="">Select Status</option>
                                                                                 <option style="color: green" value="OK" data-icon="&#10004;">✓ OK</option>
-                                                                                <option style="color: red" value="Not Good" data-icon="&#10060;">X Not Good</option>
                                                                                 <option style="color: #FCCD2A;" value="Temporary" data-icon="&#9651;">△ Temporary</option>
+                                                                                <option style="color: red" value="Not Good" data-icon="&#10060;">X Not Good</option>
+
                                                                             </select>
                                                                         </div>
                                                                         <!-- Placeholder for the selected icon -->

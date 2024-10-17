@@ -137,7 +137,7 @@
                                                                         <div class="form-group">
                                                                             <label for="category"><strong style="color: rgba(0, 103, 127, 1)">Class Trouble</strong></label>
                                                                             <select name="category" id="category" class="form-control" required>
-                                                                                <option value="">- Please Select Class Trouble -</option>
+                                                                                <option value="-">- Please Select Class Trouble -</option>
                                                                                 @foreach ($dropdown as $Problem)
                                                                                     <option value="{{ $Problem->name_value }}">{{ $Problem->name_value }}</option>
                                                                                 @endforeach
