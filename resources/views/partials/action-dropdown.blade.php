@@ -13,7 +13,7 @@
         $userRole = auth()->user()->role; // Assuming you have 'role' field in the user model
     @endphp
 
-    @if($userRole == 'Leader' || $userRole == 'IT')
+    @if($userRole == 'Admin' || $userRole == 'IT')
     <li>
         <button title="Delete" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-delete{{ $data->id }}">
             <i class="fas fa-trash-alt me-2"></i>Delete
