@@ -36,27 +36,30 @@
                     Part Info
                 </a>
 
-                <!-- Sidenav Menu Heading (Master) -->
-                <div class="sidenav-menu-heading">Dashboard</div>
+                @php
+                    $userRole = auth()->user()->role; // Assuming you have 'role' field in the user model
+                @endphp
 
-                <!-- Sidenav Accordion (Master Machine) -->
-                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapsekpiDailyReport" aria-expanded="false" aria-controls="collapsekpiDailyReport">
-                    <div class="nav-link-icon"><i class="far fa-chart-bar"></i></div>
-                    KPI
-                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
+                @if($userRole == 'Leader' || $userRole == 'IT')
+                    <!-- Sidenav Menu Heading (Master) -->
+                    <div class="sidenav-menu-heading">Dashboard</div>
 
-                <!-- Nested Navigation for Master Machine -->
-                <div class="collapse" id="collapsekpiDailyReport" data-bs-parent="#accordionSidenav">
-                    <nav class="sidenav-menu-nested nav">
+                    <!-- Sidenav Accordion (Master Machine) -->
+                    <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapsekpiDailyReport" aria-expanded="false" aria-controls="collapsekpiDailyReport">
+                        <div class="nav-link-icon"><i class="far fa-chart-bar"></i></div>
+                        KPI
+                        <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
 
+                    <!-- Nested Navigation for Master Machine -->
+                    <div class="collapse" id="collapsekpiDailyReport" data-bs-parent="#accordionSidenav">
+                        <nav class="sidenav-menu-nested nav">
                             <a class="nav-link" href="{{ url('/kpi/daily') }}">KPI Daily Report</a>
-
-
                             <a class="nav-link" href="{{ url('/mst/machine/part/stamping') }}">KPI PM</a>
+                        </nav>
+                    </div>
+                @endif
 
-                    </nav>
-                </div>
 
                 <!-- Sidenav Menu Heading (Master) -->
                 <div class="sidenav-menu-heading">Master</div>

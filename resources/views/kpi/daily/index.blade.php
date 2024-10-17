@@ -42,7 +42,7 @@
                                                         <i class="fas fa-check" style='font-size: 20px; color: green;'></i> OK
                                                     </div>
                                                 </div>
-                                                <div class="col-md-4">
+                                                <div class="col-md-3">
                                                     <label for="filter-month">Filter by Month:</label>
                                                     <select id="filter-month" class="form-control">
                                                         <option value="">Select Month</option>
@@ -52,7 +52,7 @@
                                                     </select>
                                                 </div>
 
-                                                <div class="col-md-4">
+                                                <div class="col-md-3">
                                                     <label for="filter-year">Filter by Year:</label>
                                                     <select id="filter-year" class="form-control">
                                                         <option value="">Select Year</option>
@@ -62,7 +62,7 @@
                                                     </select>
                                                 </div>
 
-                                                <div class="col-md-4">
+                                                <div class="col-md-3">
                                                     <label for="filter-report">Filter by Report:</label>
                                                     <select id="filter-report" class="form-control">
                                                         <option value="">Select Report</option>
@@ -71,6 +71,17 @@
                                                         @endforeach
                                                     </select>
                                                 </div>
+                                                <div class="col-md-3">
+                                                    <label for="filter-line">Filter by Line:</label>
+                                                    <select id="filter-line" class="form-control">
+                                                        <option value="">Select Line</option>
+                                                        <!-- You can dynamically load lines from the database here -->
+                                                        @foreach($lines as $line)
+                                                            <option value="{{ $line }}">{{ $line }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
                                             </div>
                                         </div>
 
@@ -124,6 +135,7 @@
                     d.month = $('#filter-month').val();
                     d.year = $('#filter-year').val();
                     d.report = $('#filter-report').val();
+                    d.line = $('#filter-line').val(); // Add line to the request data
                 }
             },
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
@@ -183,7 +195,7 @@
         });
 
         // Handle filter changes
-        $('#filter-month, #filter-year, #filter-report').change(function() {
+        $('#filter-month, #filter-year, #filter-report, #filter-line').change(function() {
             table.draw();
         });
     });
