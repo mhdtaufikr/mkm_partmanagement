@@ -69,9 +69,6 @@ Route::middleware(['auth'])->group(function () {
      Route::get('/part/info', [MstPartSAPController::class, 'partInfo'])->name('part.info');
 
 
-
-
-
     // Repair Parts
     Route::get('/repair-parts', [MstPartRepairController::class, 'repairPart'])->name('repairParts');
     Route::post('/repair-parts/store', [MstPartRepairController::class, 'store']);
@@ -79,6 +76,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/repair-parts/delete/{id}', [MstPartRepairController::class, 'destroy']);
     Route::get('/get-repair-stock/{partId}', [MstMachinePartController::class, 'getRepairStock']);
     Route::get('/mst/repair/part', [MstPartRepairController::class, 'repairPart']);
+
+
      // mstMachine Part
      Route::get('/mst/machine/part/{location?}', [MstMachinePartController::class, 'index'])->name('mst.machine.part');
     Route::get('/mst/machine/detail/{id}', [MstMachinePartController::class, 'detail']);
@@ -95,30 +94,29 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/spare-parts/{machineId}/update', [MstMachinePartController::class, 'update'])->name('spare-parts.update');
 
 
+    // Daily Report
     Route::get('/history', [HistoryController::class, 'index'])->name('history');
-     Route::post('/history/store', [HistoryController::class, 'store']);
-     Route::get('/history/detail/{id}', [HistoryController::class, 'showDetail']);
-     Route::post('/history/upload', [HistoryController::class, 'uploadBulk']);
-     Route::get('/history/template', [HistoryController::class, 'templateBulk']);
-
-    Route::get('/get-parts/{machineId}', [HistoryController::class, 'getParts']);
-
-    Route::get('/get-repair-locations/{partId}', [HistoryController::class, 'getRepairLocations']);
-    Route::get('/get-op-nos/{line}', [HistoryController::class, 'getOpNos'])->name('getOpNos');
+    Route::post('/history/store', [HistoryController::class, 'store']);
+    Route::get('/history/detail/{id}', [HistoryController::class, 'showDetail']);
+    Route::post('/history/upload', [HistoryController::class, 'uploadBulk']);
+    Route::get('/history/template', [HistoryController::class, 'templateBulk']);
     Route::get('/form', [HistoryController::class, 'form'])->name('form');
     Route::get('/form/update/{id}', [HistoryController::class, 'formUpdate'])->name('formUpdate');
-
-
-    Route::get('/get-repair-locations-for-part/{part_id}', [HistoryController::class, 'getRepairLocationsForPart']);
     Route::post('/historical-problems/store', [HistoryController::class, 'storehp'])->name('historical');
     Route::post('/historical-problems/store/status', [HistoryController::class, 'storehpStatus'])->name('historicalStatus');
     Route::get('/form/{no_machine}/{date}/{shift}/{id_pm}/{id_checksheet_head}', [HistoryController::class, 'formStatus'])->name('formStatus');
     Route::get('/fetch-parts', [HistoryController::class, 'fetchParts'])->name('fetch.parts');
     Route::get('/get-sap-quantity', [HistoryController::class, 'getSapQuantity'])->name('get.sap.quantity');
+    Route::get('/get-parts/{machineId}', [HistoryController::class, 'getParts']);
+    Route::get('/get-repair-locations/{partId}', [HistoryController::class, 'getRepairLocations']);
+    Route::get('/get-op-nos/{line}', [HistoryController::class, 'getOpNos'])->name('getOpNos');
+    Route::get('/get-repair-locations-for-part/{part_id}', [HistoryController::class, 'getRepairLocationsForPart']);
+    Route::get('/history/get-opno-line', [HistoryController::class, 'getOpNoWithLine'])->name('history.getOpNoWithLine');
+    Route::get('/history/get-dates-by-opno', [HistoryController::class, 'getDatesByOpNo'])->name('history.getDatesByOpNo');
+    Route::delete('/history/delete', [HistoryController::class, 'delete'])->name('history.delete');
 
 
     //Preventive Maintanance Master
-    //Master Mechine
     Route::get('/mst/preventive', [PreventiveController::class, 'index']);
     Route::post('/mst/preventive/store', [PreventiveController::class, 'store']);
     Route::get('/mst/preventive/detail/{id}', [PreventiveController::class, 'detail'])->name('machine.detail');

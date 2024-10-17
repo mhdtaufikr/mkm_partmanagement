@@ -30,21 +30,32 @@ class HistoryController extends Controller
 
     if ($request->ajax()) {
         $query = HistoricalProblem::with(['spareParts.part', 'machine', 'children'])
-        ->join('machines', 'historical_problems.id_machine', '=', 'machines.id')
-        ->select('historical_problems.*', 'machines.plant', 'machines.line')
-        ->orderBy('date', 'desc')
-        ->orderBy('start_time', 'desc');
+            ->join('machines', 'historical_problems.id_machine', '=', 'machines.id')
+            ->select('historical_problems.*', 'machines.plant', 'machines.line')
+            ->orderBy('date', 'desc')
+            ->orderBy('start_time', 'desc');
 
-    // Only apply the plant filter if the user's plant is not 'all'
-    if ($userPlant !== 'All') {
-        $query->where('machines.plant', $userPlant);
-    }
+        // Only apply the plant filter if the user's plant is not 'All'
+        if ($userPlant !== 'All') {
+            $query->where('machines.plant', $userPlant);
+        }
 
-    // Filter by line if provided
-    if ($request->line) {
-        $query->where('machines.line', $request->line);
-    }
+        // Apply the userType filter
+        if ($userType === 'Mechanic') {
+            $query->where('historical_problems.shop', 'Mechanic');
+        } elseif ($userType === 'Power House') {
+            $query->where('historical_problems.shop', 'Power House');
+        } elseif ($userType === 'Electric') {
+            $query->where('historical_problems.shop', 'Electric');
+        } elseif ($userType === 'ME') {
+            // Show both Mechanic and Electric if the type is ME
+            $query->whereIn('historical_problems.shop', ['Mechanic', 'Electric']);
+        }
 
+        // Filter by line if provided
+        if ($request->line) {
+            $query->where('machines.line', $request->line);
+        }
 
         // Process data for DataTables
         return DataTables::of($query)
@@ -66,7 +77,7 @@ class HistoryController extends Controller
                 return $latestStatus->status;
             })
             ->editColumn('machine.op_no', function ($row) {
-                return '<a href="/mst/machine/detail/' . encrypt($row->machine->id) . '" target="_blank">' . $row->machine->op_no .'</a>';
+                return '<a href="/mst/machine/detail/' . encrypt($row->machine->id) . '" target="_blank">' . $row->machine->op_no . '</a>';
             })
             ->addColumn('flag', function ($row) {
                 $isChild = !is_null($row->parent_id);
@@ -76,7 +87,7 @@ class HistoryController extends Controller
                 }
                 return '';
             })
-            ->addColumn('action', function($row){
+            ->addColumn('action', function($row) {
                 return '<button class="btn btn-sm btn-primary btn-detail" data-id="'.$row->id.'" data-bs-toggle="modal" data-bs-target="#modal-detail">Detail</button>';
             })
             ->rawColumns(['action', 'flag', 'machine.op_no'])
@@ -84,36 +95,30 @@ class HistoryController extends Controller
     }
 
 
-    $machinesQuery = Machine::query();
-    $linesQuery = Machine::select('line')->distinct();
-
-    if (($userPlant === 'Engine' || $userPlant === 'Stamping') && ($userType === 'Mechanic' || $userType === 'Electric')) {
-        $machinesQuery->where('plant', $userPlant)->where('shop', 'ME');
-        $linesQuery->where('plant', $userPlant)->where('shop', 'ME');
-    } elseif (($userPlant === 'Engine' || $userPlant === 'Stamping') && $userType === 'Power House') {
-        $machinesQuery->where('plant', $userPlant)->where('shop', 'PH');
-        $linesQuery->where('plant', $userPlant)->where('shop', 'PH');
-    }
-
-    $machines = $machinesQuery->get();
-    $lines = $linesQuery->get();
-
    // Fetch open reports logic remains unchanged
-    $openReports = HistoricalProblem::whereNull('parent_id')
-    ->whereIn('status', ['Not Good', 'Temporary'])
-    ->with('children')
-    ->whereHas('machine', function ($q) use ($userPlant, $userType) {
-        if ($userPlant !== 'All' && $userType !== 'All') {
-            $q->where('plant', $userPlant);
-            if ($userType !== 'All') {
-                $q->whereHas('historicalProblems', function ($q2) use ($userType) {
-                    $q2->where('shop', $userType);
-                });
-            }
-        }
-    })
-    ->orderBy('date', 'desc') // Ensure FIFO ordering by date
-    ->get();
+   $openReports = HistoricalProblem::whereNull('parent_id')
+   ->whereIn('status', ['Not Good', 'Temporary'])
+   ->with('children')
+   ->whereHas('machine', function ($q) use ($userPlant, $userType) {
+       if ($userPlant !== 'All') {
+           $q->where('plant', $userPlant);
+       }
+
+       if ($userType !== 'All') {
+           $q->whereHas('historicalProblems', function ($q2) use ($userType) {
+               if ($userType === 'ME') {
+                   // Show both Mechanic and Electric if the userType is ME
+                   $q2->whereIn('shop', ['Mechanic', 'Electric']);
+               } else {
+                   // Otherwise, just filter by the specific userType (Mechanic, Power House, or Electric)
+                   $q2->where('shop', $userType);
+               }
+           });
+       }
+   })
+   ->orderBy('date', 'desc') // Ensure FIFO ordering by date
+   ->get();
+
 
     // Filter out chains where any descendant has "OK" status
     $openReports = $openReports->filter(function ($report) {
@@ -121,8 +126,132 @@ class HistoryController extends Controller
     });
 
 
-    return view('history.index', compact('machines', 'lines', 'openReports'));
+    return view('history.index', compact('openReports'));
 }
+
+public function getOpNoWithLine(Request $request)
+{
+    // Get the authenticated user's plant and type
+    $userPlant = auth()->user()->plant;
+    $userType = auth()->user()->type;
+
+    // Base query to fetch distinct OP No and Line from machines and historical_problems
+    $query = Machine::join('historical_problems', 'machines.id', '=', 'historical_problems.id_machine')
+                    ->select('machines.op_no', 'machines.line')
+                    ->distinct();
+
+    // Apply plant filtering if the user's plant is not 'All'
+    if ($userPlant !== 'All') {
+        $query->where('machines.plant', $userPlant);
+    }
+
+    // Apply shop filtering based on userType
+    if ($userType === 'Mechanic') {
+        $query->where('historical_problems.shop', 'Mechanic');
+    } elseif ($userType === 'Power House') {
+        $query->where('historical_problems.shop', 'Power House');
+    } elseif ($userType === 'Electric') {
+        $query->where('historical_problems.shop', 'Electric');
+    } elseif ($userType === 'ME') {
+        // Show both Mechanic and Electric shops if the userType is ME
+        $query->where(function ($q) {
+            $q->where('historical_problems.shop', 'Mechanic')
+              ->orWhere('historical_problems.shop', 'Electric');
+        });
+    }
+
+    // Apply search filter if needed
+    if ($request->has('search') && !empty($request->search)) {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('machines.op_no', 'like', "%{$search}%")
+              ->orWhere('machines.line', 'like', "%{$search}%");
+        });
+    }
+
+    // Get the results
+    $opNoWithLine = $query->get();
+
+    // Return the results as JSON
+    return response()->json($opNoWithLine);
+}
+
+
+
+
+public function getDatesByOpNo(Request $request)
+{
+    // Validate that OP No is provided
+    $request->validate([
+        'op_no' => 'required|string',
+    ]);
+
+    // Fetch distinct dates for the selected OP No
+    $dates = HistoricalProblem::join('machines', 'historical_problems.id_machine', '=', 'machines.id')
+                    ->where('machines.op_no', $request->op_no)
+                    ->select('historical_problems.date')
+                    ->distinct()
+                    ->orderBy('historical_problems.date', 'desc')
+                    ->get();
+
+    // Return the dates as JSON for the dropdown
+    return response()->json($dates);
+}
+
+public function delete(Request $request)
+{
+    // Validate the input to ensure both fields are selected
+    $request->validate([
+        'op_no' => 'required|string',
+        'date' => 'required|date',
+    ]);
+
+    // Fetch the parent historical problem based on OP No and Date
+    $historicalProblem = HistoricalProblem::join('machines', 'historical_problems.id_machine', '=', 'machines.id')
+                    ->where('machines.op_no', $request->op_no)
+                    ->where('historical_problems.date', $request->date)
+                    ->select('historical_problems.*')
+                    ->first();
+
+    if ($historicalProblem) {
+        // Recursively delete the chain of historical problems (parent and children)
+        $this->deleteHistoricalProblemChain($historicalProblem->id);
+
+        return redirect()->back()->with('status', 'Historical problem chain deleted successfully.');
+    }
+
+    return redirect()->back()->with('failed', 'No matching report found for the selected OP No and Date.');
+}
+
+private function deleteHistoricalProblemChain($parentId)
+{
+    // Get all children for the given historical problem (parentId)
+    $children = HistoricalProblem::where('parent_id', $parentId)->get();
+
+    foreach ($children as $child) {
+        // Recursively delete child records (and their children)
+        $this->deleteHistoricalProblemChain($child->id);
+    }
+
+    // Once all children and their children are deleted, delete related records
+    $this->deleteRelatedRecords($parentId);
+
+    // Finally, delete the historical problem itself
+    HistoricalProblem::where('id', $parentId)->delete();
+}
+
+private function deleteRelatedRecords($problemId)
+{
+    // Delete related records in historical_problem_parts
+    HistoricalProblemPart::where('problem_id', $problemId)->delete();
+
+    // Delete related records in checksheet_status_logs
+    ChecksheetStatusLog::where('historical_id', $problemId)->delete();
+}
+
+
+
+
 
 
     private function hasOkInDescendants($report) {
@@ -248,10 +377,14 @@ public function form()
     $linesQuery = Machine::select('line')->distinct();
 
     // Apply filtering based on the plant and type of the user
-    if (($userPlant === 'Engine' || $userPlant === 'Stamping') && ($userType === 'Mechanic' || $userType === 'Electric')) {
+    if (($userPlant === 'Engine' || $userPlant === 'Stamping') && ($userType === 'Mechanic' || $userType === 'Electric' || $userType === 'ME')) {
         $linesQuery->where('plant', $userPlant)->where('shop', 'ME');
-    } elseif (($userPlant === 'Engine' || $userPlant === 'Stamping') && $userType === 'Power House') {
+    }
+    if (($userPlant === 'Engine' || $userPlant === 'Stamping') && $userType === 'Power House') {
         $linesQuery->where('plant', $userPlant)->where('shop', 'PH');
+    }
+    if (($userPlant === 'All') && $userType === 'Power House') {
+        $linesQuery->where('shop', 'PH');
     }
     // Fetch the filtered lines
     $lines = $linesQuery->get();
@@ -279,8 +412,8 @@ public function fetchParts(Request $request)
         $hasMorePages = false; // Initialize a variable to track pagination
 
         if ($stockType == 'sap') {
-            // Fetch unique parts from the parts table for SAP stock type
-            $query = Part::query();
+            // Fetch unique parts from the parts table for SAP stock type where total_stock > 0
+            $query = Part::query()->where('total_stock', '>', 0); // Add condition to ensure total_stock > 0
 
             if (!empty($searchTerm)) {
                 $query->where(function($q) use ($searchTerm) {
@@ -301,8 +434,11 @@ public function fetchParts(Request $request)
             $hasMorePages = $spareParts->hasMorePages(); // Set pagination flag based on paginator instance
 
         } elseif ($stockType == 'repair') {
-            // Fetch unique parts based on part_id for repair stock type
+            // Fetch unique parts based on part_id for repair stock type where total_stock > 0
             $query = RepairPart::with('part')
+                ->whereHas('part', function($q) {
+                    $q->where('total_stock', '>', 0); // Add condition to ensure total_stock > 0
+                })
                 ->selectRaw('MIN(repair_parts.id) as id, part_id') // Use MIN or MAX on columns not in GROUP BY
                 ->groupBy('part_id'); // Group by part_id
 
@@ -338,6 +474,7 @@ public function fetchParts(Request $request)
         return response()->json(['error' => 'Failed to fetch parts'], 500);
     }
 }
+
 
 
 

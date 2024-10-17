@@ -17,11 +17,123 @@
                         <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#dailyReport">
                             <i class="fas fa-file-excel"></i> Upload Daily Report
                         </button>
+                        @if(auth()->user()->role == 'IT' || auth()->user()->role == 'Leader')
+                            <!-- Button to trigger delete modal -->
+                            <button class="btn btn-danger btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                <i class="fas fa-trash-alt"></i> Delete Daily Report
+                            </button>
+                        @endif
+
                     </div>
                 </div>
             </div>
         </div>
     </header>
+    <!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Daily Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('history.delete') }}" method="POST">
+                @csrf
+                @method('DELETE')
+                <div class="modal-body">
+                    <!-- OP No Dropdown -->
+                    <div class="mb-3">
+                        <label for="op_no" class="form-label">Select OP No. - Line</label>
+                        <select name="op_no" id="op_no" class="form-control chosen-select" required>
+                            <option value="">Select OP No.</option>
+                        </select>
+                    </div>
+
+                    <!-- Date Dropdown (will be dynamically populated based on OP No.) -->
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Select Date</label>
+                        <select name="date" id="date" class="form-control chosen-select" required>
+                            <option value="">Select Date</option>
+                            <!-- Dates will be dynamically loaded -->
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Initialize Chosen and Handle Dynamic Fetching for OP No and Date -->
+<script>
+    $(document).ready(function() {
+        // Initialize Chosen plugin
+        $('.chosen-select').chosen({
+            width: '100%',
+            no_results_text: 'No results found'
+        });
+
+        // Fetch OP No. with Line dynamically via AJAX (without DataTables)
+        $.ajax({
+            url: "{{ route('history.getOpNoWithLine') }}", // Route to fetch OP No. with Line
+            method: 'GET',
+            success: function(response) {
+                var opNoDropdown = $('#op_no');
+                opNoDropdown.empty().append('<option value="">Select OP No.</option>');
+
+                $.each(response, function(index, item) {
+                    opNoDropdown.append('<option value="' + item.op_no + '">' + item.op_no + ' - ' + item.line + '</option>');
+                });
+
+                opNoDropdown.trigger('chosen:updated');
+            },
+            error: function() {
+                alert('Failed to fetch OP No.');
+            }
+        });
+
+        // Fetch dates dynamically when an OP No is selected
+        $('#op_no').on('change', function() {
+            var op_no = $(this).val();
+
+            // Clear current date options
+            $('#date').empty().append('<option value="">Select Date</option>');
+
+            if (op_no) {
+    $.ajax({
+        url: "{{ route('history.getDatesByOpNo') }}",
+        method: 'GET',
+        data: { op_no: op_no },
+        success: function(response) {
+            // Populate date dropdown with the response data
+            $.each(response, function(index, date) {
+                let dateObj = new Date(date.date);
+                let day = String(dateObj.getDate()).padStart(2, '0'); // Ensure two digits for the day
+                let month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+                let year = dateObj.getFullYear();
+                let formattedDate = `${day}/${month}/${year}`; // Format as dd/mm/yyyy
+
+                $('#date').append('<option value="' + date.date + '">' + formattedDate + '</option>');
+            });
+
+            // Refresh the Chosen dropdown
+            $('#date').trigger('chosen:updated');
+        },
+        error: function() {
+            alert('Failed to fetch dates.');
+        }
+    });
+}
+
+
+            // Refresh the Chosen dropdown
+            $('#date').trigger('chosen:updated');
+        });
+    });
+</script>
 <!-- Modal for Upload -->
 <div class="modal fade" id="dailyReport" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">
     <div class="modal-dialog">
