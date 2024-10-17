@@ -17,7 +17,7 @@
                         <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#dailyReport">
                             <i class="fas fa-file-excel"></i> Upload Daily Report
                         </button>
-                        @if(auth()->user()->role == 'IT' || auth()->user()->role == 'Leader')
+                        @if(auth()->user()->role == 'IT' || auth()->user()->role == 'Admin')
                             <!-- Button to trigger delete modal -->
                             <button class="btn btn-danger btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#deleteModal">
                                 <i class="fas fa-trash-alt"></i> Delete Daily Report
