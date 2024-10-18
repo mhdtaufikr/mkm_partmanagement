@@ -56,7 +56,7 @@
             <div class="container-fluid px-4 mt-n10">
                 <div class="row">
                     <!-- Card 1: Bar Chart -->
-                    <div class="col-xl-6 col-md-6">
+                    <!-- <div class="col-xl-6 col-md-6">
                         <div class="card">
                             <div style="color: white" class="card-header">
                                 Bar Chart Example
@@ -65,10 +65,10 @@
                                 <div id="chartdiv" style="height: 265px;"></div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- Card 2: Line Chart -->
-                    <div class="col-xl-6 col-md-6">
+                  <!--   <div class="col-xl-6 col-md-6">
                         <div class="card">
                             <div style="color: white"  class="card-header">
                                 Line Chart Example
@@ -77,10 +77,10 @@
                                 <div id="chartdiv2" style="height: 265px;"></div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- Card 3: Pie Chart -->
-                    <div class="col-xl-6 col-md-6">
+                    <!-- <div class="col-xl-6 col-md-6">
                         <div class="card">
                             <div style="color: white" class="card-header">
                                 Pie Chart Example
@@ -89,10 +89,10 @@
                                 <div id="chartdiv3" style="height: 265px;"></div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- Card 4: Radar Chart -->
-                    <div class="col-xl-6 col-md-6">
+                    <!-- <div class="col-xl-6 col-md-6">
                         <div class="card">
                             <div style="color: white" class="card-header">
                                 Radar Chart Example
@@ -102,7 +102,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
         <!-- /.container-fluid -->
@@ -122,7 +122,7 @@
             greet = 'Good Evening';
 
         document.getElementById('lblGreetings').innerHTML =
-            '<b>' + greet + '</b> and welcome to MKM Part Management';
+            '<b>' + greet + '</b> and welcome to DigiMAMS';
     </script>
 
 <!-- Chart code -->

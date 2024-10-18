@@ -40,7 +40,7 @@
                     $userRole = auth()->user()->role; // Assuming you have 'role' field in the user model
                 @endphp
 
-                @if($userRole == 'Leader' || $userRole == 'IT')
+                @if($userRole == 'Admin' || $userRole == 'IT')
                     <!-- Sidenav Menu Heading (Master) -->
                     <div class="sidenav-menu-heading">Dashboard</div>
 

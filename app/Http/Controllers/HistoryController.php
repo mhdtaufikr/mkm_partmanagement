@@ -96,34 +96,42 @@ class HistoryController extends Controller
 
 
    // Fetch open reports logic remains unchanged
-   $openReports = HistoricalProblem::whereNull('parent_id')
-   ->whereIn('status', ['Not Good', 'Temporary'])
-   ->with('children')
-   ->whereHas('machine', function ($q) use ($userPlant, $userType) {
-       if ($userPlant !== 'All') {
-           $q->where('plant', $userPlant);
-       }
+    $openReports = HistoricalProblem::whereNull('parent_id')
+    ->whereIn('status', ['Not Good', 'Temporary'])
+    ->with('children')
+    ->join('machines', 'historical_problems.id_machine', '=', 'machines.id')
+    ->select('historical_problems.*', 'machines.plant', 'machines.line');
 
-       if ($userType !== 'All') {
-           $q->whereHas('historicalProblems', function ($q2) use ($userType) {
-               if ($userType === 'ME') {
-                   // Show both Mechanic and Electric if the userType is ME
-                   $q2->whereIn('shop', ['Mechanic', 'Electric']);
-               } else {
-                   // Otherwise, just filter by the specific userType (Mechanic, Power House, or Electric)
-                   $q2->where('shop', $userType);
-               }
-           });
-       }
-   })
-   ->orderBy('date', 'desc') // Ensure FIFO ordering by date
-   ->get();
+    // Apply the plant filter
+    if ($userPlant !== 'All') {
+    $openReports->where('machines.plant', $userPlant);
+    }
 
+    // Apply the userType filter
+    if ($userType === 'Mechanic') {
+    $openReports->where('historical_problems.shop', 'Mechanic');
+    } elseif ($userType === 'Power House') {
+    $openReports->where('historical_problems.shop', 'Power House');
+    } elseif ($userType === 'Electric') {
+    $openReports->where('historical_problems.shop', 'Electric');
+    } elseif ($userType === 'ME') {
+    // Show both Mechanic and Electric shops if userType is 'ME'
+    $openReports->whereIn('historical_problems.shop', ['Mechanic', 'Electric']);
+    }
+
+    // Apply the line filter if provided
+    if ($request->line) {
+    $openReports->where('machines.line', $request->line);
+    }
+
+    // Order by date in descending order
+    $openReports = $openReports->orderBy('historical_problems.date', 'desc')->get();
 
     // Filter out chains where any descendant has "OK" status
     $openReports = $openReports->filter(function ($report) {
     return !$this->hasOkInDescendants($report);
     });
+
 
 
     return view('history.index', compact('openReports'));
