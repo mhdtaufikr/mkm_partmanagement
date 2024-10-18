@@ -173,7 +173,7 @@
                                 <td>{{ $report->machine->line ?? 'N/A' }}</td>  <!-- Display the line -->
                                 <td>{{ $report->machine->op_no ?? 'N/A' }}</td> <!-- Display the OP No -->
                                 <td>{{ $report->shop }}</td>
-                                <td>{{ $report->problem }}</td>
+                                <td>{{ Str::limit($report->problem, 50, '...') }}</td>
                                 <td>
                                     <!-- Form for selecting the report -->
                                     <form action="{{ url('form/update/' . encrypt($report->id)) }}" method="GET">
