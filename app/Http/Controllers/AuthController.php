@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AccessRequestMail;
+
 
 
 class AuthController extends Controller
@@ -70,7 +73,6 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255',
-            'role' => 'required|string|max:255',
             'purpose' => 'required|string|max:255',
         ]);
 

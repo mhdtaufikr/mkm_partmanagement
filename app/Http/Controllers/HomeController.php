@@ -55,7 +55,7 @@ class HomeController extends Controller
             ->get();
 
         // Pass the data to the view
-        return view('home.index', compact('dailyProblemSummary', 'downtimeByLine', 'problemCountByLine'));
+        return view('home.index', compact('dailyProblemSummary', 'downtimeByLine', 'problemCountByLine','plant','type'));
     }
 
 
