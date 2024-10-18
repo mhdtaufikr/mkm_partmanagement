@@ -3,6 +3,43 @@
         <div class="sidenav-menu">
             <div class="nav accordion" id="accordionSidenav">
 
+                <div class="sidenav-menu-heading">Dashboard</div>
+
+                <!-- Sidenav Accordion (Engine) -->
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseDashboardEngine" aria-expanded="false" aria-controls="collapseDashboardEngine">
+                    <div class="nav-link-icon"><i class="fas fa-chart-pie"></i></div>
+                    Engine
+                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+
+                <!-- Nested Navigation for Engine -->
+                <div class="collapse" id="collapseDashboardEngine" data-bs-parent="#accordionSidenav">
+                    <nav class="sidenav-menu-nested nav">
+                        <a class="nav-link" href="{{ url('/home/engine/mechanic') }}">Mechanic</a>
+                        <a class="nav-link" href="{{ url('/home/engine/electric') }}">Electric</a>
+                        <a class="nav-link" href="{{ url('/home/engine/me') }}">ME (Mechanic and Electric)</a>
+                        <a class="nav-link" href="{{ url('/home/engine/power-house') }}">Power House</a>
+                    </nav>
+                </div>
+
+                <!-- Sidenav Accordion (Stamping) -->
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseDashboardStamping" aria-expanded="false" aria-controls="collapseDashboardStamping">
+                    <div class="nav-link-icon"><i class="fas fa-chart-pie"></i></div>
+                    Stamping
+                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+
+                <!-- Nested Navigation for Stamping -->
+                <div class="collapse" id="collapseDashboardStamping" data-bs-parent="#accordionSidenav">
+                    <nav class="sidenav-menu-nested nav">
+                        <a class="nav-link" href="{{ url('/home/stamping/mechanic') }}">Mechanic</a>
+                        <a class="nav-link" href="{{ url('/home/stamping/electric') }}">Electric</a>
+                        <a class="nav-link" href="{{ url('/home/stamping/me') }}">ME (Mechanic and Electric)</a>
+                        <a class="nav-link" href="{{ url('/home/stamping/power-house') }}">Power House</a>
+                    </nav>
+                </div>
+
+
                 <!-- Sidenav Menu Heading (Core) -->
                 <div class="sidenav-menu-heading">Core</div>
 
@@ -42,7 +79,7 @@
 
                 @if($userRole == 'Admin' || $userRole == 'IT')
                     <!-- Sidenav Menu Heading (Master) -->
-                    <div class="sidenav-menu-heading">Dashboard</div>
+                    <div class="sidenav-menu-heading">KPI Setting</div>
 
                     <!-- Sidenav Accordion (Master Machine) -->
                     <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapsekpiDailyReport" aria-expanded="false" aria-controls="collapsekpiDailyReport">

@@ -36,7 +36,7 @@ Route::post('request/access', [AuthController::class, 'requestAccess']);
 
 Route::middleware(['auth'])->group(function () {
     //Home Controller
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/home/{plant}/{type}', [HomeController::class, 'index'])->name('home');
 
     //Dropdown Controller
      Route::get('/dropdown', [DropdownController::class, 'index']);

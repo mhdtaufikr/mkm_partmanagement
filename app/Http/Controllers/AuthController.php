@@ -46,7 +46,7 @@ class AuthController extends Controller
                   ]);
 
                 // Redirect to home page
-                return redirect('/home');
+                return redirect('/home/engine/me');
             } else {
                 // User is not active, redirect with message
                 return redirect('/')->with('statusLogin', 'Give Access First to User');
