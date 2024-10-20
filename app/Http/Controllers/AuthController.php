@@ -40,17 +40,43 @@ class AuthController extends Controller
             // Check user status
             if ($user->is_active == '1') {
                 // Update last login
+                $update_lastlogin = User::where('email', $user->email)
+                    ->update([
+                        'last_login' => now(),
+                        'login_counter' => $user->login_counter + 1,
+                    ]);
 
-                  //update last login
-                  $update_lastlogin=User:: where('email',$user->email)
-                  ->update([
-                      'last_login' => now(),
-                      'login_counter' =>  $user->login_counter + 1,
-                  ]);
+                // Determine the correct plant and type for redirection
+                $plant = strtolower($user->plant);  // Convert to lowercase for URL consistency
+                $type = strtolower($user->type);    // Convert to lowercase for URL consistency
 
-                // Redirect to home page
-                return redirect('/home/engine/me');
-            } else {
+                // Handle special cases for 'ME' type and 'Power House'
+                if ($type == 'me') {
+                    $type = 'me';
+                } elseif ($type == 'power house') {
+                    $type = 'power-house';
+                }
+
+                // Handle the case where the user has access to all plants and all types
+                if ($plant == 'all' && $type == 'all') {
+                    // Redirect to a default page (e.g., engine ME page)
+                    return redirect('/home/engine/me');
+                }
+
+                // Handle case where only plant is 'all'
+                if ($plant == 'all') {
+                    return redirect("/home/{$type}");
+                }
+
+                // Handle case where only type is 'all'
+                if ($type == 'all') {
+                    return redirect("/home/{$plant}");
+                }
+
+                // For specific plant and type, redirect to their respective dashboard
+                return redirect("/home/{$plant}/{$type}");
+            }
+            else {
                 // User is not active, redirect with message
                 return redirect('/')->with('statusLogin', 'Give Access First to User');
             }
