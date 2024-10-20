@@ -224,10 +224,10 @@
             var trendSeries = chart.series.push(am5xy.LineSeries.new(root, {
                 name: "Trend Line",
                 xAxis: xAxis,
-                yAxis: yAxisRight,
+                yAxis: yAxis,
                 valueYField: "trend",
                 categoryXField: "month",
-                tooltip: am5.Tooltip.new(root, { labelText: "{name}: {valueY}%" }),
+                tooltip: am5.Tooltip.new(root, { labelText: "{name}: {valueY}" }),
                 stroke: am5.color(0xFFA500)  // Orange color for the trend line
             }));
 
@@ -625,11 +625,11 @@
                                 var trendSeries = chart.series.push(am5xy.LineSeries.new(root, {
                                     name: "Trend Line",
                                     xAxis: xAxis,
-                                    yAxis: yAxisRight,
+                                    yAxis: yAxis,
                                     valueYField: "trend",
                                     categoryXField: "date",
                                     stroke: am5.color(0xFFA500),  // Orange color for the trendline
-                                    tooltip: am5.Tooltip.new(root, { labelText: "{name}: {valueY}%" })
+                                    tooltip: am5.Tooltip.new(root, { labelText: "{name}: {valueY}" })
                                 }));
 
                                 // Make the trendline dotted
