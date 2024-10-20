@@ -151,7 +151,7 @@ for ($day = 1; $day <= 31; $day++) {
 }
 
         // Pass the data to the view
-        return view('home.index', compact('trendDataByDay','plannedDataByDay','actualDataByDay','dailyProblemSummary', 'downtimeByLine', 'problemCountByLine','plant','type','plannedData','actualData','trendData'));
+        return view('home.index', compact('plant', 'shopTypesCurrentMonth','trendDataByDay','plannedDataByDay','actualDataByDay','dailyProblemSummary', 'downtimeByLine', 'problemCountByLine','plant','type','plannedData','actualData','trendData'));
     }
 
 

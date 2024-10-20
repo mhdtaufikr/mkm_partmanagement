@@ -66,7 +66,7 @@
 <div class="col-xl-6 col-md-6">
     <div class="card">
         <div style="color: white" class="card-header">
-            Preventive Maintenance
+            Preventive Maintenance Yearly
         </div>
         <div class="card-body">
             <div id="pmChartDiv" style="width: 100%; height: 275px;"></div>
@@ -477,7 +477,7 @@
                     <div class="col-xl-6 col-md-6">
                         <div class="card">
                             <div style="color: white" class="card-header">
-                                Preventive Maintenance
+                                Preventive Maintenance Monthly
                             </div>
                             <div class="card-body">
                                 <div id="pmRadarChartDiv" style="width: 100%; height: 300px;"></div>
@@ -684,7 +684,10 @@
         <!-- /.container-fluid -->
     </section>
 
+    <div id="lblGreetings"></div>
+
     <script>
+        // Get current date and time
         var myDate = new Date();
         var hrs = myDate.getHours();
 
@@ -694,12 +697,21 @@
             greet = 'Good Morning';
         else if (hrs >= 12 && hrs <= 17)
             greet = 'Good Afternoon';
-        else if (hrs >= 17 && hrs <= 24)
+        else if (hrs >= 17 && hrs < 24)
             greet = 'Good Evening';
 
+        // Access the variables passed from the controller
+        var plant = @json($plant).toUpperCase(); // Convert plant name to uppercase
+        var shopTypes = @json($shopTypesCurrentMonth); // This will be an array of shop types
+
+        // Create a string to display the shop types and convert to uppercase
+        var shopTypesString = shopTypes.join(', ').toUpperCase(); // Join shop types into a string and convert to uppercase
+
+        // Update the greeting message
         document.getElementById('lblGreetings').innerHTML =
-            '<b>' + greet + '</b> and welcome to DigiMAMS';
+            '<b>' + greet + '</b>, welcome to DigiMAMS || Plant : <b>' + plant + '</b>, Type:  <b>' + shopTypesString + '</b>';
     </script>
+
 
 
     <script>
